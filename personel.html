@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personel Paneli | Aksiyon & Görev Takip</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- ÜST BAR (PERSONEL NAVBAR) -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Sol Logo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/30">
+                        <i class="fa-solid fa-user-check text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-base sm:text-lg leading-tight flex items-center gap-2 flex-wrap">
+                            Personel Görev Paneli
+                            <span class="text-xs bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded font-semibold border border-sky-400/30">Çalışan Ekranı</span>
+                            <span id="personelServerBadge" class="hidden text-[11px] px-2.5 py-0.5 rounded font-semibold flex items-center gap-1.5"></span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Kişisel Görev & Aksiyon Takibi</p>
+                    </div>
+                </div>
+
+                <!-- Sağ: Seçili Kişi & Kişi Değiştir -->
+                <div id="headerUserActions" class="hidden flex items-center gap-2">
+                    <button onclick="showUserSelectionScreen()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-rotate text-sky-400"></i>
+                        <span>Kişi Değiştir</span>
+                    </button>
+                    <button onclick="notifyManagerMail()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/30 transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span class="hidden sm:inline">Yöneticiye Bildir</span>
+                        <span class="sm:hidden">Bildir</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ANA İÇERİK -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+        <!-- 1. KULLANICI SEÇİM EKRANI (İLK AÇILIŞTA GÖRÜNÜR) -->
+        <div id="userSelectionScreen" class="py-6 max-w-xl mx-auto space-y-6 animate-in fade-in zoom-in duration-150">
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white mx-auto flex items-center justify-center text-2xl shadow-xl shadow-sky-500/25">
+                    <i class="fa-solid fa-id-badge"></i>
+                </div>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Hoş Geldiniz!</h2>
+                <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
+                    Kişisel görevlerinizi görüntülemek ve durumlarını güncellemek için lütfen <strong>adınızı seçin</strong>:
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-6">
+                <div id="selectionCardsList" class="space-y-2.5">
+                    <!-- JS çalışanları kartlar halinde dolduracak -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ÇALIŞANIN KENDİ GÖREV ALANI (KİŞİ SEÇİLDİĞİNDE GÖRÜNÜR) -->
+        <div id="personalDashboardScreen" class="hidden space-y-6">
+
+            <!-- Karşılama Kartı -->
+            <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 rounded-2xl p-6 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div id="userAvatarBig" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-sky-400 to-indigo-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-sky-500/30 shrink-0">
+                        HC
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded font-semibold border border-sky-400/30">Personel Paneli</span>
+                            <span id="userRoleText" class="text-[11px] text-slate-300 font-medium">Şirket Yöneticisi</span>
+                        </div>
+                        <h2 id="userNameText" class="text-xl sm:text-2xl font-extrabold mt-1">Hikmet CAN</h2>
+                        <p class="text-xs text-slate-300 mt-0.5">Üzerinizdeki güncel görevleri aşağıdan takip edebilir ve bitirdiklerinizi işaretleyebilirsiniz.</p>
+                    </div>
+                </div>
+
+                <!-- Kişisel Tamamlanma Rozeti -->
+                <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center min-w-[120px] self-start sm:self-center">
+                    <span class="text-[10px] text-slate-300 uppercase font-semibold">Başarı Oranınız</span>
+                    <div id="userSuccessPct" class="text-2xl font-black text-emerald-400">%0</div>
+                    <span id="userFractionText" class="text-[10px] text-slate-300 font-medium">0 / 0 Bitti</span>
+                </div>
+            </div>
+
+            <!-- Kişisel 4'lü KPI Kartları -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Toplam Görevim</span>
+                    <h3 id="statUserTotal" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-rose-200 bg-rose-50/20">
+                    <span class="text-xs font-semibold text-rose-600 uppercase tracking-wider flex items-center gap-1">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Geciken İşler
+                    </span>
+                    <h3 id="statUserDelayed" class="text-2xl font-bold text-rose-600 mt-1">0</h3>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-amber-200 bg-amber-50/20">
+                    <span class="text-xs font-semibold text-amber-600 uppercase tracking-wider flex items-center gap-1">
+                        <i class="fa-solid fa-hourglass-half"></i> Bekleyen / Açık
+                    </span>
+                    <h3 id="statUserOpen" class="text-2xl font-bold text-amber-600 mt-1">0</h3>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-emerald-200 bg-emerald-50/20">
+                    <span class="text-xs font-semibold text-emerald-600 uppercase tracking-wider flex items-center gap-1">
+                        <i class="fa-solid fa-circle-check"></i> Tamamladıklarım
+                    </span>
+                    <h3 id="statUserCompleted" class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
+                </div>
+            </div>
+
+            <!-- Sadece Bu Çalışana Ait Görev Listesi -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-sky-600"></i>
+                            Size Atanmış Görevler & Aksiyon Listesi
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">İşinizi bitirdiğinizde "Tamamla" butonuna basmanız yeterlidir; yöneticiniz anında görecektir.</p>
+                    </div>
+                    <span id="userBadgeTaskCount" class="text-xs font-bold bg-sky-100 text-sky-800 px-3 py-1 rounded-full">0 Görev</span>
+                </div>
+
+                <div id="userTasksContainer" class="p-4 sm:p-6 space-y-3">
+                    <!-- JS dinamik kartları basacak -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- JAVASCRIPT KODLARI -->
+    <script>
+        const INITIAL_TEAM = [
+            { name: "Hikmet CAN", title: "Şirket Yöneticisi / Ortak", phone: "0532 111 22 33", department: "Yönetim & Mağazalar", email: "hikmet@sirket.com" },
+            { name: "Veli CAN", title: "Satış & Pazarlama Sorumlusu", phone: "0533 222 33 44", department: "Satış - Pazarlama", email: "veli@sirket.com" },
+            { name: "Umut CAN", title: "Operasyon & İl Müdürü", phone: "0535 333 44 55", department: "Operasyon & Yönetim", email: "umut@sirket.com" },
+            { name: "Mustafa CAN", title: "Fabrika & Üretim Müdürü", phone: "0536 444 55 66", department: "Fabrika", email: "mustafa@sirket.com" },
+            { name: "Fahri CAN", title: "Mağaza Koordinatörü", phone: "0530 555 66 77", department: "Mağazalar", email: "fahri@sirket.com" },
+            { name: "Fırat", title: "Tedarik & Envanter Sorumlusu", phone: "0542 666 77 88", department: "Tedarik & Ambalaj", email: "firat@sirket.com" }
+        ];
+
+        const INITIAL_TASKS = [
+            { id: 1, title: "3. Mağaza açılması", department: "Hikmet CAN", action: "Fahri Can ile görüşme yapılacak", owner: "Hikmet CAN", dueDate: "2026-09-29", status: "Açık", priority: "Yüksek" },
+            { id: 2, title: "Alışveriş sipariş listesi hazırlanacak", department: "Satış-Pazarlama", action: "7 gün içinde liste hazırlanacak", owner: "Veli CAN", dueDate: "2026-09-28", status: "Açık", priority: "Normal" },
+            { id: 3, title: "Bellidede şirketi yönetici atanması", department: "Umut CAN", action: "Eylül ayında görüşmeler yapılacak", owner: "Umut CAN", dueDate: "2026-10-01", status: "Açık", priority: "Yüksek" },
+            { id: 4, title: "İl Müdürü alımı", department: "Umut CAN", action: "İş görüşmesi yapılacak", owner: "Umut CAN", dueDate: "2026-10-01", status: "Açık", priority: "Kritik" },
+            { id: 5, title: "Tedarik & Envanter Ambalaj listesi", department: "Fırat - Umut - Mustafa", action: "Reçeteler yapılacak, talep listesi çıkarılacak", owner: "Umut CAN", dueDate: "2026-09-29", status: "Açık", priority: "Normal" },
+            { id: 6, title: "Reçetelerin oluşumu", department: "Fabrika", action: "Ürün başlıkları belirlenip içerik çıkarılacak", owner: "Mustafa CAN", dueDate: "2026-09-29", status: "Açık", priority: "Yüksek" },
+            { id: 7, title: "Fabrika ruhsat işleri", department: "Mustafa CAN", action: "Resmi belgeler hazırlanacak", owner: "Mustafa CAN", dueDate: "2026-09-29", status: "Tamamlandı", priority: "Kritik" }
+        ];
+
+        let team = JSON.parse(localStorage.getItem('task_team_members')) || INITIAL_TEAM;
+        let tasks = JSON.parse(localStorage.getItem('task_items')) || INITIAL_TASKS;
+        let currentSelectedUser = localStorage.getItem('task_personel_selected_user') || '';
+
+        function updatePersonelServerBadge(online) {
+            const badge = document.getElementById('personelServerBadge');
+            if (!badge) return;
+            if (window.location.protocol.startsWith('http')) {
+                badge.classList.remove('hidden');
+                if (online) {
+                    badge.className = "text-[11px] bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded font-semibold border border-emerald-400/30 flex items-center gap-1.5";
+                    badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Şirket Ağı Bağlı';
+                } else {
+                    badge.className = "text-[11px] bg-rose-500/20 text-rose-300 px-2.5 py-0.5 rounded font-semibold border border-rose-400/30 flex items-center gap-1.5";
+                    badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Bağlantı Kesildi';
+                }
+            } else {
+                badge.classList.remove('hidden');
+                badge.className = "text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-medium border border-slate-700 flex items-center gap-1";
+                badge.innerHTML = '<i class="fa-solid fa-laptop text-[10px]"></i> Yerel Mod';
+            }
+        }
+
+        async function syncWithServer() {
+            if (!window.location.protocol.startsWith('http')) return;
+            try {
+                const res = await fetch('/api/data');
+                if (res.ok) {
+                    const data = await res.json();
+                    let changed = false;
+
+                    const serverTasksStr = JSON.stringify(data.tasks || []);
+                    if (serverTasksStr !== JSON.stringify(tasks)) {
+                        tasks = data.tasks || [];
+                        localStorage.setItem('task_items', serverTasksStr);
+                        changed = true;
+                    }
+
+                    const serverTeamStr = JSON.stringify(data.team || []);
+                    if (serverTeamStr !== JSON.stringify(team)) {
+                        team = data.team || [];
+                        localStorage.setItem('task_team_members', serverTeamStr);
+                        changed = true;
+                    }
+
+                    if (changed) {
+                        if (currentSelectedUser) {
+                            renderPersonalDashboard(currentSelectedUser);
+                        } else {
+                            showUserSelectionScreen();
+                        }
+                    }
+                    updatePersonelServerBadge(true);
+                }
+            } catch (err) {
+                updatePersonelServerBadge(false);
+            }
+        }
+
+        async function pushDataToServer() {
+            if (!window.location.protocol.startsWith('http')) return;
+            try {
+                await fetch('/api/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tasks: tasks,
+                        team: team
+                    })
+                });
+                updatePersonelServerBadge(true);
+            } catch (err) {
+                console.error("Sunucuya gönderilemedi:", err);
+                updatePersonelServerBadge(false);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (currentSelectedUser) {
+                renderPersonalDashboard(currentSelectedUser);
+            } else {
+                showUserSelectionScreen();
+            }
+            updatePersonelServerBadge(true);
+
+            if (window.location.protocol.startsWith('http')) {
+                syncWithServer();
+                setInterval(syncWithServer, 3000); // 3 saniyede bir yöneticiden gelen yeni görevleri çek
+            }
+        });
+
+        // Yönetici sekmesinde bir görev eklendiğinde veya değiştiğinde anında güncelle
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'task_items') {
+                tasks = JSON.parse(e.newValue || '[]');
+                if (currentSelectedUser) renderPersonalDashboard(currentSelectedUser);
+            } else if (e.key === 'task_team_members') {
+                team = JSON.parse(e.newValue || '[]');
+                if (!currentSelectedUser) showUserSelectionScreen();
+            }
+        });
+
+        function saveTasks() {
+            localStorage.setItem('task_items', JSON.stringify(tasks));
+            pushDataToServer();
+        }
+
+        // 1. KULLANICI SEÇİM EKRANI
+        function showUserSelectionScreen() {
+            currentSelectedUser = '';
+            localStorage.removeItem('task_personel_selected_user');
+
+            document.getElementById('userSelectionScreen').classList.remove('hidden');
+            document.getElementById('personalDashboardScreen').classList.add('hidden');
+            document.getElementById('headerUserActions').classList.add('hidden');
+
+            const list = document.getElementById('selectionCardsList');
+            const now = new Date();
+            now.setHours(0,0,0,0);
+
+            list.innerHTML = team.map(member => {
+                const userTasks = tasks.filter(t => t.owner.toLowerCase().trim() === member.name.toLowerCase().trim());
+                const total = userTasks.length;
+                const delayed = userTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now).length;
+                const open = userTasks.filter(t => t.status !== 'Tamamlandı').length;
+
+                return `
+                    <div onclick="selectPerson('${escapeHtml(member.name)}')" class="p-3.5 rounded-xl border border-slate-200 hover:border-sky-500 hover:bg-sky-50/40 cursor-pointer transition-all flex items-center justify-between group shadow-2xs hover:shadow-md">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform shrink-0">
+                                ${getInitials(member.name)}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm group-hover:text-sky-600 transition-colors">${escapeHtml(member.name)}</h4>
+                                <p class="text-xs text-slate-500">${escapeHtml(member.title)} • ${escapeHtml(member.department || '')}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            ${delayed > 0 ? `<span class="text-[11px] font-bold bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full">${delayed} Geciken!</span>` : ''}
+                            <span class="text-xs font-semibold bg-slate-100 group-hover:bg-sky-100 text-slate-700 group-hover:text-sky-800 px-3 py-1 rounded-full">
+                                ${open} Bekleyen İş
+                            </span>
+                            <i class="fa-solid fa-chevron-right text-slate-300 group-hover:text-sky-500 text-xs ml-1"></i>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectPerson(name) {
+            currentSelectedUser = name;
+            localStorage.setItem('task_personel_selected_user', name);
+            renderPersonalDashboard(name);
+        }
+
+        // 2. KİŞİSEL PANEL RENDER
+        function renderPersonalDashboard(name) {
+            document.getElementById('userSelectionScreen').classList.add('hidden');
+            document.getElementById('personalDashboardScreen').classList.remove('hidden');
+            document.getElementById('headerUserActions').classList.remove('hidden');
+
+            const member = team.find(m => m.name.toLowerCase().trim() === name.toLowerCase().trim()) || { name: name, title: "Personel" };
+
+            document.getElementById('userAvatarBig').innerText = getInitials(member.name);
+            document.getElementById('userNameText').innerText = member.name;
+            document.getElementById('userRoleText').innerText = member.title;
+
+            const now = new Date();
+            now.setHours(0,0,0,0);
+
+            const userTasks = tasks.filter(t => t.owner.toLowerCase().trim() === name.toLowerCase().trim());
+            const total = userTasks.length;
+            const completed = userTasks.filter(t => t.status === 'Tamamlandı').length;
+            const open = userTasks.filter(t => t.status !== 'Tamamlandı').length;
+            const delayed = userTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now).length;
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('statUserTotal').innerText = total;
+            document.getElementById('statUserDelayed').innerText = delayed;
+            document.getElementById('statUserOpen').innerText = open;
+            document.getElementById('statUserCompleted').innerText = completed;
+
+            document.getElementById('userSuccessPct').innerText = `%${pct}`;
+            document.getElementById('userFractionText').innerText = `${completed} / ${total} Bitti`;
+            document.getElementById('userBadgeTaskCount').innerText = `${total} Görev`;
+
+            const container = document.getElementById('userTasksContainer');
+
+            if (userTasks.length === 0) {
+                container.innerHTML = `
+                    <div class="py-12 text-center text-slate-400">
+                        <i class="fa-solid fa-circle-check text-4xl text-emerald-400 mb-2"></i>
+                        <p class="font-bold text-slate-700 text-sm">Üzerinizde bekleyen herhangi bir görev bulunmuyor.</p>
+                        <p class="text-xs text-slate-500 mt-1">Tüm işlerinizi tamamladınız, tebrikler!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = userTasks.map(task => {
+                const isOverdue = task.status !== 'Tamamlandı' && new Date(task.dueDate) < now;
+                const isCompleted = task.status === 'Tamamlandı';
+
+                return `
+                    <div class="p-4 sm:p-5 rounded-2xl border ${isOverdue ? 'border-rose-200 bg-rose-50/30' : isCompleted ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 bg-white'} shadow-2xs hover:shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="space-y-1.5 flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-[10px] font-semibold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                                    ${escapeHtml(task.department)}
+                                </span>
+                                ${isOverdue ? '<span class="text-[10px] font-bold bg-rose-100 text-rose-700 px-2.5 py-0.5 rounded-full animate-pulse"><i class="fa-solid fa-clock mr-1"></i> GECİKTİ</span>' : ''}
+                                ${isCompleted ? '<span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-check mr-1"></i> TAMAMLANDI</span>' : ''}
+                                <span class="text-[11px] font-medium text-slate-500">
+                                    Hedef Termin: <strong class="${isOverdue ? 'text-rose-600' : 'text-slate-800'}">${formatTurkishDate(task.dueDate)}</strong>
+                                </span>
+                            </div>
+                            <h4 class="font-bold text-slate-900 text-sm sm:text-base ${isCompleted ? 'line-through text-slate-400' : ''}">
+                                ${escapeHtml(task.title)}
+                            </h4>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                <strong class="text-slate-800">Aksiyon Planı:</strong> ${escapeHtml(task.action)}
+                            </p>
+                        </div>
+
+                        <!-- Butonlar (Sadece durum güncelleme) -->
+                        <div class="flex items-center gap-2 self-end md:self-center shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 w-full md:w-auto justify-end">
+                            ${task.status === 'Tamamlandı' ? `
+                                <button onclick="setTaskStatus(${task.id}, 'Açık')" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-colors flex items-center gap-1.5">
+                                    <i class="fa-solid fa-rotate-left"></i> Tekrar Aç
+                                </button>
+                            ` : `
+                                <button onclick="setTaskStatus(${task.id}, 'Devam Ediyor')" class="px-3.5 py-2 rounded-xl border border-sky-200 bg-sky-50 text-sky-700 text-xs font-semibold hover:bg-sky-100 transition-colors flex items-center gap-1.5 ${task.status === 'Devam Ediyor' ? 'ring-2 ring-sky-400' : ''}">
+                                    <i class="fa-solid fa-spinner"></i> Devam Ediyor
+                                </button>
+                                <button onclick="setTaskStatus(${task.id}, 'Tamamlandı')" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/25 transition-all flex items-center gap-1.5 active:scale-95">
+                                    <i class="fa-solid fa-check"></i> Tamamla
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setTaskStatus(taskId, status) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = status;
+                saveTasks();
+                renderPersonalDashboard(currentSelectedUser);
+            }
+        }
+
+        function notifyManagerMail() {
+            const userTasks = tasks.filter(t => t.owner.toLowerCase().trim() === currentSelectedUser.toLowerCase().trim());
+            const completed = userTasks.filter(t => t.status === 'Tamamlandı').length;
+            const total = userTasks.length;
+
+            const subject = encodeURIComponent(`[Bilgilendirme] ${currentSelectedUser} - Görev Durum Güncellemesi`);
+            let body = `Sayın Yönetici,\n\n`;
+            body += `${currentSelectedUser} olarak üzerimdeki görevlerin son durumunu bildirmek isterim:\n`;
+            body += `Toplam ${total} görevimden ${completed} tanesi tamamlanmıştır.\n\n`;
+            body += `Detaylı listeyi sistemden inceleyebilirsiniz.\nİyi çalışmalar dilerim.`;
+
+            window.location.href = `mailto:yonetim@sirket.com?subject=${subject}&body=${encodeURIComponent(body)}`;
+        }
+
+        function formatTurkishDate(dateStr) {
+            if (!dateStr) return '-';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) return `${parts[2]}.${parts[1]}.${parts[0]}`;
+            return dateStr;
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = name.trim().split(' ');
+            if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
