@@ -852,31 +852,37 @@
         let viewMode = "table";
         let currentEmailPersonName = "";
 
+        const CLOUD_DB_URL = "https://extendsclass.com/api/json-storage/bin/cffebea";
+
         function updateServerStatusBadge(online) {
             const badge = document.getElementById('serverStatusBadge');
             if (!badge) return;
-            if (window.location.protocol.startsWith('http')) {
-                badge.classList.remove('hidden');
-                if (online) {
-                    badge.className = "text-[11px] bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded font-semibold border border-emerald-400/30 flex items-center gap-1.5";
-                    badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Şirket Ağı Canlı Senkronize';
-                } else {
-                    badge.className = "text-[11px] bg-rose-500/20 text-rose-300 px-2.5 py-0.5 rounded font-semibold border border-rose-400/30 flex items-center gap-1.5";
-                    badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span> Sunucuya Bağlanılamadı';
-                }
+            badge.classList.remove('hidden');
+            if (online) {
+                badge.className = "text-[11px] bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded font-semibold border border-emerald-400/30 flex items-center gap-1.5";
+                badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 7/24 Bulut Canlı Senkronize';
             } else {
-                badge.classList.remove('hidden');
-                badge.className = "text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-medium border border-slate-700 flex items-center gap-1";
-                badge.innerHTML = '<i class="fa-solid fa-laptop text-[10px]"></i> Yerel Mod';
+                badge.className = "text-[11px] bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded font-semibold border border-amber-400/30 flex items-center gap-1.5";
+                badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Çevrimdışı (Yerel)';
             }
         }
 
         async function syncWithServer() {
-            if (!window.location.protocol.startsWith('http')) return;
             try {
-                const res = await fetch('/api/data');
-                if (res.ok) {
-                    const data = await res.json();
+                let data = null;
+                if (window.location.protocol.startsWith('http') && window.location.hostname === 'localhost') {
+                    try {
+                        const localRes = await fetch('/api/data');
+                        if (localRes.ok) data = await localRes.json();
+                    } catch(e) {}
+                }
+
+                if (!data) {
+                    const cloudRes = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
+                    if (cloudRes.ok) data = await cloudRes.json();
+                }
+
+                if (data) {
                     let changed = false;
 
                     const serverTasksStr = JSON.stringify(data.tasks || []);
@@ -913,21 +919,31 @@
         }
 
         async function pushDataToServer() {
-            if (!window.location.protocol.startsWith('http')) return;
+            const payload = JSON.stringify({
+                tasks: tasks,
+                team: team,
+                notes: document.getElementById('managementNotes')?.value || localStorage.getItem('task_management_notes') || ''
+            });
+
             try {
-                await fetch('/api/data', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        tasks: tasks,
-                        team: team,
-                        notes: document.getElementById('managementNotes')?.value || localStorage.getItem('task_management_notes') || ''
-                    })
+                await fetch(CLOUD_DB_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                    body: payload
                 });
                 updateServerStatusBadge(true);
             } catch (err) {
-                console.error("Sunucuya gönderilemedi:", err);
-                updateServerStatusBadge(false);
+                console.warn("Buluta gönderilemedi:", err);
+            }
+
+            if (window.location.protocol.startsWith('http') && window.location.hostname === 'localhost') {
+                try {
+                    await fetch('/api/data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: payload
+                    });
+                } catch(e) {}
             }
         }
 
@@ -946,11 +962,9 @@
             renderApp();
             updateServerStatusBadge(true);
 
-            // Sunucu modundaysa diğer bilgisayarlardan gelen verileri anında eşitle
-            if (window.location.protocol.startsWith('http')) {
-                syncWithServer();
-                setInterval(syncWithServer, 3000);
-            }
+            // 7/24 Bulut Senkronizasyonunu başlat (her 3 saniyede bir diğer cihazları kontrol et)
+            syncWithServer();
+            setInterval(syncWithServer, 3000);
         });
 
         // Diğer sekmelerden (personel.html) gelen değişiklikleri anında senkronize et
