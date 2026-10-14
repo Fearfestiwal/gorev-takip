@@ -807,18 +807,35 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <div class="p-6 space-y-4 text-xs text-slate-700">
-                <div class="space-y-2 pt-2">
-                    <button onclick="exportBackup()" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors">
-                        <i class="fa-solid fa-download text-sky-600"></i>
+            <div class="p-6 space-y-4 text-xs text-stone-700">
+                <div class="space-y-2">
+                    <button onclick="exportBackup()" class="w-full py-2.5 px-4 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors">
+                        <i class="fa-solid fa-download text-amber-600"></i>
                         Verileri Bilgisayara İndir (Yedek Al - JSON)
                     </button>
-                    <label class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer text-center block">
-                        <i class="fa-solid fa-upload text-emerald-600"></i>
+                    <button onclick="exportToExcelCSV()" class="w-full py-2.5 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors">
+                        <i class="fa-solid fa-file-excel text-emerald-600"></i>
+                        Excel / Tablo Olarak İndir (.CSV)
+                    </button>
+                    <label class="w-full py-2.5 px-4 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer text-center block">
+                        <i class="fa-solid fa-upload text-blue-600"></i>
                         Yedekten Geri Yükle (.json Seç)
                         <input type="file" id="importFileInput" accept=".json" onchange="importBackup(event)" class="hidden">
                     </label>
-                    <button onclick="resetToSampleData()" class="w-full py-2 px-4 text-rose-600 hover:bg-rose-50 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors mt-4">
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-900 text-[11px] space-y-1">
+                    <p class="font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-hard-drive text-amber-700"></i>
+                        Yerel (Local) Depolama:
+                    </p>
+                    <p class="text-amber-800">
+                        Verileriniz hem tarayıcınızın yerel hafızasında hem de bulutta saklanır. İsterseniz tek tıkla bilgisayarınıza indirebilir veya <strong>Sirket_Sunucusunu_Baslat.bat</strong> ile sadece şirket bilgisayarınızda tutabilirsiniz.
+                    </p>
+                </div>
+
+                <div class="pt-2 border-t border-stone-200">
+                    <button onclick="resetToSampleData()" class="w-full py-2 px-4 text-rose-600 hover:bg-rose-50 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors">
                         <i class="fa-solid fa-rotate-left"></i>
                         Örnek Verileri Tekrar Yükle
                     </button>
@@ -1809,6 +1826,31 @@
             const a = document.createElement('a');
             a.href = url;
             a.download = `Aksiyon_Takip_Raporu_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportToExcelCSV() {
+            let csv = "\uFEFF"; // Excel Türkçe karakter desteği (UTF-8 BOM)
+            csv += "ID;Görev Başlığı;Departman / Birim;Yapılacak Aksiyon;Sorumlu Kişi;Termin Tarihi;Durum;Öncelik\n";
+            tasks.forEach(t => {
+                const escapeCsv = (str) => `"${(str || '').toString().replace(/"/g, '""')}"`;
+                csv += [
+                    t.id,
+                    escapeCsv(t.title),
+                    escapeCsv(t.department),
+                    escapeCsv(t.action),
+                    escapeCsv(t.owner),
+                    escapeCsv(t.dueDate),
+                    escapeCsv(t.status),
+                    escapeCsv(t.priority)
+                ].join(";") + "\n";
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Can_Kardesler_Gorev_Listesi_${new Date().toISOString().slice(0,10)}.csv`;
             a.click();
             URL.revokeObjectURL(url);
         }

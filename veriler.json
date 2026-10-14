@@ -5,42 +5,42 @@
       "title": "Şirket Yöneticisi / Ortak",
       "phone": "0532 111 22 33",
       "department": "Yönetim & Mağazalar",
-      "email": "hikmet@sirket.com"
+      "email": "hikmet@cankardesler.com"
     },
     {
       "name": "Veli CAN",
       "title": "Satış & Pazarlama Sorumlusu",
       "phone": "0533 222 33 44",
       "department": "Satış - Pazarlama",
-      "email": "veli@sirket.com"
+      "email": "veli@cankardesler.com"
     },
     {
       "name": "Umut CAN",
       "title": "Operasyon & İl Müdürü",
       "phone": "0535 333 44 55",
       "department": "Operasyon & Yönetim",
-      "email": "umut@sirket.com"
+      "email": "umut@cankardesler.com"
     },
     {
       "name": "Mustafa CAN",
       "title": "Fabrika & Üretim Müdürü",
       "phone": "0536 444 55 66",
       "department": "Fabrika",
-      "email": "mustafa@sirket.com"
+      "email": "mustafa@cankardesler.com"
     },
     {
       "name": "Fahri CAN",
       "title": "Mağaza Koordinatörü",
       "phone": "0530 555 66 77",
       "department": "Mağazalar",
-      "email": "fahri@sirket.com"
+      "email": "fahri@cankardesler.com"
     },
     {
       "name": "Fırat",
       "title": "Tedarik & Envanter Sorumlusu",
       "phone": "0542 666 77 88",
       "department": "Tedarik & Ambalaj",
-      "email": "firat@sirket.com"
+      "email": "firat@cankardesler.com"
     }
   ],
   "tasks": [
