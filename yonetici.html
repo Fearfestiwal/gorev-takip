@@ -885,19 +885,23 @@
                 if (data) {
                     let changed = false;
 
-                    const serverTasksStr = JSON.stringify(data.tasks || []);
-                    if (serverTasksStr !== JSON.stringify(tasks)) {
-                        tasks = data.tasks || [];
-                        localStorage.setItem('task_items', serverTasksStr);
-                        changed = true;
+                    if (Array.isArray(data.tasks) && data.tasks.length > 0) {
+                        const serverTasksStr = JSON.stringify(data.tasks);
+                        if (serverTasksStr !== JSON.stringify(tasks)) {
+                            tasks = data.tasks;
+                            localStorage.setItem('task_items', serverTasksStr);
+                            changed = true;
+                        }
                     }
 
-                    const serverTeamStr = JSON.stringify(data.team || []);
-                    if (serverTeamStr !== JSON.stringify(team)) {
-                        team = data.team || [];
-                        localStorage.setItem('task_team_members', serverTeamStr);
-                        updateTeamDatalist();
-                        changed = true;
+                    if (Array.isArray(data.team) && data.team.length > 0) {
+                        const serverTeamStr = JSON.stringify(data.team);
+                        if (serverTeamStr !== JSON.stringify(team)) {
+                            team = data.team;
+                            localStorage.setItem('task_team_members', serverTeamStr);
+                            updateTeamDatalist();
+                            changed = true;
+                        }
                     }
 
                     const noteInput = document.getElementById('managementNotes');

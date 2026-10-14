@@ -209,18 +209,22 @@
                 if (data) {
                     let changed = false;
 
-                    const serverTasksStr = JSON.stringify(data.tasks || []);
-                    if (serverTasksStr !== JSON.stringify(tasks)) {
-                        tasks = data.tasks || [];
-                        localStorage.setItem('task_items', serverTasksStr);
-                        changed = true;
+                    if (Array.isArray(data.tasks) && data.tasks.length > 0) {
+                        const serverTasksStr = JSON.stringify(data.tasks);
+                        if (serverTasksStr !== JSON.stringify(tasks)) {
+                            tasks = data.tasks;
+                            localStorage.setItem('task_items', serverTasksStr);
+                            changed = true;
+                        }
                     }
 
-                    const serverTeamStr = JSON.stringify(data.team || []);
-                    if (serverTeamStr !== JSON.stringify(team)) {
-                        team = data.team || [];
-                        localStorage.setItem('task_team_members', serverTeamStr);
-                        changed = true;
+                    if (Array.isArray(data.team) && data.team.length > 0) {
+                        const serverTeamStr = JSON.stringify(data.team);
+                        if (serverTeamStr !== JSON.stringify(team)) {
+                            team = data.team;
+                            localStorage.setItem('task_team_members', serverTeamStr);
+                            changed = true;
+                        }
                     }
 
                     if (changed) {
@@ -303,9 +307,31 @@
             document.getElementById('personalDashboardScreen').classList.add('hidden');
             document.getElementById('headerUserActions').classList.add('hidden');
 
+            if (!team || team.length === 0) {
+                team = [...INITIAL_TEAM];
+                localStorage.setItem('task_team_members', JSON.stringify(team));
+            }
+            if (!tasks || tasks.length === 0) {
+                tasks = [...INITIAL_TASKS];
+                localStorage.setItem('task_items', JSON.stringify(tasks));
+            }
+
             const list = document.getElementById('selectionCardsList');
             const now = new Date();
             now.setHours(0,0,0,0);
+
+            if (team.length === 0) {
+                list.innerHTML = `
+                    <div class="p-6 text-center text-slate-500 space-y-3">
+                        <i class="fa-solid fa-users text-3xl text-slate-300"></i>
+                        <p class="text-xs">Personel listesi yükleniyor...</p>
+                        <button onclick="restoreDefaultTeam()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition-all shadow-md">
+                            Ekip Listesini Yükle
+                        </button>
+                    </div>
+                `;
+                return;
+            }
 
             list.innerHTML = team.map(member => {
                 const userTasks = tasks.filter(t => t.owner.toLowerCase().trim() === member.name.toLowerCase().trim());
@@ -335,6 +361,13 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        function restoreDefaultTeam() {
+            team = [...INITIAL_TEAM];
+            tasks = [...INITIAL_TASKS];
+            saveTasks();
+            showUserSelectionScreen();
         }
 
         function selectPerson(name) {
