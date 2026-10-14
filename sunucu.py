@@ -3,17 +3,29 @@ import socketserver
 import json
 import os
 import socket
+import sys
+
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+    try:
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
 
 PORT = 8080
 DATA_FILE = "veriler.json"
 
 DEFAULT_TEAM = [
-    { "name": "Hikmet CAN", "title": "Şirket Yöneticisi / Ortak", "phone": "0532 111 22 33", "department": "Yönetim & Mağazalar", "email": "hikmet@sirket.com" },
-    { "name": "Veli CAN", "title": "Satış & Pazarlama Sorumlusu", "phone": "0533 222 33 44", "department": "Satış - Pazarlama", "email": "veli@sirket.com" },
-    { "name": "Umut CAN", "title": "Operasyon & İl Müdürü", "phone": "0535 333 44 55", "department": "Operasyon & Yönetim", "email": "umut@sirket.com" },
-    { "name": "Mustafa CAN", "title": "Fabrika & Üretim Müdürü", "phone": "0536 444 55 66", "department": "Fabrika", "email": "mustafa@sirket.com" },
-    { "name": "Fahri CAN", "title": "Mağaza Koordinatörü", "phone": "0530 555 66 77", "department": "Mağazalar", "email": "fahri@sirket.com" },
-    { "name": "Fırat", "title": "Tedarik & Envanter Sorumlusu", "phone": "0542 666 77 88", "department": "Tedarik & Ambalaj", "email": "firat@sirket.com" }
+    { "name": "Hikmet CAN", "title": "Şirket Yöneticisi / Ortak", "phone": "0532 111 22 33", "department": "Yönetim & Mağazalar", "email": "hikmet@cankardesler.com" },
+    { "name": "Veli CAN", "title": "Satış & Pazarlama Sorumlusu", "phone": "0533 222 33 44", "department": "Satış - Pazarlama", "email": "veli@cankardesler.com" },
+    { "name": "Umut CAN", "title": "Operasyon & İl Müdürü", "phone": "0535 333 44 55", "department": "Operasyon & Yönetim", "email": "umut@cankardesler.com" },
+    { "name": "Mustafa CAN", "title": "Fabrika & Üretim Müdürü", "phone": "0536 444 55 66", "department": "Fabrika", "email": "mustafa@cankardesler.com" },
+    { "name": "Fahri CAN", "title": "Mağaza Koordinatörü", "phone": "0530 555 66 77", "department": "Mağazalar", "email": "fahri@cankardesler.com" },
+    { "name": "Fırat", "title": "Tedarik & Envanter Sorumlusu", "phone": "0542 666 77 88", "department": "Tedarik & Ambalaj", "email": "firat@cankardesler.com" }
 ]
 
 DEFAULT_TASKS = [
@@ -132,20 +144,20 @@ if __name__ == "__main__":
         main_ip = local_ips[0] if local_ips else "BILGISAYAR_IP_ADRESI"
 
         print("=" * 70)
-        print("  KOORDİNASYON & AKSİYON TAKİP SİSTEMİ - ŞİRKET SUNUCUSU AKTİF")
+        print("  CAN KARDESLER KURU YEMIS - SIRKET ICI YEREL SUNUCU (LOCAL)")
         print("=" * 70)
         print()
-        print("  👑 SİZİN EKRANINIZ (Yönetici Paneli):")
-        print(f"     👉 http://localhost:{PORT}/yonetici.html")
+        print("  [YONETICI PANELINIZ]:")
+        print(f"     -> http://localhost:{PORT}/yonetici.html")
         print()
-        print("  👥 ÇALIŞANLARIN EKRANI (Diğer Bilgisayarlar ve Telefonlar İçin):")
+        print("  [PERSONEL EKRANI] (Diger Bilgisayarlar ve Telefonlar Icin):")
         for ip in local_ips:
-            print(f"     👉 http://{ip}:{PORT}/personel.html")
+            print(f"     -> http://{ip}:{PORT}/personel.html")
         print()
-        print(f"  💾 Ortak Veritabanı: {os.path.abspath(DATA_FILE)}")
-        print("  🔄 Tüm bilgisayarlar tek bir ortak veritabanına bağlıdır.")
+        print(f"  [YEREL VERITABANI]: {os.path.abspath(DATA_FILE)}")
+        print("  [GUVENLIK]: Veriler %100 bu bilgisayarda saklanir, disa aktarilmaz.")
         print("=" * 70)
-        print("  Sunucuyu durdurmak için bu pencereyi kapatabilirsiniz.")
+        print("  Sunucuyu durdurmak icin pencereyi kapatabilir veya Ctrl+C yapabilirsiniz.")
         print()
 
         try:
