@@ -823,7 +823,7 @@
                                     <span>Giriş PIN Kodu *</span>
                                     <span class="text-[9px] text-[#A6192E] font-normal">Personel Şifresi</span>
                                 </label>
-                                <input type="text" id="personPin" placeholder="Örn: 1234" maxlength="6" required class="w-full px-3 py-2 rounded-xl border border-[#FFBF3F]/60 bg-[#FFFDF7] text-[#31261D] font-bold text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-[#FFBF3F]">
+                                <input type="text" id="personPin" value="1978" placeholder="1978" maxlength="6" required class="w-full px-3 py-2 rounded-xl border border-[#FFBF3F]/60 bg-[#FFFDF7] text-[#31261D] font-bold text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-[#FFBF3F]">
                             </div>
                         </div>
                         <div class="flex items-center justify-end gap-2 pt-1">
@@ -2472,7 +2472,7 @@
         function resetTeamForm() {
             document.getElementById('teamMemberForm').reset();
             document.getElementById('editPersonIndex').value = "-1";
-            document.getElementById('personPin').value = "";
+            document.getElementById('personPin').value = "1978";
             document.getElementById('teamFormTitle').innerHTML = '<i class="fa-solid fa-user-plus text-[#A6192E]"></i> Yeni Kişi Ekle';
             document.getElementById('cancelTeamEditBtn').classList.add('hidden');
         }
