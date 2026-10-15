@@ -1145,19 +1145,69 @@
             return arr.map(normalizeTask).filter(Boolean);
         }
 
-        let team = JSON.parse(localStorage.getItem('task_team_members')) || [];
-        let tasks = JSON.parse(localStorage.getItem('task_items')) || [];
-
-        if (!team || team.length === 0) {
-            team = DEFAULT_INIT_TEAM;
-            localStorage.setItem('task_team_members', JSON.stringify(team));
+        function getDeletedTaskIds() {
+            try {
+                return JSON.parse(localStorage.getItem('task_deleted_ids') || '[]');
+            } catch(e) {
+                return [];
+            }
         }
-        if (!tasks || tasks.length === 0) {
+        function addDeletedTaskId(id) {
+            const deleted = getDeletedTaskIds();
+            const idStr = String(id);
+            if (!deleted.includes(idStr)) {
+                deleted.push(idStr);
+                localStorage.setItem('task_deleted_ids', JSON.stringify(deleted));
+            }
+        }
+
+        function setLocalActionTimestamp() {
+            const now = Date.now();
+            lastLocalActionTime = now;
+            localStorage.setItem('cancerez_last_local_action', String(now));
+        }
+        function isRecentLocalAction(thresholdMs = 6000) {
+            const saved = parseInt(localStorage.getItem('cancerez_last_local_action') || '0', 10);
+            return (Date.now() - saved) < thresholdMs;
+        }
+
+        const isStorageInitialized = localStorage.getItem('cancerez_storage_initialized') === 'true';
+        const rawStoredTasks = localStorage.getItem('task_items');
+        let tasks = [];
+
+        if (rawStoredTasks !== null) {
+            try {
+                tasks = JSON.parse(rawStoredTasks) || [];
+            } catch(e) {
+                tasks = [];
+            }
+            const deletedIds = getDeletedTaskIds();
+            tasks = tasks.filter(t => !deletedIds.includes(String(t.id)));
+            tasks = normalizeTasks(tasks);
+        } else if (!isStorageInitialized) {
             tasks = DEFAULT_INIT_TASKS;
             localStorage.setItem('task_items', JSON.stringify(tasks));
+            localStorage.setItem('cancerez_storage_initialized', 'true');
         } else {
-            tasks = normalizeTasks(tasks);
-            localStorage.setItem('task_items', JSON.stringify(tasks));
+            tasks = [];
+            localStorage.setItem('task_items', '[]');
+        }
+
+        const rawStoredTeam = localStorage.getItem('task_team_members');
+        let team = [];
+        if (rawStoredTeam !== null) {
+            try {
+                team = JSON.parse(rawStoredTeam) || [];
+            } catch(e) {
+                team = [];
+            }
+        } else if (!isStorageInitialized) {
+            team = DEFAULT_INIT_TEAM;
+            localStorage.setItem('task_team_members', JSON.stringify(team));
+            localStorage.setItem('cancerez_storage_initialized', 'true');
+        } else {
+            team = [];
+            localStorage.setItem('task_team_members', '[]');
         }
 
         let activePage = 1;
@@ -1165,7 +1215,7 @@
         let currentEmailPersonName = "";
 
         const CLOUD_DB_URL = localStorage.getItem('cancerez_cloud_db_url') || "https://extendsclass.com/api/json-storage/bin/aecadfa";
-        let lastLocalActionTime = 0;
+        let lastLocalActionTime = parseInt(localStorage.getItem('cancerez_last_local_action') || '0', 10);
         let pushInProgress = false;
 
         function isLocalEnvironment() {
@@ -1189,8 +1239,8 @@
         }
 
         async function syncWithServer(isManual = false) {
-            // Son 5 saniye içinde yerel işlem yapıldıysa veya buluta veri gönderme işlemi devam ediyorsa ezilmeyi önle (manuel yenilemede pas geç)
-            if (!isManual && (pushInProgress || (Date.now() - lastLocalActionTime < 5000))) {
+            // Son 6 saniye içinde yerel işlem yapıldıysa veya buluta veri gönderme işlemi devam ediyorsa ezilmeyi önle (manuel yenilemede pas geç)
+            if (!isManual && (pushInProgress || isRecentLocalAction(6000))) {
                 return;
             }
 
@@ -1205,16 +1255,20 @@
 
                 if (!data) {
                     try {
-                        const cloudRes = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
+                        const cacheBuster = (CLOUD_DB_URL.includes('?') ? '&' : '?') + '_ts=' + Date.now();
+                        const cloudRes = await fetch(CLOUD_DB_URL + cacheBuster, { 
+                            cache: 'no-store',
+                            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+                        });
                         if (cloudRes.ok) {
                             const cloudJson = await cloudRes.json();
-                            data = (cloudJson && cloudJson.data && (cloudJson.data.tasks || cloudJson.data.team)) ? cloudJson.data : cloudJson;
+                            data = (cloudJson && cloudJson.data && typeof cloudJson.data === 'object' && (Array.isArray(cloudJson.data.tasks) || Array.isArray(cloudJson.data.team))) ? cloudJson.data : cloudJson;
                         }
                     } catch(e) {}
                 }
 
-                // Buluta ulaşılamadıysa ve yerel hafıza henüz boşsa github'daki veriler.json dosyasını çek
-                if (!data && tasks.length === 0 && team.length === 0) {
+                // Buluta ulaşılamadıysa ve yerel hafıza henüz hiç başlatılmamışsa github'daki veriler.json dosyasını çek
+                if (!data && !isStorageInitialized && tasks.length === 0 && team.length === 0) {
                     try {
                         const repoRes = await fetch('./veriler.json', { cache: 'no-store' });
                         if (repoRes.ok) data = await repoRes.json();
@@ -1222,14 +1276,17 @@
                 }
 
                 if (data) {
-                    if (!isManual && (pushInProgress || (Date.now() - lastLocalActionTime < 5000))) {
+                    if (!isManual && (pushInProgress || isRecentLocalAction(6000))) {
                         return;
                     }
 
                     let changed = false;
 
                     if (Array.isArray(data.tasks)) {
-                        const normalizedServerTasks = normalizeTasks(data.tasks);
+                        const deletedIds = getDeletedTaskIds();
+                        // Silinmiş görevleri sunucudan tekrar gelse bile içeri alma
+                        const validServerTasks = data.tasks.filter(t => !deletedIds.includes(String(t.id)));
+                        const normalizedServerTasks = normalizeTasks(validServerTasks);
                         const serverTasksStr = JSON.stringify(normalizedServerTasks);
                         if (serverTasksStr !== JSON.stringify(tasks)) {
                             tasks = normalizedServerTasks;
@@ -1946,6 +2003,9 @@
                             <button onclick="editTask(${task.id})" class="px-3 py-1.5 bg-[#FAF7F2] hover:bg-[#F2ECE0] text-[#31261D] font-bold text-xs rounded-xl border border-[#E8DFC8] transition-all cursor-pointer flex items-center gap-1">
                                 <i class="fa-solid fa-pen-to-square text-[#A6192E]"></i>
                                 <span>Düzenle</span>
+                            </button>
+                            <button onclick="deleteTask(${task.id})" title="Görevi Sil" class="p-1.5 bg-[#FAF7F2] hover:bg-rose-50 text-stone-500 hover:text-[#A6192E] rounded-xl border border-[#E8DFC8] transition-colors cursor-pointer">
+                                <i class="fa-regular fa-trash-can text-xs"></i>
                             </button>
                             <button onclick="filterAndShowTasksByPerson('${escapeHtml(task.owner)}')" class="px-3 py-1.5 bg-[#A6192E] hover:bg-[#8C1224] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1">
                                 <span>2. Sayfada İncele</span>
@@ -2828,11 +2888,15 @@
             renderApp();
         }
 
-        function deleteTask(id) {
+        async function deleteTask(id) {
             if (confirm("Bu görevi silmek istediğinize emin misiniz?")) {
-                tasks = tasks.filter(t => String(t.id) !== String(id));
+                const taskId = String(id);
+                addDeletedTaskId(taskId);
+                tasks = tasks.filter(t => String(t.id) !== taskId);
+                setLocalActionTimestamp();
                 saveData();
                 renderApp();
+                await pushDataToServer();
             }
         }
 
@@ -2923,12 +2987,15 @@
             reader.readAsText(file);
         }
 
-        function clearAllSystemData() {
+        async function clearAllSystemData() {
             if (confirm("DİKKAT: Sistemdeki tüm görevleri, ekipleri ve notları tamamen silip boş şablon olarak başlatmak istediğinize emin misiniz?")) {
                 team = [];
                 tasks = [];
                 localStorage.setItem('task_team_members', '[]');
                 localStorage.setItem('task_items', '[]');
+                localStorage.setItem('task_deleted_ids', '[]');
+                localStorage.setItem('cancerez_storage_initialized', 'true');
+                setLocalActionTimestamp();
                 localStorage.setItem('task_management_notes', '');
                 const noteInput = document.getElementById('managementNotes');
                 if (noteInput) noteInput.value = '';
@@ -2936,6 +3003,7 @@
                 updateTeamDatalist();
                 renderApp();
                 closeSettingsModal();
+                await pushDataToServer();
                 alert("Sistem tamamen sıfırlandı!");
             }
         }

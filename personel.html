@@ -463,20 +463,73 @@
             return arr.map(normalizeTask).filter(Boolean);
         }
 
-        if (!team || team.length === 0) {
-            team = DEFAULT_INIT_TEAM;
-            localStorage.setItem('task_team_members', JSON.stringify(team));
+        function getDeletedTaskIds() {
+            try {
+                return JSON.parse(localStorage.getItem('task_deleted_ids') || '[]');
+            } catch(e) {
+                return [];
+            }
         }
-        if (!tasks || tasks.length === 0) {
+        function addDeletedTaskId(id) {
+            const deleted = getDeletedTaskIds();
+            const idStr = String(id);
+            if (!deleted.includes(idStr)) {
+                deleted.push(idStr);
+                localStorage.setItem('task_deleted_ids', JSON.stringify(deleted));
+            }
+        }
+
+        function setLocalActionTimestamp() {
+            const now = Date.now();
+            lastLocalActionTime = now;
+            localStorage.setItem('cancerez_last_local_action', String(now));
+        }
+        function isRecentLocalAction(thresholdMs = 6000) {
+            const saved = parseInt(localStorage.getItem('cancerez_last_local_action') || '0', 10);
+            return (Date.now() - saved) < thresholdMs;
+        }
+
+        const isStorageInitialized = localStorage.getItem('cancerez_storage_initialized') === 'true';
+        const rawStoredTasks = localStorage.getItem('task_items');
+        let tasks = [];
+
+        if (rawStoredTasks !== null) {
+            try {
+                tasks = JSON.parse(rawStoredTasks) || [];
+            } catch(e) {
+                tasks = [];
+            }
+            const deletedIds = getDeletedTaskIds();
+            tasks = tasks.filter(t => !deletedIds.includes(String(t.id)));
+            tasks = normalizeTasks(tasks);
+        } else if (!isStorageInitialized) {
             tasks = DEFAULT_INIT_TASKS;
             localStorage.setItem('task_items', JSON.stringify(tasks));
+            localStorage.setItem('cancerez_storage_initialized', 'true');
         } else {
-            tasks = normalizeTasks(tasks);
-            localStorage.setItem('task_items', JSON.stringify(tasks));
+            tasks = [];
+            localStorage.setItem('task_items', '[]');
+        }
+
+        const rawStoredTeam = localStorage.getItem('task_team_members');
+        let team = [];
+        if (rawStoredTeam !== null) {
+            try {
+                team = JSON.parse(rawStoredTeam) || [];
+            } catch(e) {
+                team = [];
+            }
+        } else if (!isStorageInitialized) {
+            team = DEFAULT_INIT_TEAM;
+            localStorage.setItem('task_team_members', JSON.stringify(team));
+            localStorage.setItem('cancerez_storage_initialized', 'true');
+        } else {
+            team = [];
+            localStorage.setItem('task_team_members', '[]');
         }
 
         const CLOUD_DB_URL = localStorage.getItem('cancerez_cloud_db_url') || "https://extendsclass.com/api/json-storage/bin/aecadfa";
-        let lastLocalActionTime = 0;
+        let lastLocalActionTime = parseInt(localStorage.getItem('cancerez_last_local_action') || '0', 10);
         let pushInProgress = false;
         let lastKnownTeam = (team && team.length > 0) ? team : [];
 
@@ -501,8 +554,8 @@
         }
 
         async function syncWithServer(isManual = false) {
-            // Son 5 saniye içinde personel bir durum değiştirdiyse veya gönderme sürüyorsa ezilmeyi engelle (manuel yenilemede pas geç)
-            if (!isManual && (pushInProgress || (Date.now() - lastLocalActionTime < 5000))) {
+            // Son 6 saniye içinde personel bir durum değiştirdiyse veya gönderme sürüyorsa ezilmeyi engelle (manuel yenilemede pas geç)
+            if (!isManual && (pushInProgress || isRecentLocalAction(6000))) {
                 return;
             }
 
@@ -517,16 +570,20 @@
 
                 if (!data) {
                     try {
-                        const cloudRes = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
+                        const cacheBuster = (CLOUD_DB_URL.includes('?') ? '&' : '?') + '_ts=' + Date.now();
+                        const cloudRes = await fetch(CLOUD_DB_URL + cacheBuster, { 
+                            cache: 'no-store',
+                            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+                        });
                         if (cloudRes.ok) {
                             const cloudJson = await cloudRes.json();
-                            data = (cloudJson && cloudJson.data && (cloudJson.data.tasks || cloudJson.data.team)) ? cloudJson.data : cloudJson;
+                            data = (cloudJson && cloudJson.data && typeof cloudJson.data === 'object' && (Array.isArray(cloudJson.data.tasks) || Array.isArray(cloudJson.data.team))) ? cloudJson.data : cloudJson;
                         }
                     } catch(e) {}
                 }
 
-                // Buluta ulaşılamadıysa ve yerel hafıza henüz boşsa github'daki veriler.json dosyasını çek
-                if (!data && tasks.length === 0 && team.length === 0) {
+                // Buluta ulaşılamadıysa ve yerel hafıza henüz hiç başlatılmamışsa github'daki veriler.json dosyasını çek
+                if (!data && !isStorageInitialized && tasks.length === 0 && team.length === 0) {
                     try {
                         const repoRes = await fetch('./veriler.json', { cache: 'no-store' });
                         if (repoRes.ok) data = await repoRes.json();
@@ -534,14 +591,16 @@
                 }
 
                 if (data) {
-                    if (!isManual && (pushInProgress || (Date.now() - lastLocalActionTime < 5000))) {
+                    if (!isManual && (pushInProgress || isRecentLocalAction(6000))) {
                         return;
                     }
 
                     let changed = false;
 
                     if (Array.isArray(data.tasks)) {
-                        const normalizedServerTasks = normalizeTasks(data.tasks);
+                        const deletedIds = getDeletedTaskIds();
+                        const validServerTasks = data.tasks.filter(t => !deletedIds.includes(String(t.id)));
+                        const normalizedServerTasks = normalizeTasks(validServerTasks);
                         const serverTasksStr = JSON.stringify(normalizedServerTasks);
                         if (serverTasksStr !== JSON.stringify(tasks)) {
                             tasks = normalizedServerTasks;
@@ -666,7 +725,7 @@
         });
 
         function saveTasks() {
-            lastLocalActionTime = Date.now();
+            setLocalActionTimestamp();
             localStorage.setItem('task_items', JSON.stringify(tasks));
             pushDataToServer();
         }
