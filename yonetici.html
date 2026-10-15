@@ -857,6 +857,7 @@
 
         const CLOUD_DB_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a13e949ddf65df";
         let lastLocalActionTime = 0;
+        let pushInProgress = false;
 
         function isLocalEnvironment() {
             return window.location.protocol.startsWith('http') && 
@@ -879,8 +880,8 @@
         }
 
         async function syncWithServer() {
-            // Son 4 saniye içinde yerel işlem yapıldıysa bulut güncellemesini bekleterek ezilmeyi önle
-            if (Date.now() - lastLocalActionTime < 4000) {
+            // Son 5 saniye içinde yerel işlem yapıldıysa veya buluta veri gönderme işlemi devam ediyorsa ezilmeyi önle
+            if (pushInProgress || (Date.now() - lastLocalActionTime < 5000)) {
                 return;
             }
 
@@ -902,7 +903,7 @@
                 }
 
                 if (data) {
-                    if (Date.now() - lastLocalActionTime < 4000) {
+                    if (pushInProgress || (Date.now() - lastLocalActionTime < 5000)) {
                         return;
                     }
 
@@ -946,6 +947,9 @@
         }
 
         async function pushDataToServer() {
+            pushInProgress = true;
+            lastLocalActionTime = Date.now();
+
             const rawData = {
                 tasks: tasks,
                 team: team,
@@ -966,6 +970,9 @@
                 if (res.ok) updateServerStatusBadge(true);
             } catch (err) {
                 console.warn("Buluta gönderilemedi:", err);
+            } finally {
+                pushInProgress = false;
+                lastLocalActionTime = Date.now();
             }
 
             if (isLocalEnvironment()) {
@@ -1261,7 +1268,7 @@
                             <td class="py-3 px-3 text-center font-medium ${isOverdue ? 'text-rose-600 font-bold' : 'text-slate-600'}">
                                 ${dateFormatted}
                             </td>
-                            <td class="py-3 px-3 text-center">
+                            <td class="py-3 px-3 text-center cursor-pointer select-none" onclick="toggleTaskStatus(${task.id})" title="Durumu değiştirmek için tıklayın">
                                 ${statusBadge}
                             </td>
                             <td class="py-3 px-3 text-center no-print">

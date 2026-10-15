@@ -165,6 +165,8 @@
 
         const CLOUD_DB_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a13e949ddf65df";
         let lastLocalActionTime = 0;
+        let pushInProgress = false;
+        let lastKnownTeam = (team && team.length > 0) ? team : [];
 
         function isLocalEnvironment() {
             return window.location.protocol.startsWith('http') && 
@@ -187,8 +189,8 @@
         }
 
         async function syncWithServer() {
-            // Son 4 saniye içinde personel bir durum değiştirdiyse sunucudan ezilmesini engelle
-            if (Date.now() - lastLocalActionTime < 4000) {
+            // Son 5 saniye içinde personel bir durum değiştirdiyse veya gönderme sürüyorsa ezilmeyi engelle
+            if (pushInProgress || (Date.now() - lastLocalActionTime < 5000)) {
                 return;
             }
 
@@ -210,7 +212,7 @@
                 }
 
                 if (data) {
-                    if (Date.now() - lastLocalActionTime < 4000) {
+                    if (pushInProgress || (Date.now() - lastLocalActionTime < 5000)) {
                         return;
                     }
 
@@ -226,6 +228,7 @@
                     }
 
                     if (Array.isArray(data.team)) {
+                        if (data.team.length > 0) lastKnownTeam = data.team;
                         const serverTeamStr = JSON.stringify(data.team);
                         if (serverTeamStr !== JSON.stringify(team)) {
                             team = data.team;
@@ -253,9 +256,14 @@
         }
 
         async function pushDataToServer() {
+            pushInProgress = true;
+            lastLocalActionTime = Date.now();
+
+            const safeTeam = (team && team.length > 0) ? team : (lastKnownTeam && lastKnownTeam.length > 0 ? lastKnownTeam : (JSON.parse(localStorage.getItem('task_team_members')) || []));
+
             const rawData = {
                 tasks: tasks,
-                team: team,
+                team: safeTeam,
                 notes: localStorage.getItem('task_management_notes') || ''
             };
 
@@ -273,6 +281,9 @@
                 if (res.ok) updatePersonelServerBadge(true);
             } catch (err) {
                 console.warn("Buluta gönderilemedi:", err);
+            } finally {
+                pushInProgress = false;
+                lastLocalActionTime = Date.now();
             }
 
             if (isLocalEnvironment()) {
