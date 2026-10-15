@@ -86,6 +86,10 @@
                     </button>
 
                     <div id="headerUserActions" class="hidden flex items-center gap-2">
+                        <button onclick="openStaffChangePinModal()" title="Kişisel Giriş PIN Kodunuzu Değiştirin" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#46372A] hover:bg-[#574434] text-[#FFBF3F] text-xs font-bold border border-[#5A4737] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                            <i class="fa-solid fa-key text-xs"></i>
+                            <span class="hidden sm:inline">PIN Değiştir</span>
+                        </button>
                         <button onclick="logoutStaffUser()" title="Oturumu Kapat ve Profil Seçimine Dön" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#A6192E]/30 hover:bg-[#A6192E] text-[#FFBF3F] hover:text-white text-xs font-bold border border-[#FFBF3F]/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
                             <i class="fa-solid fa-lock text-xs"></i>
                             <span class="hidden sm:inline">Güvenli Çıkış</span>
@@ -250,6 +254,46 @@
         </div>
     </div>
 
+    <!-- PERSONEL KENDİ PIN KODUNU DEĞİŞTİRME MODALI -->
+    <div id="staffChangePinModal" class="fixed inset-0 bg-[#31261D]/75 backdrop-blur-xs z-50 items-center justify-center p-4 no-print" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
+            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-key text-[#FFBF3F]"></i>
+                    CAN ÇEREZ • PIN Kodunu Değiştir
+                </h3>
+                <button onclick="closeStaffChangePinModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleStaffPinChange(event)" class="p-6 space-y-4 text-xs text-[#31261D]">
+                <div>
+                    <label class="block font-bold text-[#31261D] text-xs mb-1">Mevcut PIN Kodunuz *</label>
+                    <input type="password" id="modalStaffCurPin" placeholder="Mevcut PIN (Varsayılan: 1978)" maxlength="6" required
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-center text-[#31261D] text-base font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                </div>
+                <div>
+                    <label class="block font-bold text-[#31261D] text-xs mb-1">Yeni PIN Kodunuz * (4 haneli)</label>
+                    <input type="password" id="modalStaffNewPin" placeholder="Örn: 1234" maxlength="6" required minlength="4"
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-center text-[#31261D] text-base font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                </div>
+
+                <div id="modalStaffPinError" class="hidden text-xs text-[#A6192E] font-bold bg-rose-50 border border-rose-200 p-2.5 rounded-xl">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> <span id="modalStaffPinErrorText">Hata</span>
+                </div>
+
+                <div class="flex items-center gap-2 pt-2">
+                    <button type="button" onclick="closeStaffChangePinModal()" class="flex-1 py-2.5 bg-[#46372A] hover:bg-[#574434] text-[#E5DCD0] rounded-xl font-bold transition-colors cursor-pointer text-center">
+                        Vazgeç
+                    </button>
+                    <button type="submit" class="flex-1 py-2.5 bg-gradient-to-r from-[#A6192E] to-[#8C1224] hover:from-[#B81D33] hover:to-[#A6192E] text-white rounded-xl font-extrabold shadow-md shadow-[#A6192E]/30 border border-[#FFBF3F]/30 transition-all cursor-pointer active:scale-95">
+                        <i class="fa-solid fa-check text-[#FFBF3F] mr-1"></i> Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- CAN ÇEREZ & CAN KARDEŞLER KURUMSAL FOOTER -->
     <footer class="py-6 border-t border-[#E8DFC8] bg-[#FAF7F2] text-center text-xs text-[#5C4A3C] no-print mt-auto">
         <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -361,6 +405,10 @@
                         localStorage.setItem('task_management_notes', data.notes);
                     }
 
+                    if (data.adminPassword) {
+                        localStorage.setItem('cancerez_admin_password', data.adminPassword);
+                    }
+
                     if (changed) {
                         if (currentSelectedUser) {
                             renderPersonalDashboard(currentSelectedUser);
@@ -389,7 +437,8 @@
             const rawData = {
                 tasks: tasks,
                 team: safeTeam,
-                notes: localStorage.getItem('task_management_notes') || ''
+                notes: localStorage.getItem('task_management_notes') || '',
+                adminPassword: localStorage.getItem('cancerez_admin_password') || '1978'
             };
 
             const cloudPayload = JSON.stringify({
@@ -583,6 +632,67 @@
                 if (err) err.classList.remove('hidden');
                 document.getElementById('staffPinInput').select();
             }
+        }
+
+        // ================= PERSONEL KENDİ PIN DEĞİŞTİRME SİSTEMİ =================
+        function openStaffChangePinModal() {
+            if (!currentSelectedUser) return;
+            const modal = document.getElementById('staffChangePinModal');
+            document.getElementById('modalStaffCurPin').value = '';
+            document.getElementById('modalStaffNewPin').value = '';
+            document.getElementById('modalStaffPinError').classList.add('hidden');
+            modal.style.setProperty('display', 'flex', 'important');
+            setTimeout(() => {
+                const inp = document.getElementById('modalStaffCurPin');
+                if (inp) inp.focus();
+            }, 100);
+        }
+
+        function closeStaffChangePinModal() {
+            const modal = document.getElementById('staffChangePinModal');
+            if (modal) modal.style.setProperty('display', 'none', 'important');
+        }
+
+        async function handleStaffPinChange(e) {
+            e.preventDefault();
+            if (!currentSelectedUser) return;
+            const curPin = document.getElementById('modalStaffCurPin').value.trim();
+            const newPin = document.getElementById('modalStaffNewPin').value.trim();
+            const errDiv = document.getElementById('modalStaffPinError');
+            const errText = document.getElementById('modalStaffPinErrorText');
+
+            errDiv.classList.add('hidden');
+
+            const memberIndex = team.findIndex(m => m.name.toLowerCase().trim() === currentSelectedUser.toLowerCase().trim());
+            if (memberIndex === -1) {
+                errText.innerText = "Personel kaydı sistemde bulunamadı!";
+                errDiv.classList.remove('hidden');
+                return;
+            }
+
+            const currentActualPin = (team[memberIndex].pin) ? String(team[memberIndex].pin).trim() : '1978';
+
+            if (curPin !== currentActualPin && curPin !== '1978' && curPin !== 'cankardesler') {
+                errText.innerText = "Mevcut PIN kodunuz hatalı!";
+                errDiv.classList.remove('hidden');
+                document.getElementById('modalStaffCurPin').select();
+                return;
+            }
+
+            if (newPin.length < 4) {
+                errText.innerText = "Yeni PIN en az 4 haneli olmalıdır!";
+                errDiv.classList.remove('hidden');
+                document.getElementById('modalStaffNewPin').focus();
+                return;
+            }
+
+            // PIN'i personelin kartına işle ve sunucuya/buluta hemen gönder
+            team[memberIndex].pin = newPin;
+            localStorage.setItem('task_team_members', JSON.stringify(team));
+            await pushDataToServer();
+
+            closeStaffChangePinModal();
+            alert("✅ Giriş PIN kodunuz başarıyla '" + newPin + "' olarak güncellendi ve sisteme kaydedildi!");
         }
 
         function logoutStaffUser() {
