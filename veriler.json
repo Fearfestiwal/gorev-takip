@@ -1,5 +1,27 @@
 {
-  "team": [],
-  "tasks": [],
-  "notes": ""
+  "team": [
+    {
+      "id": 1,
+      "name": "Ahmet Can",
+      "role": "Şube Sorumlusu",
+      "phone": "05551234567",
+      "pin": "1978",
+      "status": "aktif"
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1729000000001,
+      "title": "Günlük Çerez Reyon Düzeni ve Tazelik Kontrolü",
+      "desc": "Sabah açılışında tüm kuruyemiş reyonlarının kontrol edilmesi ve etiketlerin düzenlenmesi.",
+      "category": "Operasyon",
+      "priority": "Yuksek",
+      "assignee": "Ahmet Can",
+      "deadline": "2026-10-16",
+      "status": "beklemede",
+      "createdAt": "2026-10-16T08:00:00.000Z"
+    }
+  ],
+  "notes": "CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan) - Can Kardeşler Kuruluşudur.\n7/24 Kesintisiz Bulut Senkronizasyonu Devrede.",
+  "adminPassword": "1978"
 }

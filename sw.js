@@ -1,5 +1,5 @@
 // Can Çerez 1978 - Service Worker
-const CACHE_NAME = 'can-cerez-v5';
+const CACHE_NAME = 'can-cerez-v6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -35,8 +35,11 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // API veya dinamik istekler ağ öncelikli
-  if (e.request.url.includes('/api/')) {
+  // API veya harici bulut veritabanı istekleri daima doğrudan ağ üzerinden yapılsın
+  if (e.request.url.includes('/api/') || 
+      e.request.url.includes('extendsclass.com') || 
+      e.request.url.includes('firebaseio.com') || 
+      e.request.url.includes('firebasedatabase.app')) {
     e.respondWith(
       fetch(e.request).catch(() => caches.match(e.request))
     );

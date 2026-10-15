@@ -331,7 +331,7 @@
 
     <!-- JAVASCRIPT: PORTAL & GİRİŞ MANTIĞI -->
     <script>
-        const CLOUD_DB_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a13e949ddf65df";
+        const CLOUD_DB_URL = localStorage.getItem('cancerez_cloud_db_url') || "https://extendsclass.com/api/json-storage/bin/aecadfa";
         let teamMembers = JSON.parse(localStorage.getItem('task_team_members')) || [];
         let currentGeneratedOtp = null;
 
@@ -555,8 +555,11 @@
                     const res = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
                     if (res.ok) {
                         const d = await res.json();
-                        const p = d.data || d;
+                        const p = (d && d.data && (d.data.tasks || d.data.team)) ? d.data : d;
                         if (Array.isArray(p.team)) teamMembers = p.team;
+                        if (p.adminPassword) {
+                            localStorage.setItem('cancerez_admin_password', p.adminPassword);
+                        }
                     }
                 }
             } catch(e) {}

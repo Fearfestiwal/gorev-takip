@@ -317,7 +317,7 @@
         let tasks = JSON.parse(localStorage.getItem('task_items')) || [];
         let currentSelectedUser = localStorage.getItem('task_personel_selected_user') || '';
 
-        const CLOUD_DB_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a13e949ddf65df";
+        const CLOUD_DB_URL = localStorage.getItem('cancerez_cloud_db_url') || "https://extendsclass.com/api/json-storage/bin/aecadfa";
         let lastLocalActionTime = 0;
         let pushInProgress = false;
         let lastKnownTeam = (team && team.length > 0) ? team : [];
@@ -362,7 +362,7 @@
                         const cloudRes = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
                         if (cloudRes.ok) {
                             const cloudJson = await cloudRes.json();
-                            data = cloudJson.data || cloudJson;
+                            data = (cloudJson && cloudJson.data && (cloudJson.data.tasks || cloudJson.data.team)) ? cloudJson.data : cloudJson;
                         }
                     } catch(e) {}
                 }
@@ -441,10 +441,7 @@
                 adminPassword: localStorage.getItem('cancerez_admin_password') || '1978'
             };
 
-            const cloudPayload = JSON.stringify({
-                name: "CAN CEREZ 1978 DB",
-                data: rawData
-            });
+            const cloudPayload = JSON.stringify(rawData);
 
             try {
                 const res = await fetch(CLOUD_DB_URL, {
