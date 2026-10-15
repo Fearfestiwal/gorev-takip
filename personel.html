@@ -423,8 +423,10 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const authUser = sessionStorage.getItem('cancerez_staff_auth_user');
+            const rememberedStaff = localStorage.getItem('cancerez_remember_staff_user');
+            const authUser = sessionStorage.getItem('cancerez_staff_auth_user') || rememberedStaff;
             if (authUser) {
+                sessionStorage.setItem('cancerez_staff_auth_user', authUser);
                 currentSelectedUser = authUser;
                 renderPersonalDashboard(authUser);
             } else {
@@ -564,6 +566,8 @@
             // Doğru PIN, varsayılan 1978 veya acil durum 'cankardesler'
             if (entered === correctPin || entered === '1978' || entered === 'cankardesler') {
                 sessionStorage.setItem('cancerez_staff_auth_user', pendingPinPerson);
+                localStorage.setItem('cancerez_remember_staff_user', pendingPinPerson);
+                localStorage.setItem('cancerez_active_role', 'staff');
                 currentSelectedUser = pendingPinPerson;
                 localStorage.setItem('task_personel_selected_user', pendingPinPerson);
                 closeUserPinModal();
@@ -576,11 +580,13 @@
         }
 
         function logoutStaffUser() {
-            if (confirm("Güvenli çıkış yapmak ve profil ekranına dönmek istiyor musunuz?")) {
+            if (confirm("Güvenli çıkış yapıp ana portala dönmek istiyor musunuz?")) {
                 sessionStorage.removeItem('cancerez_staff_auth_user');
+                localStorage.removeItem('cancerez_remember_staff_user');
+                localStorage.removeItem('cancerez_active_role');
                 currentSelectedUser = '';
                 localStorage.removeItem('task_personel_selected_user');
-                showUserSelectionScreen();
+                window.location.href = 'index.html?logout=true';
             }
         }
 

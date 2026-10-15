@@ -52,10 +52,10 @@ class TaskServerHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        # Redirect root to yonetici.html
+        # Redirect root to index.html
         if self.path == "/" or self.path == "":
             self.send_response(302)
-            self.send_header("Location", "/yonetici.html")
+            self.send_header("Location", "/index.html")
             self.end_headers()
             return
 

@@ -1147,9 +1147,11 @@
             }
         // ================= YÖNETİCİ KİLİT & ŞİFRE SİSTEMİ =================
         function checkAdminAuth() {
-            const isAuth = sessionStorage.getItem('cancerez_admin_auth') === 'true';
+            const isRemembered = localStorage.getItem('cancerez_remember_admin') === 'true' || localStorage.getItem('cancerez_active_role') === 'admin';
+            const isAuth = sessionStorage.getItem('cancerez_admin_auth') === 'true' || isRemembered;
             const overlay = document.getElementById('adminAuthOverlay');
             if (isAuth) {
+                sessionStorage.setItem('cancerez_admin_auth', 'true');
                 if (overlay) overlay.classList.add('hidden');
             } else {
                 if (overlay) {
@@ -1171,6 +1173,8 @@
             // '1978', kullanıcının belirlediği şifre veya 'cankardesler' (kurtarma anahtarı)
             if (entered === actualPass || entered === '1978' || entered === 'cankardesler') {
                 sessionStorage.setItem('cancerez_admin_auth', 'true');
+                localStorage.setItem('cancerez_remember_admin', 'true');
+                localStorage.setItem('cancerez_active_role', 'admin');
                 const overlay = document.getElementById('adminAuthOverlay');
                 if (overlay) overlay.classList.add('hidden');
                 const err = document.getElementById('adminAuthError');
@@ -1197,9 +1201,11 @@
         }
 
         function logoutAdmin() {
-            if (confirm("Yönetici oturumunu kapatmak ve ekranı kilitlemek istediğinize emin misiniz?")) {
+            if (confirm("Yönetici oturumunu kapatıp giriş portalına dönmek istiyor musunuz?")) {
                 sessionStorage.removeItem('cancerez_admin_auth');
-                window.location.reload();
+                localStorage.removeItem('cancerez_remember_admin');
+                localStorage.removeItem('cancerez_active_role');
+                window.location.href = 'index.html?logout=true';
             }
         }
 

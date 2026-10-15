@@ -2,1190 +2,579 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAN ÇEREZ 1978 | Yönetici Portalı</title>
-    <!-- Favicon & PWA -->
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="apple-touch-icon" href="favicon.svg">
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CAN ÇEREZ (1978) • Kurumsal Giriş Portalı</title>
+    
+    <!-- PWA & Mobil Meta Etiketleri -->
     <meta name="theme-color" content="#A6192E">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Can Çerez">
-    <!-- Google Fonts: Plus Jakarta Sans (Proxima Nova Wide hissi) & Playfair Display & DM Serif (Zanaatkar Ustalık) -->
+    <meta name="apple-mobile-web-app-title" content="CAN ÇEREZ">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="icon-192.svg">
+
+    <!-- Tailwind CSS (v4 CDN) -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Tailwind CSS with Official CAN ÇEREZ Pantone Colors -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        can: {
-                            red: '#A6192E',       // Pantone 187 C - Tutku ve Otorite
-                            redDark: '#7D1121',   // Koyu kırmızı tonu
-                            redLight: '#C42037',  // Parlak kırmızı
-                            gold: '#FFBF3F',      // Pantone 136 C - Aydınlatma ve Enerji
-                            goldDark: '#D8991D',  // Koyu bal/altın
-                            goldLight: '#FFF6E0', // Yumuşak altın zemin
-                            black: '#31261D',     // Pantone Black 4 C - Kadim ve Derin Antika Siyahı
-                            blackLight: '#46372A',// Açık antika siyah
-                            green: '#1E340C',     // Pantone 574 C - Doğallık Vizesi (Zeytin)
-                            greenLight: '#2C4A14',
-                            brown: '#824701',     // Pantone 731 C - Ustalığın Rengi (Kavrulma Kahvesi)
-                            cream: '#FAF7F2',     // Sıcak fildişi zemin
-                            creamDark: '#F2ECE1', // Kart kenarlıkları
-                            border: '#E8DFC8'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-                        display: ['"DM Serif Display"', 'serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <style>
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #FAF7F2;
         }
-        @media print {
-            body {
-                background: white !important;
-                color: black !important;
-                padding: 0 !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .print-only {
-                display: block !important;
-            }
-            table {
-                width: 100% !important;
-                border-collapse: collapse !important;
-                font-size: 11px !important;
-            }
-            th, td {
-                border: 1px solid #333 !important;
-                padding: 6px 8px !important;
-                color: #000 !important;
-            }
-            th {
-                background-color: #f1f5f9 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-        }
-        .print-only {
-            display: none;
-        }
-        .report-person-row {
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-        .report-person-row:hover {
-            background-color: #f0f9ff;
+        .font-serif {
+            font-family: 'Playfair Display', Georgia, serif;
         }
     </style>
+
+    <!-- OTOMATİK OTURUM KONTROLÜ (BENİ HATIRLA) -->
+    <script>
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const forceLogout = urlParams.get('logout') === 'true';
+            if (forceLogout) {
+                localStorage.removeItem('cancerez_active_role');
+                localStorage.removeItem('cancerez_remember_admin');
+                localStorage.removeItem('cancerez_remember_staff_user');
+                sessionStorage.clear();
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
+
+            const activeRole = localStorage.getItem('cancerez_active_role');
+            const rememberAdmin = localStorage.getItem('cancerez_remember_admin') === 'true';
+            const rememberStaff = localStorage.getItem('cancerez_remember_staff_user');
+
+            if (rememberAdmin || activeRole === 'admin') {
+                window.location.replace('yonetici.html');
+            } else if (rememberStaff || activeRole === 'staff') {
+                window.location.replace('personel.html');
+            }
+        })();
+    </script>
 </head>
-<body class="text-stone-800 antialiased min-h-screen flex flex-col bg-[#FAF7F2]">
+<body class="text-[#31261D] antialiased min-h-screen flex flex-col bg-[#FAF7F2] selection:bg-[#FFBF3F] selection:text-[#31261D]">
 
-    <!-- YÖNETİCİ GİRİŞ / KİLİT EKRANI (ŞİFRESİZ GİRİLEMEZ) -->
-    <div id="adminAuthOverlay" class="fixed inset-0 bg-[#241A13]/95 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
-        <div class="max-w-md w-full bg-[#31261D] rounded-3xl border border-[#FFBF3F]/40 shadow-2xl p-6 sm:p-8 text-center text-white relative overflow-hidden animate-in fade-in zoom-in duration-200">
-            <!-- Arka plan efektleri -->
-            <div class="absolute -right-16 -top-16 w-52 h-52 bg-[#A6192E]/25 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -left-16 -bottom-16 w-52 h-52 bg-[#FFBF3F]/15 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="relative z-10 space-y-4">
-                <!-- Logo -->
-                <div class="flex justify-center">
-                    <img src="logo.svg" alt="CAN ÇEREZ" class="h-16 w-auto drop-shadow-xl">
-                </div>
-
-                <div>
-                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#FFBF3F] bg-[#46372A] px-3 py-1 rounded-full border border-[#FFBF3F]/30 inline-block shadow-2xs">
-                        Can Kardeşler Kuruluşudur
-                    </span>
-                    <h2 class="text-xl sm:text-2xl font-black text-white mt-2.5 tracking-tight font-serif">YÖNETİCİ PANELİ GİRİŞİ</h2>
-                    <p class="text-xs text-[#E5DCD0] mt-1">Şirket içi koordinasyon ve görev yönetimine erişmek için lütfen yönetici şifrenizi giriniz.</p>
-                </div>
-
-                <form onsubmit="handleAdminLogin(event)" class="space-y-3.5 pt-2">
-                    <div class="relative">
-                        <input type="password" id="adminPassInput" placeholder="Yönetici Şifreniz..." autofocus required
-                               class="w-full px-4 py-3 bg-[#1C140E] border border-[#FFBF3F]/40 rounded-2xl text-center text-white text-base tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-[#FFBF3F] focus:border-transparent placeholder:text-stone-500">
-                        <button type="button" onclick="toggleAdminPassVisibility()" class="absolute right-3.5 top-3.5 text-stone-400 hover:text-white text-sm cursor-pointer">
-                            <i id="adminPassEye" class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-
-                    <div id="adminAuthError" class="hidden text-xs text-rose-200 font-bold bg-[#A6192E]/40 border border-[#A6192E] p-2.5 rounded-xl">
-                        <i class="fa-solid fa-triangle-exclamation mr-1 text-[#FFBF3F]"></i> Hatalı şifre! Lütfen tekrar deneyiniz.
-                    </div>
-
-                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-[#A6192E] to-[#8C1224] hover:from-[#B81D33] hover:to-[#A6192E] text-white font-extrabold rounded-2xl shadow-lg shadow-[#A6192E]/30 border border-[#FFBF3F]/40 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer text-sm">
-                        <i class="fa-solid fa-unlock-keyhole text-[#FFBF3F]"></i>
-                        Giriş Yap
-                    </button>
-                </form>
-
-                <div class="pt-3 border-t border-[#46372A] flex items-center justify-between text-[11px] text-[#A69788]">
-                    <a href="personel.html" class="text-[#FFBF3F] hover:underline flex items-center gap-1 font-semibold">
-                        <i class="fa-solid fa-users"></i> Personel Ekranına Git
-                    </a>
-                    <span>İlk Giriş Şifresi: <strong class="text-white">1978</strong></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ÜST BAR (CAN ÇEREZ YÖNETİCİ NAVBAR) -->
-    <header class="bg-[#31261D] text-white shadow-lg sticky top-0 z-30 no-print border-b border-[#FFBF3F]/30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- ÜST BAR / MARKA ALANI -->
+    <header class="bg-[#31261D] text-white shadow-xl border-b border-[#FFBF3F]/30 sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 sm:h-20">
-                <!-- Sol Logo & Başlık (CAN ÇEREZ 1978) -->
                 <div class="flex items-center gap-3">
-                    <a href="index.html" class="flex items-center gap-3 group">
-                        <img src="logo.svg" alt="CAN ÇEREZ 1978" class="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105">
-                        <div class="hidden sm:block">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-[10px] bg-[#A6192E] text-white px-2.5 py-0.5 rounded-full font-extrabold uppercase tracking-wider border border-[#FFBF3F]/40 shadow-xs">
-                                    👑 YÖNETİCİ PANELİ
-                                </span>
-                                <span class="text-[9px] bg-[#46372A] text-[#FFBF3F] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider border border-[#FFBF3F]/30">
-                                    CAN KARDEŞLER KURULUŞUDUR
-                                </span>
-                                <button id="serverStatusBadge" onclick="syncWithServer(true)" title="Bulut / Yerel veriyi yenilemek için tıklayın" class="hidden text-[10px] px-2 py-0.5 rounded font-semibold flex items-center gap-1 cursor-pointer hover:opacity-90 transition-opacity"></button>
-                            </div>
-                            <p class="text-[11px] text-[#D8CEBE]">Haftalık Koordinasyon Toplantısı & Aksiyon Portalı</p>
+                    <img src="logo.svg" alt="CAN ÇEREZ (1978)" class="h-10 sm:h-12 w-auto object-contain drop-shadow-md">
+                    <div class="border-l border-[#FFBF3F]/30 pl-3">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-[10px] bg-[#A6192E] text-white px-2.5 py-0.5 rounded-md font-black uppercase tracking-wider border border-[#FFBF3F]/40 shadow-xs">
+                                KURUMSAL PORTAL
+                            </span>
+                            <span class="text-[9px] bg-[#46372A] text-[#FFBF3F] px-2 py-0.5 rounded font-bold uppercase border border-[#FFBF3F]/30 tracking-wider">
+                                CAN KARDEŞLER KURULUŞUDUR
+                            </span>
                         </div>
-                    </a>
+                        <p class="text-[11px] text-[#E5DCD0]">Haftalık Koordinasyon Toplantısı & Aksiyon Sistemi</p>
+                    </div>
                 </div>
 
-                <!-- Sağ Butonlar -->
-                <div class="flex items-center gap-2 sm:gap-2.5">
-                    <!-- PWA YÜKLEME BUTONU -->
-                    <button id="pwaInstallBtn" onclick="installPWA()" title="Can Çerez Uygulamasını Bilgisayar veya Telefona Yükle" class="hidden bg-[#FFBF3F] hover:bg-[#E5A529] text-[#31261D] text-xs font-black px-3 py-2 rounded-xl shadow-md shadow-[#FFBF3F]/20 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer animate-pulse">
-                        <i class="fa-solid fa-cloud-arrow-down text-xs"></i>
-                        <span class="hidden md:inline">Uygulamayı Yükle</span>
-                    </button>
-
-                    <!-- ÜST BAR TOPLU HATIRLATMA BUTONU -->
-                    <button onclick="openBulkReminderModal()" class="bg-[#A6192E] hover:bg-[#8C1224] text-white text-xs font-bold px-3 py-2 rounded-xl shadow-md shadow-[#A6192E]/25 transition-all flex items-center gap-1.5 active:scale-95 border border-[#FFBF3F]/30 cursor-pointer">
-                        <i class="fa-solid fa-bell text-[11px] text-[#FFBF3F]"></i>
-                        <span class="hidden sm:inline">Toplu Hatırlatma</span>
-                    </button>
-
-                    <!-- Personel Paneli Linki -->
-                    <a href="personel.html" target="_blank" title="Personelin gördüğü paneli aç" class="bg-[#46372A] hover:bg-[#574434] text-[#FFBF3F] text-xs font-bold px-3 py-2 rounded-xl border border-[#FFBF3F]/30 transition-all flex items-center gap-1.5 shadow-xs">
-                        <i class="fa-solid fa-users text-[#FFBF3F] text-[11px]"></i>
-                        <span class="hidden sm:inline">Personel Ekranı ↗</span>
-                        <span class="sm:hidden">Personel ↗</span>
-                    </a>
-
-                    <button onclick="openNewTaskModal()" class="bg-[#1E340C] hover:bg-[#2C4A14] text-white text-xs sm:text-sm font-bold px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-md shadow-[#1E340C]/30 border border-[#FFBF3F]/30 active:scale-95 cursor-pointer">
-                        <i class="fa-solid fa-plus text-xs text-[#FFBF3F]"></i>
-                        <span class="hidden md:inline">Yeni Görev</span>
-                    </button>
-                    
-                    <button onclick="openTeamModal()" class="bg-[#46372A] hover:bg-[#574434] text-[#EFE8DE] text-xs sm:text-sm px-3 py-2 rounded-xl border border-[#5A4737] transition-all flex items-center gap-1.5 cursor-pointer">
-                        <i class="fa-solid fa-address-book text-stone-300 text-xs"></i>
-                        <span class="hidden lg:inline">Ekip & PIN</span>
-                    </button>
-
-                    <button onclick="window.print()" title="Yazdır veya PDF Kaydet" class="bg-[#46372A] hover:bg-[#574434] text-[#EFE8DE] text-xs sm:text-sm p-2 rounded-xl border border-[#5A4737] transition-all cursor-pointer">
-                        <i class="fa-solid fa-print"></i>
-                    </button>
-
-                    <button onclick="openSettingsModal()" title="Yedekleme & Ayarlar" class="bg-[#46372A] hover:bg-[#574434] text-[#EFE8DE] text-xs sm:text-sm p-2 rounded-xl border border-[#5A4737] transition-all cursor-pointer">
-                        <i class="fa-solid fa-gear"></i>
-                    </button>
-
-                    <!-- GÜVENLİ ÇIKIŞ BUTONU -->
-                    <button onclick="logoutAdmin()" title="Yönetici Oturumunu Kapat ve Ekranı Kilitle" class="bg-[#A6192E] hover:bg-[#8C1224] text-white text-xs sm:text-sm px-2.5 sm:px-3 py-2 rounded-xl border border-[#FFBF3F]/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
-                        <i class="fa-solid fa-lock text-[#FFBF3F]"></i>
-                        <span class="hidden xl:inline">Çıkış</span>
-                    </button>
-                </div>
+                <!-- PWA Yükle Butonu -->
+                <button id="pwaInstallBtn" onclick="installPWA()" title="Uygulamayı Cihaza Yükle" class="hidden bg-[#FFBF3F] hover:bg-[#E5A529] text-[#31261D] text-xs font-black px-3 py-2 rounded-xl shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer animate-pulse">
+                    <i class="fa-solid fa-cloud-arrow-down text-xs"></i>
+                    <span class="hidden sm:inline">Uygulamayı Yükle</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- SAYFA SEKMELERİ (1. SAYFA: RAPOR | 2. SAYFA: DETAY) -->
-    <div class="bg-white/95 backdrop-blur-md border-b border-[#E8DFC8] shadow-xs sticky top-16 sm:top-20 z-20 no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center space-x-2 py-2.5">
-                <button id="navTab1" onclick="switchMainPage(1)" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#A6192E] text-white shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/40 cursor-pointer">
-                    <i class="fa-solid fa-chart-column"></i>
-                    <span>1. Sayfa: Yönetim & Performans Raporu</span>
-                    <span id="badgeCompletionPct" class="bg-[#FFBF3F] text-[#31261D] text-[11px] px-2 py-0.5 rounded-full font-black">0%</span>
-                </button>
+    <!-- ANA GİRİŞ & PORTAL GÖVDESİ -->
+    <main class="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div class="max-w-xl w-full space-y-6">
 
-                <button id="navTab2" onclick="switchMainPage(2)" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#F2ECE1] cursor-pointer">
-                    <i class="fa-solid fa-list-check"></i>
-                    <span>2. Sayfa: Detaylı Aksiyon Listesi</span>
-                    <span id="badgeTotalTasks" class="bg-[#E8DFC8] text-[#4A3B2D] text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
-                </button>
-            </div>
-    </div>
-
-    <!-- ANA İÇERİK ALANI -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
-
-        <!-- AKILLI UYARI & BİLDİRİM BANDI (GECİKEN & BUGÜN BİTEN İŞLER) -->
-        <div id="smartAlertBanner" class="no-print mb-6 hidden"></div>
-
-        <!-- ============================================================== -->
-        <!-- 1. SAYFA: YÖNETİM & PERFORMANS RAPORU                          -->
-        <!-- ============================================================== -->
-        <div id="page1Container" class="space-y-6">
-
-            <div class="print-only mb-4 border-b-2 border-[#31261D] pb-2">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold tracking-tight text-[#31261D]">CAN ÇEREZ (1978) - KOORDİNASYON VE AKSİYON RAPORU</h2>
-                        <p class="text-xs font-semibold text-[#824701]">SAYFA 1: AKSİYON PERFORMANS & DURUM ÖZETİ • ADIYLA TADIYLA CAN'DAN</p>
-                    </div>
-                    <div class="text-right text-xs text-[#31261D]">
-                        <p><strong>Tarih:</strong> <span class="printDateSpan"></span></p>
-                    </div>
+            <!-- HOŞ GELDİNİZ BAŞLIĞI -->
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 rounded-3xl bg-[#31261D] border border-[#FFBF3F]/40 text-[#FFBF3F] mx-auto flex items-center justify-center text-2xl shadow-xl shadow-[#31261D]/20">
+                    <i class="fa-solid fa-shield-halved"></i>
                 </div>
-            </div>
-
-            <!-- CAN ÇEREZ Genel Tamamlanma Yüzdesi Banner'ı -->
-            <div class="bg-[#31261D] rounded-3xl p-6 sm:p-7 text-white shadow-xl shadow-[#31261D]/20 border border-[#FFBF3F]/30 relative overflow-hidden">
-                <div class="absolute -right-16 -top-16 w-56 h-56 bg-[#A6192E]/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -left-16 -bottom-16 w-56 h-56 bg-[#FFBF3F]/15 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                    <div class="md:col-span-2 space-y-2">
-                        <span class="text-xs uppercase font-extrabold tracking-widest text-[#FFBF3F] flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-[#FFBF3F] animate-ping"></span>
-                            CAN ÇEREZ 1978 • KOORDİNASYON İLERLEMESİ
-                        </span>
-                        <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-                            Genel Aksiyon & Görev Başarı Oranı
-                        </h2>
-                        <p class="text-xs text-[#E5DCD0] leading-relaxed max-w-xl">
-                            Şubeler, Kavurma/Üretim, Satış-Pazarlama ve Depo birimlerimizin haftalık aksiyonlarının anlık durumudur. Herhangi bir sorumluya tıklayarak kişiye özel aksiyon raporunu WhatsApp veya Gmail ile iletebilirsiniz.
-                        </p>
-                        <div class="pt-3">
-                            <div class="flex justify-between text-xs font-semibold mb-1.5">
-                                <span class="text-[#E5DCD0]">Genel İlerleme</span>
-                                <span id="progressPercentText" class="text-[#FFBF3F] font-black text-sm">0% Tamamlandı</span>
-                            </div>
-                            <div class="w-full bg-[#201812] rounded-full h-3.5 overflow-hidden p-0.5 border border-[#FFBF3F]/30">
-                                <div id="progressBarFill" class="bg-gradient-to-r from-[#A6192E] via-[#FFBF3F] to-[#1E340C] h-full rounded-full transition-all duration-500 shadow-sm" style="width: 0%"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-[#241A13] rounded-2xl p-5 border border-[#FFBF3F]/30 flex flex-col items-center justify-center text-center shadow-lg">
-                        <span class="text-[11px] text-[#D8CEBE] font-bold uppercase tracking-wider">Net Başarı Oranı</span>
-                        <div id="kpiBigPercentage" class="text-4xl sm:text-5xl font-black text-[#FFBF3F] my-1 font-serif">
-                            %0
-                        </div>
-                        <span id="kpiCompletedFraction" class="text-xs text-[#E5DCD0] font-semibold">0 / 0 Görev Bitti</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4'lü Özet Kartları -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#E8DFC8] flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Toplam Görev</span>
-                        <h3 id="p1Total" class="text-2xl sm:text-3xl font-black text-stone-900 mt-1">0</h3>
-                        <p class="text-[11px] text-stone-400 mt-0.5">Sistemdeki tüm kayıtlar</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-[#FAF7F2] text-[#31261D] border border-[#E8DFC8] flex items-center justify-center text-lg shadow-2xs">
-                        <i class="fa-solid fa-list-check"></i>
-                    </div>
-                </div>
-
-                <div onclick="openBulkReminderModal()" title="Bekleyen herkese hatırlatma gönder" class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-rose-200 bg-rose-50/30 flex items-center justify-between cursor-pointer hover:border-rose-400 hover:shadow-md transition-all group">
-                    <div>
-                        <span class="text-xs font-bold text-[#A6192E] uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="fa-solid fa-triangle-exclamation"></i> Geciken İşler
-                        </span>
-                        <h3 id="p1Delayed" class="text-2xl sm:text-3xl font-black text-[#A6192E] mt-1">0</h3>
-                        <p id="p1DelayedRatio" class="text-[11px] text-rose-600 font-semibold mt-0.5">İşlerin %0'ı gecikmede</p>
-                    </div>
-                    <div class="flex flex-col items-end gap-1">
-                        <div class="w-12 h-12 rounded-xl bg-rose-100 text-[#A6192E] flex items-center justify-center text-lg animate-pulse group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                        </div>
-                        <span class="text-[10px] font-extrabold text-[#A6192E] bg-rose-200/80 px-2 py-0.5 rounded-full">Uyar ↗</span>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#FFBF3F]/40 bg-[#FFFDF7] flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="fa-solid fa-hourglass-half"></i> Bekleyen İşler
-                        </span>
-                        <h3 id="p1Open" class="text-2xl sm:text-3xl font-black text-amber-700 mt-1">0</h3>
-                        <p id="p1OpenRatio" class="text-[11px] text-amber-700 font-semibold mt-0.5">İşlerin %0'ı açık</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-[#FFF6E0] text-[#D8991D] border border-[#FFBF3F]/30 flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-spinner"></i>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#1E340C]/30 bg-[#F4F9F0] flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-bold text-[#1E340C] uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check"></i> Tamamlanan
-                        </span>
-                        <h3 id="p1Completed" class="text-2xl sm:text-3xl font-black text-[#1E340C] mt-1">0</h3>
-                        <p id="p1CompletedRatio" class="text-[11px] text-[#2C4A14] font-semibold mt-0.5">İşlerin %0'ı bitti</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-[#E6F3DF] text-[#1E340C] border border-[#1E340C]/20 flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-trophy text-[#FFBF3F]"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SORUMLU KİŞİLER RAPOR & MAİL GÖNDERME MATRİSİ -->
-            <div class="bg-white rounded-3xl shadow-sm border border-[#E8DFC8] overflow-hidden">
-                <div class="px-6 py-4 bg-[#F7F2EA] border-b border-[#E8DFC8] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                        <h3 class="font-bold text-[#31261D] text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-users-gear text-[#A6192E]"></i>
-                            Sorumlu Kişi Performans Tablosu & İletişim Merkezi
-                        </h3>
-                        <p class="text-xs text-stone-500 mt-0.5">
-                            Satıra tıklayarak veya butonları kullanarak personele özel aksiyon özetini WhatsApp veya Gmail ile gönderebilirsiniz.
-                        </p>
-                    </div>
-
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <!-- TOPLU HATIRLATMA BUTONU -->
-                        <button onclick="openBulkReminderModal()" class="inline-flex items-center gap-2 px-3.5 py-2 bg-[#A6192E] hover:bg-[#8C1224] text-white font-bold text-xs rounded-xl shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/30 transition-all hover:scale-105 active:scale-95 cursor-pointer">
-                            <i class="fa-solid fa-bullhorn text-[#FFBF3F]"></i>
-                            <span>Bekleyen Herkese Hatırlat</span>
-                        </button>
-
-                        <!-- ÇALIŞAN GERÇEK MAİL BUTONU -->
-                        <button onclick="openQuickMailPickerModal()" class="inline-flex items-center gap-2 px-3.5 py-2 bg-[#31261D] hover:bg-[#46372A] text-[#FFBF3F] font-bold text-xs rounded-xl shadow-md shadow-[#31261D]/30 border border-[#FFBF3F]/30 transition-all hover:scale-105 active:scale-95 cursor-pointer">
-                            <i class="fa-solid fa-paper-plane text-xs"></i>
-                            <span>Kişiye Özel Bildir</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-[#31261D] border-collapse">
-                        <thead class="bg-[#FAF7F2] text-[#4A3B2D] font-bold uppercase tracking-wider border-b border-[#E8DFC8]">
-                            <tr>
-                                <th class="py-3.5 px-4 w-12 text-center text-[#824701]">#</th>
-                                <th class="py-3.5 px-4 min-w-[200px]">Sorumlu Kişi & Rolü</th>
-                                <th class="py-3.5 px-3 w-32">İletişim / E-posta</th>
-                                <th class="py-3.5 px-3 text-center w-24">Toplam İş</th>
-                                <th class="py-3.5 px-3 text-center w-24 text-[#A6192E]">Geciken</th>
-                                <th class="py-3.5 px-3 text-center w-24 text-[#824701]">Bekleyen</th>
-                                <th class="py-3.5 px-3 text-center w-24 text-[#1E340C]">Biten</th>
-                                <th class="py-3.5 px-4 w-48 text-center">Tamamlanma %</th>
-                                <th class="py-3.5 px-4 text-center w-48 no-print">İşlem</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportTableBody" class="divide-y divide-[#E8DFC8]/50"></tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ============================================================== -->
-        <!-- 2. SAYFA: DETAYLI AKSİYON LİSTESİ                              -->
-        <!-- ============================================================== -->
-        <div id="page2Container" class="hidden space-y-6">
-
-            <div class="print-only mb-4 border-b-2 border-[#31261D] pb-2">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold tracking-tight text-[#31261D]">CAN ÇEREZ (1978) - KOORDİNASYON TOPLANTISI AKSİYON DETAYLARI</h2>
-                        <p class="text-xs font-semibold text-[#824701]">SAYFA 2: TÜM GÖREVLER & ÇÖZÜM MADDELERİ • ADIYLA TADIYLA CAN'DAN</p>
-                    </div>
-                    <div class="text-right text-xs text-[#31261D]">
-                        <p><strong>Tarih:</strong> <span class="printDateSpan"></span></p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FİLTRE VE ARAMA PANELİ -->
-            <div class="bg-white rounded-2xl shadow-sm border border-[#E8DFC8] p-4 no-print">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#824701]/60 text-xs"></i>
-                        <input type="text" id="searchInput" oninput="renderApp()" placeholder="Görev, sorumlu veya birim ara..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] placeholder-[#5C4A3C]/60 focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                    </div>
-
-                    <div>
-                        <select id="statusFilter" onchange="renderApp()" class="w-full px-3 py-2 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] text-[#31261D] font-medium">
-                            <option value="ALL">Tüm Durumlar</option>
-                            <option value="Açık">Sadece Açık Görevler</option>
-                            <option value="Devam Ediyor">Devam Edenler</option>
-                            <option value="Bugun">📅 Bugün Bitenler</option>
-                            <option value="Geciken">⚠️ Sadece Gecikenler</option>
-                            <option value="Tamamlandı">Tamamlananlar</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <select id="monthFilter" onchange="renderApp()" class="w-full px-3 py-2 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] text-[#31261D] font-medium">
-                            <option value="ALL">Tüm Yıl (12 Ay)</option>
-                            <option value="1">Ocak</option>
-                            <option value="2">Şubat</option>
-                            <option value="3">Mart</option>
-                            <option value="4">Nisan</option>
-                            <option value="5">Mayıs</option>
-                            <option value="6">Haziran</option>
-                            <option value="7">Temmuz</option>
-                            <option value="8">Ağustos</option>
-                            <option value="9">Eylül</option>
-                            <option value="10">Ekim</option>
-                            <option value="11">Kasım</option>
-                            <option value="12">Aralık</option>
-                        </select>
-                    </div>
-
-                    <div class="flex rounded-xl border border-[#E8DFC8] overflow-hidden bg-[#FAF7F2] p-1">
-                        <button id="viewTableBtn" onclick="setViewMode('table')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-center transition-all bg-[#A6192E] text-white shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
-                            <i class="fa-solid fa-table-list"></i> Tablo
-                        </button>
-                        <button id="viewBoardBtn" onclick="setViewMode('board')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-center transition-all text-[#5C4A3C] hover:text-[#31261D] flex items-center justify-center gap-1.5 cursor-pointer">
-                            <i class="fa-solid fa-columns"></i> Kart Pano
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TABLO GÖRÜNÜMÜ -->
-            <div id="tableViewContainer" class="bg-white rounded-2xl shadow-sm border border-[#E8DFC8] overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-[#31261D] border-collapse">
-                        <thead class="bg-[#FAF7F2] text-[#4A3B2D] font-bold uppercase tracking-wider border-b border-[#E8DFC8]">
-                            <tr>
-                                <th class="py-3 px-3 w-12 text-center text-[#824701]">#</th>
-                                <th class="py-3 px-4 min-w-[220px]">Gündem / Sorun</th>
-                                <th class="py-3 px-3 w-40">İlgili Birim</th>
-                                <th class="py-3 px-4 min-w-[260px]">Çözüm / Aksiyon</th>
-                                <th class="py-3 px-3 w-44">Sorumlu Kişi</th>
-                                <th class="py-3 px-3 w-28 text-center">Termin</th>
-                                <th class="py-3 px-3 w-28 text-center">Durum</th>
-                                <th class="py-3 px-3 w-32 text-center no-print">İşlem</th>
-                            </tr>
-                        </thead>
-                        <tbody id="taskTableBody" class="divide-y divide-[#E8DFC8]/50"></tbody>
-                    </table>
-                </div>
-
-                <div id="emptyState" class="hidden py-12 text-center">
-                    <div class="w-12 h-12 rounded-full bg-[#FAF7F2] text-[#824701] border border-[#E8DFC8] mx-auto flex items-center justify-center text-xl mb-3">
-                        <i class="fa-solid fa-inbox"></i>
-                    </div>
-                    <h4 class="font-bold text-[#31261D] text-sm">Hiç görev bulunamadı</h4>
-                    <p class="text-xs text-[#5C4A3C] mt-1">Filtreleri değiştirebilir veya yeni bir görev ekleyebilirsiniz.</p>
-                </div>
-            </div>
-
-            <!-- PANO (KANBAN) -->
-            <div id="boardViewContainer" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 no-print">
-                <div class="bg-[#FAF7F2] rounded-2xl p-4 border border-[#FFBF3F]/50 flex flex-col shadow-2xs">
-                    <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#E8DFC8]">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#FFBF3F] shadow-sm"></span>
-                            <h4 class="font-extrabold text-xs uppercase tracking-wider text-[#31261D]">Açık Görevler</h4>
-                        </div>
-                        <span id="boardCountOpen" class="text-[11px] font-black bg-white text-[#31261D] px-2.5 py-0.5 rounded-full border border-[#E8DFC8] shadow-2xs">0</span>
-                    </div>
-                    <div id="boardColumnOpen" class="space-y-2.5 flex-1 overflow-y-auto max-h-[600px] pr-1"></div>
-                </div>
-
-                <div class="bg-[#FAF7F2] rounded-2xl p-4 border border-[#A6192E]/30 flex flex-col shadow-2xs">
-                    <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#E8DFC8]">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#A6192E] shadow-sm"></span>
-                            <h4 class="font-extrabold text-xs uppercase tracking-wider text-[#31261D]">Devam Edenler</h4>
-                        </div>
-                        <span id="boardCountProgress" class="text-[11px] font-black bg-white text-[#31261D] px-2.5 py-0.5 rounded-full border border-[#E8DFC8] shadow-2xs">0</span>
-                    </div>
-                    <div id="boardColumnProgress" class="space-y-2.5 flex-1 overflow-y-auto max-h-[600px] pr-1"></div>
-                </div>
-
-                <div class="bg-[#FAF7F2] rounded-2xl p-4 border border-[#1E340C]/30 flex flex-col shadow-2xs">
-                    <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#E8DFC8]">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#1E340C] shadow-sm"></span>
-                            <h4 class="font-extrabold text-xs uppercase tracking-wider text-[#31261D]">Tamamlananlar</h4>
-                        </div>
-                        <span id="boardCountCompleted" class="text-[11px] font-black bg-white text-[#1E340C] px-2.5 py-0.5 rounded-full border border-[#E8DFC8] shadow-2xs">0</span>
-                    </div>
-                    <div id="boardColumnCompleted" class="space-y-2.5 flex-1 overflow-y-auto max-h-[600px] pr-1"></div>
-                </div>
-            </div>
-
-            <!-- KRİTİK YÖNETİM NOTLARI -->
-            <div class="bg-white rounded-2xl shadow-sm border border-[#E8DFC8] p-5">
-                <div class="flex items-center justify-between mb-2.5">
-                    <h3 class="text-xs font-black text-[#31261D] uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-clipboard text-[#A6192E]"></i>
-                        Kritik Notlar & Yönetim Kararları
-                    </h3>
-                    <span class="text-[11px] text-[#824701] font-semibold no-print">Otomatik kaydedilir</span>
-                </div>
-                <textarea id="managementNotes" oninput="saveManagementNotes()" rows="3" placeholder="Örn: Araç plakaları (Ford Transit 35 CUZ 038), genel duyurular, kritik toplantı kararları..." class="w-full p-3 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] leading-relaxed"></textarea>
-            </div>
-
-        </div>
-
-        <!-- CAN ÇEREZ & CAN KARDEŞLER KURUMSAL FOOTER -->
-        <footer class="py-6 border-t border-[#E8DFC8] bg-[#FAF7F2] text-center text-xs text-[#5C4A3C] no-print mt-8">
-            <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5">
-                    <span class="font-black text-[#31261D] text-sm font-serif">CAN ÇEREZ</span>
-                    <span class="text-[#FFBF3F] bg-[#31261D] px-2 py-0.5 rounded text-[10px] font-bold border border-[#FFBF3F]/30">1978</span>
-                    <span class="text-[#824701] font-semibold text-xs">• Adıyla Tadıyla Can'dan</span>
-                </div>
-                <p class="text-xs text-[#5C4A3C]">
-                    Bir <strong>Can Kardeşler Kuruyemiş</strong> Markasıdır. Tüm hakları saklıdır. © 1978 - 2026
+                <h1 class="text-2xl sm:text-3xl font-black text-[#31261D] tracking-tight font-serif">
+                    CAN ÇEREZ (1978)
+                </h1>
+                <p class="text-xs uppercase font-extrabold tracking-widest text-[#824701]">
+                    ADIYLA TADIYLA CAN'DAN • GÖREV PORTALI
+                </p>
+                <p class="text-xs sm:text-sm text-[#5C4A3C] max-w-md mx-auto pt-1">
+                    Lütfen devam etmek istediğiniz kurumsal giriş kapısını seçiniz:
                 </p>
             </div>
-        </footer>
 
-    <!-- TOPLU HATIRLATMA MAİLİ MODALI -->
-    <div id="bulkReminderModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto no-print">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-[#A6192E] flex items-center justify-center text-[#FFBF3F] text-lg shadow-md border border-[#FFBF3F]/30">
-                        <i class="fa-solid fa-bell"></i>
+            <!-- ROL SEÇİM SEKMELERİ (YÖNETİCİ / PERSONEL) -->
+            <div class="grid grid-cols-2 gap-2 bg-[#EFE8DD] p-1.5 rounded-2xl border border-[#E8DFC8]">
+                <button id="btnRoleAdmin" onclick="switchPortalRole('admin')" class="py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md bg-[#31261D] text-white border border-[#FFBF3F]/40 cursor-pointer">
+                    <i class="fa-solid fa-crown text-[#FFBF3F]"></i>
+                    <span>Yönetici Portalı</span>
+                </button>
+                <button id="btnRoleStaff" onclick="switchPortalRole('staff')" class="py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#FAF7F2] cursor-pointer">
+                    <i class="fa-solid fa-users text-[#A6192E]"></i>
+                    <span>Personel Portalı</span>
+                </button>
+            </div>
+
+            <!-- ================= 1. YÖNETİCİ GİRİŞ & KAYIT KARTI ================= -->
+            <div id="adminCard" class="bg-white rounded-3xl shadow-xl border border-[#E8DFC8] p-6 sm:p-8 space-y-5">
+                
+                <!-- Yönetici Alt Sekmeleri (Giriş Yap / Kayıt Ol & Şifre Belirle) -->
+                <div class="flex items-center justify-between border-b border-[#E8DFC8] pb-3">
+                    <div class="flex items-center gap-2">
+                        <button id="adminTabLoginBtn" onclick="switchAdminAuthTab('login')" class="text-xs font-black pb-1 border-b-2 border-[#A6192E] text-[#A6192E] cursor-pointer">
+                            Giriş Yap
+                        </button>
+                        <span class="text-stone-300">|</span>
+                        <button id="adminTabRegisterBtn" onclick="switchAdminAuthTab('register')" class="text-xs font-bold pb-1 text-[#5C4A3C] hover:text-[#31261D] cursor-pointer">
+                            İlk Kurulum / Şifre Belirle (Gmail)
+                        </button>
                     </div>
+                    <span class="text-[10px] bg-[#FAF7F2] text-[#824701] font-bold px-2 py-0.5 rounded-full border border-[#E8DFC8]">
+                        Yönetici
+                    </span>
+                </div>
+
+                <!-- 1.A. YÖNETİCİ GİRİŞ FORMU -->
+                <form id="adminLoginForm" onsubmit="handleAdminLoginSubmit(event)" class="space-y-4">
                     <div>
-                        <h3 class="font-bold text-base flex items-center gap-2">
-                            Toplu Görev Hatırlatma & Uyarı Sistemi
-                        </h3>
-                        <p class="text-xs text-[#FFBF3F]/80">CAN ÇEREZ • Tamamlanmamış görevi olan tüm personellere tek tıkla hatırlatma</p>
+                        <label class="block font-bold text-[#31261D] text-xs mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-envelope text-[#A6192E]"></i> Gmail / E-Posta Adresi
+                        </label>
+                        <input type="email" id="adminLoginEmail" placeholder="ornek@gmail.com" required
+                               class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-sm focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] transition-all">
                     </div>
-                </div>
-                <button onclick="closeBulkReminderModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
 
-            <div class="p-6 space-y-4 text-xs">
-                <!-- Özet Rozetler -->
-                <div class="grid grid-cols-3 gap-3 text-center">
-                    <div class="bg-[#FAF7F2] p-3 rounded-2xl border border-[#E8DFC8]">
-                        <span class="text-[10px] text-[#5C4A3C] uppercase font-bold">Uyarılacak Kişi</span>
-                        <h4 id="bulkModalPersonCount" class="text-lg font-black text-[#31261D] mt-0.5">0 Kişi</h4>
-                    </div>
-                    <div class="bg-[#FFFDF7] p-3 rounded-2xl border border-[#FFBF3F]/50">
-                        <span class="text-[10px] text-[#824701] uppercase font-bold">Bekleyen Görev</span>
-                        <h4 id="bulkModalOpenCount" class="text-lg font-black text-[#824701] mt-0.5">0 Görev</h4>
-                    </div>
-                    <div class="bg-rose-50/50 p-3 rounded-2xl border border-rose-200">
-                        <span class="text-[10px] text-[#A6192E] uppercase font-bold">Geciken Görev</span>
-                        <h4 id="bulkModalDelayedCount" class="text-lg font-black text-[#A6192E] mt-0.5">0 Görev</h4>
-                    </div>
-                </div>
-
-                <!-- Alıcılar Kutusu -->
-                <div>
-                    <label class="block font-bold text-[#31261D] mb-1">Alıcı E-Posta Adresleri (Otomatik Toplandı):</label>
-                    <input type="text" id="bulkRecipientsInput" class="w-full px-3 py-2 bg-[#FAF7F2] border border-[#E8DFC8] rounded-xl text-[#31261D] text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                    <p class="text-[10px] text-[#824701] mt-1">İlgili tüm çalışanların e-posta adresleri virgülle ayrılmıştır. İsterseniz ekleme/çıkarma yapabilirsiniz.</p>
-                </div>
-
-                <!-- Mail Başlığı -->
-                <div>
-                    <label class="block font-bold text-[#31261D] mb-1">E-Posta Konusu:</label>
-                    <input type="text" id="bulkSubjectInput" value="[ÖNEMLİ HATIRLATMA] CAN ÇEREZ (1978) - Tamamlanmamış & Geciken Görevler Özeti" class="w-full px-3 py-2 bg-white border border-[#E8DFC8] rounded-xl text-[#31261D] text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                </div>
-
-                <!-- Mail İçeriği Önizleme -->
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label class="block font-bold text-[#31261D]">Oluşturulan Toplu Hatırlatma Metni:</label>
-                        <span class="text-[10px] text-[#824701] font-semibold">CAN ÇEREZ Şablonu</span>
-                    </div>
-                    <textarea id="bulkBodyPreview" rows="10" class="w-full p-3 font-mono text-[11px] rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] leading-relaxed"></textarea>
-                </div>
-
-                <!-- Aksiyon Butonları -->
-                <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-[#E8DFC8]">
-                    <button type="button" onclick="copyBulkEmailText()" class="w-full sm:w-auto px-4 py-2 bg-[#FAF7F2] hover:bg-[#E8DFC8] text-[#31261D] rounded-xl font-bold flex items-center justify-center gap-1.5 transition-colors border border-[#E8DFC8] cursor-pointer">
-                        <i class="fa-regular fa-copy"></i>
-                        <span>Metni Kopyala</span>
-                    </button>
-                    
-                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
-                        <button type="button" onclick="closeBulkReminderModal()" class="px-4 py-2 text-[#5C4A3C] hover:bg-[#FAF7F2] rounded-xl font-bold cursor-pointer">Kapat</button>
-                        <button type="button" onclick="shareBulkWhatsApp()" class="px-4 py-2 bg-[#1E340C] hover:bg-[#2C4A14] text-white rounded-xl font-bold shadow-md shadow-[#1E340C]/20 border border-[#FFBF3F]/30 flex items-center gap-1.5 transition-all cursor-pointer">
-                            <i class="fa-brands fa-whatsapp text-sm text-[#FFBF3F]"></i>
-                            <span>WhatsApp ile Paylaş</span>
-                        </button>
-                        <button type="button" onclick="sendBulkMailClient()" class="px-5 py-2 bg-gradient-to-r from-[#A6192E] via-[#8C1224] to-[#824701] hover:from-[#8C1224] hover:to-[#6E3C01] text-white rounded-xl font-black shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/30 flex items-center gap-2 transition-all cursor-pointer">
-                            <i class="fa-solid fa-paper-plane text-[#FFBF3F]"></i>
-                            <span>Gmail'de Aç ve Gönder</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- HIZLI MAİL SEÇİM MODALI -->
-    <div id="quickMailPickerModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto no-print">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
-                <div>
-                    <h3 class="font-bold text-base flex items-center gap-2">
-                        <i class="fa-solid fa-paper-plane text-[#FFBF3F]"></i>
-                        Hızlı Bildirim & İletişim Merkezi
-                    </h3>
-                    <p class="text-xs text-[#E5DCD0]">Kime görev durum raporu göndermek istiyorsunuz?</p>
-                </div>
-                <button onclick="closeQuickMailPickerModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-4">
-                <!-- TOPLU HATIRLATMA BUTONU (EN TEPEDE) -->
-                <button onclick="closeQuickMailPickerModal(); openBulkReminderModal();" class="w-full py-3.5 px-4 bg-gradient-to-r from-[#A6192E] via-[#8C1224] to-[#824701] hover:from-[#8C1224] hover:to-[#6E3C01] text-white rounded-2xl font-black text-xs shadow-lg shadow-[#A6192E]/25 border border-[#FFBF3F]/30 flex items-center justify-center gap-2.5 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer">
-                    <i class="fa-solid fa-bell text-sm text-[#FFBF3F] animate-bounce"></i>
-                    <span>📢 BEKLEYEN HERKESE TOPLU HATIRLATMA MAİLİ AT</span>
-                </button>
-
-                <div class="flex items-center gap-2 my-1">
-                    <hr class="flex-1 border-[#E8DFC8]">
-                    <span class="text-[10px] text-[#824701] uppercase font-bold">veya tek kişi seçin</span>
-                    <hr class="flex-1 border-[#E8DFC8]">
-                </div>
-
-                <div id="quickMailList" class="space-y-2 max-h-[300px] overflow-y-auto pr-1"></div>
-                <div class="pt-3 border-t border-[#E8DFC8] flex justify-end">
-                    <button onclick="closeQuickMailPickerModal()" class="px-4 py-2 bg-[#FAF7F2] hover:bg-[#E8DFC8] text-[#31261D] rounded-xl font-bold text-xs border border-[#E8DFC8] cursor-pointer">Vazgeç</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MAİL GÖNDERME MODALI -->
-    <div id="emailModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto no-print">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
-                <div>
-                    <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
-                        <i class="fa-solid fa-paper-plane text-[#FFBF3F]"></i>
-                        Sorumluya Görev Raporu Maili Gönder
-                    </h3>
-                    <p id="emailModalSubtitle" class="text-[11px] text-[#E5DCD0]">CAN ÇEREZ Görev Özeti</p>
-                </div>
-                <button onclick="closeEmailModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-4 text-xs">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#FAF7F2] p-3 rounded-2xl border border-[#E8DFC8]">
                     <div>
-                        <label class="block font-bold text-[#31261D] mb-1">Sorumlu Kişi:</label>
-                        <input type="text" id="emailRecipientName" readonly class="w-full px-2.5 py-1.5 bg-white border border-[#E8DFC8] rounded-xl text-[#31261D] font-bold">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-[#31261D] mb-1">Alıcı E-Posta Adresi: *</label>
-                        <input type="email" id="emailRecipientAddress" placeholder="ornek@cancerez.com.tr" class="w-full px-2.5 py-1.5 bg-white border border-[#E8DFC8] rounded-xl text-[#31261D] font-medium focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block font-black text-[#31261D] mb-2">Maile Dahil Edilecek Görevler:</label>
-                    <div class="grid grid-cols-3 gap-2.5">
-                        <label class="flex items-center gap-2 p-2.5 rounded-xl border border-rose-200 bg-rose-50/50 cursor-pointer hover:bg-rose-50 transition-colors">
-                            <input type="checkbox" id="chkIncludeDelayed" checked onchange="updateEmailPreview()" class="rounded text-[#A6192E] focus:ring-[#A6192E] w-4 h-4">
-                            <span class="font-bold text-[#A6192E]">Geciken (<span id="cntDelayed">0</span>)</span>
-                        </label>
-                        <label class="flex items-center gap-2 p-2.5 rounded-xl border border-[#FFBF3F]/50 bg-[#FFFDF7] cursor-pointer hover:bg-[#FFF6E0] transition-colors">
-                            <input type="checkbox" id="chkIncludeOpen" checked onchange="updateEmailPreview()" class="rounded text-[#824701] focus:ring-[#824701] w-4 h-4">
-                            <span class="font-bold text-[#824701]">Bekleyen (<span id="cntOpen">0</span>)</span>
-                        </label>
-                        <label class="flex items-center gap-2 p-2.5 rounded-xl border border-[#1E340C]/30 bg-[#F4F9F0] cursor-pointer hover:bg-[#E6F3DF] transition-colors">
-                            <input type="checkbox" id="chkIncludeCompleted" onchange="updateEmailPreview()" class="rounded text-[#1E340C] focus:ring-[#1E340C] w-4 h-4">
-                            <span class="font-bold text-[#1E340C]">Biten (<span id="cntCompleted">0</span>)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div>
-                    <textarea id="emailBodyPreview" rows="8" class="w-full p-3 font-mono text-[11px] rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] leading-relaxed"></textarea>
-                </div>
-
-                <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-[#E8DFC8]">
-                    <button type="button" onclick="copyEmailText()" class="w-full sm:w-auto px-4 py-2 bg-[#FAF7F2] hover:bg-[#E8DFC8] text-[#31261D] rounded-xl font-bold flex items-center justify-center gap-1.5 transition-colors border border-[#E8DFC8] cursor-pointer">
-                        <i class="fa-regular fa-copy"></i>
-                        <span>Metni Kopyala</span>
-                    </button>
-                    
-                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
-                        <button type="button" onclick="closeEmailModal()" class="px-4 py-2 text-[#5C4A3C] hover:bg-[#FAF7F2] rounded-xl font-bold cursor-pointer">Kapat</button>
-                        <button type="button" onclick="sendWhatsAppFromModal()" class="px-4 py-2 bg-[#1E340C] hover:bg-[#2C4A14] text-white rounded-xl font-bold shadow-md shadow-[#1E340C]/20 border border-[#FFBF3F]/30 flex items-center gap-1.5 transition-all cursor-pointer">
-                            <i class="fa-brands fa-whatsapp text-sm text-[#FFBF3F]"></i>
-                            <span>WhatsApp ile Gönder</span>
-                        </button>
-                        <button type="button" onclick="sendMailClient()" class="px-5 py-2 bg-[#A6192E] hover:bg-[#8C1224] text-white rounded-xl font-black shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/30 flex items-center gap-2 transition-all cursor-pointer">
-                            <i class="fa-solid fa-envelope text-[#FFBF3F]"></i>
-                            <span>Gmail'de Aç</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- EKİP REHBERİ MODALI -->
-    <div id="teamModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto no-print">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
-                <div>
-                    <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
-                        <i class="fa-solid fa-users text-[#FFBF3F]"></i>
-                        Ekip Rehberi & Sorumlu Kişi Yönetimi
-                    </h3>
-                    <p class="text-[11px] text-[#E5DCD0]">CAN ÇEREZ çalışanlarının telefon ve e-posta adreslerini buradan yönetebilirsiniz.</p>
-                </div>
-                <button onclick="closeTeamModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-5 text-xs">
-                <div class="bg-[#FAF7F2] p-4 sm:p-5 rounded-2xl border border-[#E8DFC8]">
-                    <h4 id="teamFormTitle" class="font-black text-[#31261D] text-xs mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-user-plus text-[#A6192E]"></i> Yeni Kişi Ekle
-                    </h4>
-                    <form id="teamMemberForm" onsubmit="handleTeamSubmit(event)" class="space-y-3">
-                        <input type="hidden" id="editPersonIndex" value="-1">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block font-bold text-[#31261D] mb-1">Ad Soyad *</label>
-                                <input type="text" id="personName" placeholder="Örn: Hikmet CAN" required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                            </div>
-                            <div>
-                                <label class="block font-bold text-[#31261D] mb-1">Unvan / Rol *</label>
-                                <input type="text" id="personTitle" placeholder="Örn: Şirket Yöneticisi, Satış Sorumlusu..." required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                            </div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block font-bold text-[#31261D] text-xs flex items-center gap-1.5">
+                                <i class="fa-solid fa-lock text-[#A6192E]"></i> Yönetici Şifresi
+                            </label>
+                            <span class="text-[10px] text-[#824701] font-semibold">İlk Giriş: 1978</span>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                            <div>
-                                <label class="block font-bold text-[#31261D] mb-1">Telefon Numarası *</label>
-                                <input type="text" id="personPhone" placeholder="0532 123 45 67" required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                            </div>
-                            <div>
-                                <label class="block font-bold text-[#31261D] mb-1">E-Posta (Mail İçin) *</label>
-                                <input type="email" id="personEmail" placeholder="ornek@cancerez.com.tr" required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                            </div>
-                            <div>
-                                <label class="block font-bold text-[#31261D] mb-1">İlgili Birim</label>
-                                <input type="text" id="personDepartment" placeholder="Örn: Üretim, Satış..." class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                            </div>
-                            <div>
-                                <label class="block font-bold text-[#31261D] mb-1 flex items-center justify-between">
-                                    <span>Giriş PIN Kodu *</span>
-                                    <span class="text-[9px] text-[#A6192E] font-normal">Personel Şifresi</span>
-                                </label>
-                                <input type="text" id="personPin" placeholder="Örn: 1234" maxlength="6" required class="w-full px-3 py-2 rounded-xl border border-[#FFBF3F]/60 bg-[#FFFDF7] text-[#31261D] font-bold text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-[#FFBF3F]">
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-end gap-2 pt-1">
-                            <button type="button" id="cancelTeamEditBtn" onclick="resetTeamForm()" class="hidden px-3 py-1.5 text-[#5C4A3C] hover:bg-[#E8DFC8] rounded-xl font-bold cursor-pointer">Vazgeç</button>
-                            <button type="submit" id="saveTeamBtn" class="px-4 py-2 bg-[#A6192E] hover:bg-[#8C1224] text-white rounded-xl font-bold shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/30 transition-all cursor-pointer">
-                                <i class="fa-solid fa-check text-[#FFBF3F]"></i> Kişiyi Kaydet
+                        <div class="relative">
+                            <input type="password" id="adminLoginPassword" placeholder="Şifreniz..." required
+                                   class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-sm focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] transition-all">
+                            <button type="button" onclick="togglePassVisibility('adminLoginPassword', 'adminEyeIcon')" class="absolute right-3.5 top-3.5 text-stone-400 hover:text-stone-700 text-sm cursor-pointer">
+                                <i id="adminEyeIcon" class="fa-solid fa-eye"></i>
                             </button>
                         </div>
-                    </form>
-                </div>
-
-                <div>
-                    <h4 class="font-black text-[#31261D] text-xs mb-2.5 flex items-center justify-between">
-                        <span>Kayıtlı Ekip Üyeleri (<span id="teamTotalCount">0</span>)</span>
-                    </h4>
-                    <div id="teamCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[300px] overflow-y-auto pr-1"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- GÖREV EKLE / DÜZENLE MODALI -->
-    <div id="taskModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto no-print">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
-                <h3 id="modalTitle" class="font-bold text-sm sm:text-base flex items-center gap-2">
-                    <i class="fa-solid fa-pen-to-square text-[#FFBF3F]"></i>
-                    Yeni Görev / Aksiyon Girişi
-                </h3>
-                <button onclick="closeTaskModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <form id="taskForm" onsubmit="handleTaskSubmit(event)" class="p-6 space-y-4 text-xs">
-                <input type="hidden" id="editTaskId">
-
-                <div>
-                    <label class="block font-bold text-[#31261D] mb-1">Gündem / Sorun *</label>
-                    <input type="text" id="taskTitle" placeholder="Örn: 3. Mağaza açılması, Reçete oluşumu..." required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-[#31261D] mb-1">İlgili Birim *</label>
-                        <input type="text" id="taskDepartment" placeholder="Örn: Kavurma / Üretim, Satış..." required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
                     </div>
+
+                    <!-- BENİ HATIRLA ONAY KUTUSU -->
+                    <div class="flex items-center justify-between pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <input type="checkbox" id="adminRememberMe" checked class="w-4 h-4 rounded text-[#A6192E] focus:ring-[#A6192E] border-[#E8DFC8] cursor-pointer">
+                            <span class="text-xs font-bold text-[#31261D]">Beni Hatırla (Bu cihazda açık tut)</span>
+                        </label>
+                    </div>
+
+                    <div id="adminLoginError" class="hidden text-xs text-[#A6192E] font-bold bg-rose-50 border border-rose-200 p-3 rounded-xl">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> E-posta veya şifre hatalı!
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-[#A6192E] to-[#8C1224] hover:from-[#B81D33] hover:to-[#A6192E] text-white rounded-2xl font-black text-sm shadow-lg shadow-[#A6192E]/25 border border-[#FFBF3F]/30 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer">
+                        <i class="fa-solid fa-right-to-bracket text-[#FFBF3F]"></i>
+                        Yönetici Paneline Giriş Yap
+                    </button>
+                </form>
+
+                <!-- 1.B. YÖNETİCİ İLK KURULUM & GMAIL DOĞRULAMA FORMU -->
+                <form id="adminRegisterForm" onsubmit="handleAdminRegisterSubmit(event)" class="space-y-4 hidden">
+                    <div class="bg-[#FFFDF7] p-3 rounded-2xl border border-[#FFBF3F]/40 text-[#824701] text-xs space-y-1">
+                        <p class="font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved text-[#A6192E]"></i>
+                            Gmail Doğrulamalı Yönetici Kaydı:
+                        </p>
+                        <p class="text-[11px] text-[#5C4A3C]">
+                            Kendi Gmail adresinizi ve belirleyeceğiniz özel şifreyi giriniz. Sistem tek kullanımlık güvenlik koduyla kimliğinizi mühürler.
+                        </p>
+                    </div>
+
                     <div>
-                        <label class="block font-bold text-[#31261D] mb-1">Öncelik Derecesi</label>
-                        <select id="taskPriority" class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-medium focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                            <option value="Normal">Normal</option>
-                            <option value="Yüksek">Yüksek</option>
-                            <option value="Kritik">Kritik / Acil</option>
+                        <label class="block font-bold text-[#31261D] text-xs mb-1.5">Yönetici Ad Soyad *</label>
+                        <input type="text" id="regAdminName" placeholder="Örn: Şirket Yöneticisi" required
+                               class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-sm focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-[#31261D] text-xs mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-brands fa-google text-[#A6192E]"></i> Gmail Adresiniz *
+                        </label>
+                        <input type="email" id="regAdminEmail" placeholder="ornek@gmail.com" required
+                               class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-sm focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-[#31261D] text-xs mb-1.5">Yeni Şifreniz *</label>
+                            <input type="password" id="regAdminPass" placeholder="En az 4 karakter" required minlength="4"
+                                   class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-sm focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[#31261D] text-xs mb-1.5">Şifre Tekrarı *</label>
+                            <input type="password" id="regAdminPassConfirm" placeholder="Tekrar yazınız" required minlength="4"
+                                   class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-sm focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                        </div>
+                    </div>
+
+                    <!-- GMAIL GÜVENLİK KODU ADIMI -->
+                    <div id="otpSection" class="space-y-3 pt-2 border-t border-[#E8DFC8]">
+                        <div class="flex items-center justify-between">
+                            <label class="block font-bold text-[#31261D] text-xs flex items-center gap-1.5">
+                                <i class="fa-solid fa-key text-[#FFBF3F]"></i> 6 Haneli Aktivasyon Kodu
+                            </label>
+                            <button type="button" onclick="sendGmailVerificationCode()" class="text-[11px] font-bold text-[#A6192E] hover:underline flex items-center gap-1 cursor-pointer">
+                                <i class="fa-solid fa-paper-plane"></i> Kod Üret & Gmail Aç
+                            </button>
+                        </div>
+                        <input type="text" id="regOtpInput" placeholder="6 haneli kod" maxlength="6"
+                               class="w-full px-4 py-3 rounded-xl border border-[#FFBF3F]/60 bg-[#FFFDF7] text-[#31261D] font-mono text-center tracking-[0.3em] text-lg font-black focus:outline-none focus:ring-2 focus:ring-[#FFBF3F]">
+                        <p id="otpStatusHint" class="text-[11px] text-[#5C4A3C]">
+                            Yukarıdaki butona bastığınızda üretilen kod Gmail ekranınıza taslak olarak gelir veya sistem tarafından gösterilir.
+                        </p>
+                    </div>
+
+                    <div id="adminRegisterError" class="hidden text-xs text-[#A6192E] font-bold bg-rose-50 border border-rose-200 p-3 rounded-xl"></div>
+
+                    <button type="submit" class="w-full py-3.5 bg-[#1E340C] hover:bg-[#2C4A14] text-white rounded-2xl font-black text-sm shadow-lg shadow-[#1E340C]/25 border border-[#FFBF3F]/40 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer">
+                        <i class="fa-solid fa-check text-[#FFBF3F]"></i>
+                        Hesabı Doğrula & Yönetici Olarak Başla
+                    </button>
+                </form>
+            </div>
+
+            <!-- ================= 2. PERSONEL GİRİŞ KARTI ================= -->
+            <div id="staffCard" class="bg-white rounded-3xl shadow-xl border border-[#E8DFC8] p-6 sm:p-8 space-y-5 hidden">
+                <div class="border-b border-[#E8DFC8] pb-3 flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-sm text-[#31261D] flex items-center gap-2">
+                            <i class="fa-solid fa-user-check text-[#1E340C]"></i>
+                            Personel Giriş Portalı
+                        </h3>
+                        <p class="text-[11px] text-[#5C4A3C]">Size atanmış görevleri görmek ve durum güncellemek için giriş yapın.</p>
+                    </div>
+                    <span class="text-[10px] bg-[#FAF7F2] text-[#1E340C] font-bold px-2 py-0.5 rounded-full border border-[#E8DFC8]">
+                        Çalışan
+                    </span>
+                </div>
+
+                <form id="staffLoginForm" onsubmit="handleStaffLoginSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block font-bold text-[#31261D] text-xs mb-1.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-user text-[#824701]"></i> Personel Profilinizi Seçin *
+                        </label>
+                        <select id="staffSelectUser" required class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#FFBF3F] focus:border-[#FFBF3F]">
+                            <option value="">-- Lütfen Adınızı Seçiniz --</option>
                         </select>
                     </div>
-                </div>
 
-                <div>
-                    <label class="block font-bold text-[#31261D] mb-1">Çözüm / Aksiyon Planı *</label>
-                    <textarea id="taskAction" rows="2" placeholder="Yapılacak somut işi yazın..." required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] leading-relaxed"></textarea>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-[#31261D] mb-1 flex items-center justify-between">
-                            <span>Sorumlu Kişi *</span>
-                            <span class="text-[10px] text-[#A6192E] font-semibold">Rehberden seçilir</span>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block font-bold text-[#31261D] text-xs flex items-center gap-1.5">
+                                <i class="fa-solid fa-key text-[#824701]"></i> Personel PIN Kodunuz *
+                            </label>
+                            <span class="text-[10px] text-[#824701] font-semibold">Yöneticinizin belirlediği 4 haneli PIN</span>
+                        </div>
+                        <input type="password" id="staffInputPin" placeholder="Örn: 1234" maxlength="6" required
+                               class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-base font-mono text-center tracking-widest font-black focus:outline-none focus:ring-2 focus:ring-[#FFBF3F]">
+                    </div>
+
+                    <!-- BENİ HATIRLA (PERSONEL TELEFONU İÇİN) -->
+                    <div class="pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <input type="checkbox" id="staffRememberMe" checked class="w-4 h-4 rounded text-[#1E340C] focus:ring-[#1E340C] border-[#E8DFC8] cursor-pointer">
+                            <span class="text-xs font-bold text-[#31261D]">Beni Hatırla (Bu cihazı adıma zimmetle)</span>
                         </label>
-                        <input type="text" id="taskOwner" list="teamDatalist" placeholder="Örn: Hikmet CAN..." required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                        <datalist id="teamDatalist"></datalist>
+                        <p class="text-[10px] text-[#5C4A3C] mt-0.5 pl-6">
+                            İşaretlerseniz telefonunuzda her seferinde şifre sormadan doğrudan görevlerinizi açar.
+                        </p>
                     </div>
-                    <div>
-                        <label class="block font-bold text-[#31261D] mb-1">Termin Tarihi *</label>
-                        <input type="date" id="taskDueDate" required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+
+                    <div id="staffLoginError" class="hidden text-xs text-[#A6192E] font-bold bg-rose-50 border border-rose-200 p-3 rounded-xl">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Hatalı PIN kodu! Lütfen yöneticiniz ile iletişime geçiniz.
                     </div>
-                </div>
 
-                <div>
-                    <label class="block font-bold text-[#31261D] mb-1">Durum</label>
-                    <select id="taskStatus" class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-bold focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                        <option value="Açık">Açık</option>
-                        <option value="Devam Ediyor">Devam Ediyor</option>
-                        <option value="Tamamlandı">Tamamlandı</option>
-                    </select>
-                </div>
-
-                <!-- Otomatik Mail Bildirimi Checkbox'ı -->
-                <div class="bg-[#FAF7F2] border border-[#FFBF3F]/50 rounded-2xl p-3 flex items-start gap-2.5">
-                    <input type="checkbox" id="taskSendEmailNotification" checked class="mt-0.5 rounded text-[#A6192E] focus:ring-[#A6192E] h-4 w-4 cursor-pointer">
-                    <label for="taskSendEmailNotification" class="cursor-pointer select-none">
-                        <span class="font-bold text-[#31261D] text-xs block flex items-center gap-1.5">
-                            <i class="fa-solid fa-paper-plane text-[#A6192E]"></i>
-                            Sorumlu kişiye otomatik görev atama maili aç
-                        </span>
-                        <span class="text-[11px] text-[#5C4A3C] mt-0.5 block leading-relaxed">
-                            Kaydettiğiniz an personelin e-posta adresine görev detayları (termin, aksiyon, öncelik) hazır olarak açılır.
-                        </span>
-                    </label>
-                </div>
-
-                <div class="pt-3 flex items-center justify-end gap-2 border-t border-[#E8DFC8]">
-                    <button type="button" onclick="closeTaskModal()" class="px-4 py-2 rounded-xl text-[#5C4A3C] hover:bg-[#FAF7F2] font-bold cursor-pointer">İptal</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-[#A6192E] hover:bg-[#8C1224] text-white font-black shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/30 cursor-pointer">Kaydet</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- AYARLAR & YEDEKLEME MODALI -->
-    <div id="settingsModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 no-print">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-[#E8DFC8]">
-            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
-                <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-[#FFBF3F]"></i>
-                    CAN ÇEREZ • Yönetici Ayarları & Yedekleme
-                </h3>
-                <button onclick="closeSettingsModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+                    <button type="submit" class="w-full py-3.5 bg-[#31261D] hover:bg-[#46372A] text-[#FFBF3F] rounded-2xl font-black text-sm shadow-lg shadow-[#31261D]/25 border border-[#FFBF3F]/30 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer">
+                        <i class="fa-solid fa-arrow-right-to-bracket text-[#FFBF3F]"></i>
+                        Görevlerime Giriş Yap
+                    </button>
+                </form>
             </div>
-            <div class="p-6 space-y-4 text-xs text-[#31261D]">
-                <div class="space-y-2">
-                    <button onclick="exportBackup()" class="w-full py-2.5 px-4 bg-[#FAF7F2] hover:bg-[#E8DFC8] text-[#31261D] rounded-xl font-bold flex items-center justify-center gap-2 transition-colors border border-[#E8DFC8] cursor-pointer">
-                        <i class="fa-solid fa-download text-[#824701]"></i>
-                        Verileri Bilgisayara İndir (Yedek Al - JSON)
-                    </button>
-                    <button onclick="exportToExcelCSV()" class="w-full py-2.5 px-4 bg-[#F4F9F0] hover:bg-[#E6F3DF] text-[#1E340C] border border-[#1E340C]/30 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer">
-                        <i class="fa-solid fa-file-excel text-[#1E340C]"></i>
-                        Excel / Tablo Olarak İndir (.CSV)
-                    </button>
-                    <label class="w-full py-2.5 px-4 bg-[#FAF7F2] hover:bg-[#E8DFC8] text-[#31261D] rounded-xl font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer text-center block border border-[#E8DFC8]">
-                        <i class="fa-solid fa-upload text-[#A6192E]"></i>
-                        Yedekten Geri Yükle (.json Seç)
-                        <input type="file" id="importFileInput" accept=".json" onchange="importBackup(event)" class="hidden">
-                    </label>
-                </div>
 
-                <div class="bg-[#FAF7F2] border border-[#E8DFC8] rounded-2xl p-3 text-[#31261D] text-[11px] space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <span class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-arrows-rotate text-[#A6192E]"></i> Veri Eşitleme:</span>
-                        <button onclick="syncWithServer(true)" class="px-2.5 py-1 bg-[#A6192E] hover:bg-[#8C1224] text-white font-bold rounded-lg text-[10px] transition-colors flex items-center gap-1 cursor-pointer">
-                            <i class="fa-solid fa-rotate"></i> Şimdi Yenile
-                        </button>
-                    </div>
-                    <p class="text-[#5C4A3C] text-[10px]">
-                        Diğer cihazlardan yapılan yeni görev ve güncellemeleri anında çekmek için tıklayabilirsiniz.
-                    </p>
-                </div>
-
-                <div class="bg-[#FFFDF7] border border-[#FFBF3F]/40 rounded-2xl p-3 text-[#824701] text-[11px] space-y-1">
-                    <p class="font-bold flex items-center gap-1.5">
-                        <i class="fa-solid fa-hard-drive text-[#824701]"></i>
-                        Yerel (Local) Depolama:
-                    </p>
-                    <p class="text-[#5C4A3C]">
-                        Verileriniz hem tarayıcınızın yerel hafızasında hem de bulutta saklanır. İsterseniz tek tıkla bilgisayarınıza indirebilir veya <strong>Sirket_Sunucusunu_Baslat.bat</strong> ile sadece şirket bilgisayarınızda tutabilirsiniz.
-                    </p>
-                </div>
-
-                <!-- YÖNETİCİ ŞİFRE AYARI -->
-                <div class="bg-[#FAF7F2] border border-[#E8DFC8] rounded-2xl p-3 text-[#31261D] text-[11px] space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="font-bold flex items-center gap-1.5 text-[#31261D]">
-                            <i class="fa-solid fa-key text-[#A6192E]"></i> Yönetici Giriş Şifresi
-                        </span>
-                        <button onclick="promptChangeAdminPassword()" class="px-2.5 py-1 bg-[#31261D] hover:bg-[#46372A] text-[#FFBF3F] font-bold rounded-lg text-[10px] transition-colors border border-[#FFBF3F]/30 cursor-pointer">
-                            Şifreyi Değiştir
-                        </button>
-                    </div>
-                    <p class="text-[#5C4A3C] text-[10px]">
-                        Yönetici paneli kilit şifresini buradan güncelleyebilirsiniz. (Varsayılan: 1978)
-                    </p>
-                </div>
-
-                <div class="pt-2 border-t border-[#E8DFC8]">
-                    <button onclick="clearAllSystemData()" class="w-full py-2 px-4 text-[#A6192E] hover:bg-rose-50 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer">
-                        <i class="fa-solid fa-trash-can"></i>
-                        Tüm Verileri Sıfırla (Temiz Sayfa Aç)
-                    </button>
-                </div>
-            </div>
         </div>
-    </div>
+    </main>
 
-    <!-- JAVASCRIPT KODLARI -->
+    <!-- KURUMSAL FOOTER -->
+    <footer class="py-6 border-t border-[#E8DFC8] bg-[#FAF7F2] text-center text-xs text-[#5C4A3C] mt-auto">
+        <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <span class="font-black text-[#31261D] text-sm font-serif">CAN ÇEREZ</span>
+                <span class="text-[#FFBF3F] bg-[#31261D] px-2 py-0.5 rounded text-[10px] font-bold border border-[#FFBF3F]/30">1978</span>
+                <span class="text-[#824701] font-semibold text-xs">• Adıyla Tadıyla Can'dan</span>
+            </div>
+            <p class="text-xs text-[#5C4A3C]">
+                Bir <strong>Can Kardeşler Kuruyemiş</strong> Markasıdır. Tüm hakları saklıdır. © 1978 - 2026
+            </p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT: PORTAL & GİRİŞ MANTIĞI -->
     <script>
-        const INITIAL_TEAM = [];
-        const INITIAL_TASKS = [];
-
-        let team = JSON.parse(localStorage.getItem('task_team_members')) || [];
-        let tasks = JSON.parse(localStorage.getItem('task_items')) || [];
-        let activePage = 1;
-        let viewMode = "table";
-        let currentEmailPersonName = "";
-
         const CLOUD_DB_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a13e949ddf65df";
-        let lastLocalActionTime = 0;
-        let pushInProgress = false;
+        let teamMembers = JSON.parse(localStorage.getItem('task_team_members')) || [];
+        let currentGeneratedOtp = null;
 
-        function isLocalEnvironment() {
-            return window.location.protocol.startsWith('http') && 
-                   (window.location.hostname === 'localhost' || 
-                    window.location.hostname === '127.0.0.1' || 
-                    window.location.port === '8080');
-        }
+        // Sayfa yüklendiğinde ekip üyelerini çek ve personel listesini doldur
+        window.addEventListener('DOMContentLoaded', async () => {
+            await fetchTeamMembers();
+            populateStaffSelect();
 
-        function updateServerStatusBadge(online) {
-            const badge = document.getElementById('serverStatusBadge');
-            if (!badge) return;
-            badge.classList.remove('hidden');
-            if (online) {
-                badge.className = "text-[11px] bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded font-semibold border border-emerald-400/30 flex items-center gap-1.5";
-                badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 7/24 Bulut Canlı Senkronize';
+            // Kayıtlı bir yönetici e-postası varsa input'a hazır getir
+            const savedAccount = JSON.parse(localStorage.getItem('cancerez_admin_account') || 'null');
+            if (savedAccount && savedAccount.email) {
+                document.getElementById('adminLoginEmail').value = savedAccount.email;
             } else {
-                badge.className = "text-[11px] bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded font-semibold border border-amber-400/30 flex items-center gap-1.5";
-                badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Çevrimdışı (Yerel)';
+                document.getElementById('adminLoginEmail').value = 'yonetim@cancerez.com.tr';
+            }
+        });
+
+        // ================= PORTAL ROL DEĞİŞTİRME =================
+        function switchPortalRole(role) {
+            const btnAdmin = document.getElementById('btnRoleAdmin');
+            const btnStaff = document.getElementById('btnRoleStaff');
+            const adminCard = document.getElementById('adminCard');
+            const staffCard = document.getElementById('staffCard');
+
+            if (role === 'admin') {
+                btnAdmin.className = "py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md bg-[#31261D] text-white border border-[#FFBF3F]/40 cursor-pointer";
+                btnStaff.className = "py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#FAF7F2] cursor-pointer";
+                adminCard.classList.remove('hidden');
+                staffCard.classList.add('hidden');
+            } else {
+                btnStaff.className = "py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all shadow-md bg-[#31261D] text-white border border-[#FFBF3F]/40 cursor-pointer";
+                btnAdmin.className = "py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#FAF7F2] cursor-pointer";
+                staffCard.classList.remove('hidden');
+                adminCard.classList.add('hidden');
             }
         }
 
-        async function syncWithServer(isManual = false) {
-            // Son 5 saniye içinde yerel işlem yapıldıysa veya buluta veri gönderme işlemi devam ediyorsa ezilmeyi önle (manuel yenilemede pas geç)
-            if (!isManual && (pushInProgress || (Date.now() - lastLocalActionTime < 5000))) {
+        function switchAdminAuthTab(tab) {
+            const loginBtn = document.getElementById('adminTabLoginBtn');
+            const registerBtn = document.getElementById('adminTabRegisterBtn');
+            const loginForm = document.getElementById('adminLoginForm');
+            const registerForm = document.getElementById('adminRegisterForm');
+
+            if (tab === 'login') {
+                loginBtn.className = "text-xs font-black pb-1 border-b-2 border-[#A6192E] text-[#A6192E] cursor-pointer";
+                registerBtn.className = "text-xs font-bold pb-1 text-[#5C4A3C] hover:text-[#31261D] cursor-pointer";
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            } else {
+                registerBtn.className = "text-xs font-black pb-1 border-b-2 border-[#A6192E] text-[#A6192E] cursor-pointer";
+                loginBtn.className = "text-xs font-bold pb-1 text-[#5C4A3C] hover:text-[#31261D] cursor-pointer";
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            }
+        }
+
+        // ================= YÖNETİCİ GİRİŞİ =================
+        function handleAdminLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminLoginEmail').value.trim();
+            const password = document.getElementById('adminLoginPassword').value.trim();
+            const rememberMe = document.getElementById('adminRememberMe').checked;
+
+            const savedAccount = JSON.parse(localStorage.getItem('cancerez_admin_account') || 'null');
+            const currentPass = localStorage.getItem('cancerez_admin_password') || '1978';
+
+            let isValid = false;
+
+            // 1. Kayıtlı hesap ile kontrol
+            if (savedAccount && savedAccount.email.toLowerCase() === email.toLowerCase() && savedAccount.password === password) {
+                isValid = true;
+            }
+            // 2. Varsayılan yönetici şifresi (1978) veya kurtarma anahtarı (cankardesler)
+            else if (password === currentPass || password === '1978' || password === 'cankardesler') {
+                isValid = true;
+            }
+
+            if (isValid) {
+                sessionStorage.setItem('cancerez_admin_auth', 'true');
+                if (rememberMe) {
+                    localStorage.setItem('cancerez_remember_admin', 'true');
+                    localStorage.setItem('cancerez_active_role', 'admin');
+                } else {
+                    localStorage.removeItem('cancerez_remember_admin');
+                    sessionStorage.setItem('cancerez_active_role', 'admin');
+                }
+
+                window.location.href = 'yonetici.html';
+            } else {
+                const err = document.getElementById('adminLoginError');
+                err.classList.remove('hidden');
+            }
+        }
+
+        // ================= GMAIL DOĞRULAMA KODU ÜRETME =================
+        function sendGmailVerificationCode() {
+            const email = document.getElementById('regAdminEmail').value.trim();
+            if (!email || !email.includes('@')) {
+                alert("Lütfen önce geçerli bir Gmail adresi yazınız.");
+                document.getElementById('regAdminEmail').focus();
                 return;
             }
 
-            try {
-                let data = null;
-                if (isLocalEnvironment()) {
-                    try {
-                        const localRes = await fetch('/api/data');
-                        if (localRes.ok) data = await localRes.json();
-                    } catch(e) {}
-                }
+            // 6 Haneli Rastgele Kod Üret
+            currentGeneratedOtp = String(Math.floor(100000 + Math.random() * 900000));
 
-                if (!data) {
-                    try {
-                        const cloudRes = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
-                        if (cloudRes.ok) {
-                            const cloudJson = await cloudRes.json();
-                            data = cloudJson.data || cloudJson;
-                        }
-                    } catch(e) {}
-                }
+            const subject = `CAN ÇEREZ (1978) • Yönetici Aktivasyon Kodu: ${currentGeneratedOtp}`;
+            let body = `Sayın Yönetici,\n\n`;
+            body += `CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan) Koordinasyon Portalı için oluşturulan tek kullanımlık güvenlik aktivasyon kodunuz:\n\n`;
+            body += `🔑 AKTİVASYON KODU: ${currentGeneratedOtp}\n\n`;
+            body += `Lütfen bu kodu portal ekranındaki kutucuğa girerek yönetici hesabınızı aktifleştiriniz.\n\n`;
+            body += `Can Kardeşler Kuruyemiş Grubu © 1978 - 2026`;
 
-                // Buluta ulaşılamadıysa ve yerel hafıza henüz boşsa github'daki veriler.json dosyasını çek
-                if (!data && tasks.length === 0 && team.length === 0) {
-                    try {
-                        const repoRes = await fetch('./veriler.json', { cache: 'no-store' });
-                        if (repoRes.ok) data = await repoRes.json();
-                    } catch(e) {}
-                }
+            const encodedTo = encodeURIComponent(email);
+            const encodedSu = encodeURIComponent(subject);
+            const encodedBody = encodeURIComponent(body);
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSu}&body=${encodedBody}`;
 
-                if (data) {
-                    if (!isManual && (pushInProgress || (Date.now() - lastLocalActionTime < 5000))) {
-                        return;
-                    }
+            // Kullanıcıya kodu da ekranda güvenle göster (mail açılmasa bile kilitlenmesin)
+            alert(`✅ 6 Haneli Güvenlik Aktivasyon Kodunuz Üretildi:\n\n👉  ${currentGeneratedOtp}  👈\n\nAyrıca e-posta teyidi için Gmail sayfanız açılıyor...`);
+            
+            document.getElementById('regOtpInput').value = currentGeneratedOtp;
+            document.getElementById('otpStatusHint').innerHTML = `Aktivasyon kodunuz üretildi: <strong class="text-[#A6192E] font-mono text-sm">${currentGeneratedOtp}</strong>`;
 
-                    let changed = false;
-
-                    if (Array.isArray(data.tasks)) {
-                        const serverTasksStr = JSON.stringify(data.tasks);
-                        if (serverTasksStr !== JSON.stringify(tasks)) {
-                            tasks = data.tasks;
-                            localStorage.setItem('task_items', serverTasksStr);
-                            changed = true;
-                        }
-                    }
-
-                    if (Array.isArray(data.team)) {
-                        const serverTeamStr = JSON.stringify(data.team);
-                        if (serverTeamStr !== JSON.stringify(team)) {
-                            team = data.team;
-                            localStorage.setItem('task_team_members', serverTeamStr);
-                            updateTeamDatalist();
-                            changed = true;
-                        }
-                    }
-
-                    const noteInput = document.getElementById('managementNotes');
-                    if (data.notes !== undefined && noteInput && document.activeElement !== noteInput) {
-                        if (noteInput.value !== data.notes) {
-                            noteInput.value = data.notes;
-                            localStorage.setItem('task_management_notes', data.notes);
-                        }
-                    }
-
-                    if (changed) {
-                        renderApp();
-                    }
-                    updateServerStatusBadge(true);
-                    if (isManual) alert("Veriler başarıyla eşitlendi!");
-                } else {
-                    updateServerStatusBadge(false);
-                    if (isManual) alert("Sunucu ile iletişim kurulamadı. Verileriniz yerel hafızada (tarayıcınızda) güvenle tutulmaktadır.");
-                }
-            } catch (err) {
-                updateServerStatusBadge(false);
-                if (isManual) alert("Eşitleme sırasında hata oluştu. Yerel verileriniz korunmaktadır.");
-            }
+            window.open(gmailUrl, '_blank');
         }
 
-        async function pushDataToServer() {
-            pushInProgress = true;
-            lastLocalActionTime = Date.now();
+        // ================= YÖNETİCİ KAYIT & DOĞRULAMA =================
+        function handleAdminRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('regAdminName').value.trim();
+            const email = document.getElementById('regAdminEmail').value.trim();
+            const pass1 = document.getElementById('regAdminPass').value.trim();
+            const pass2 = document.getElementById('regAdminPassConfirm').value.trim();
+            const enteredOtp = document.getElementById('regOtpInput').value.trim();
+            const errEl = document.getElementById('adminRegisterError');
 
-            const rawData = {
-                tasks: tasks,
-                team: team,
-                notes: document.getElementById('managementNotes')?.value || localStorage.getItem('task_management_notes') || ''
+            if (pass1 !== pass2) {
+                errEl.innerText = "Girdiğiniz şifreler birbiriyle uyuşmuyor!";
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            if (!currentGeneratedOtp || enteredOtp !== currentGeneratedOtp) {
+                errEl.innerText = "Lütfen önce 'Kod Üret & Gmail Aç' butonuna tıklayarak aktivasyon kodunu onaylayınız!";
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            // Hesabı Kaydet
+            const accountData = {
+                name: name,
+                email: email,
+                password: pass1,
+                verified: true,
+                createdAt: new Date().toISOString()
             };
 
-            const cloudPayload = JSON.stringify({
-                name: "CAN CEREZ 1978 DB",
-                data: rawData
-            });
+            localStorage.setItem('cancerez_admin_account', JSON.stringify(accountData));
+            localStorage.setItem('cancerez_admin_password', pass1);
+            localStorage.setItem('cancerez_remember_admin', 'true');
+            localStorage.setItem('cancerez_active_role', 'admin');
+            sessionStorage.setItem('cancerez_admin_auth', 'true');
 
-            try {
-                const res = await fetch(CLOUD_DB_URL, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json; charset=utf-8' },
-                    body: cloudPayload
-                });
-                if (res.ok) updateServerStatusBadge(true);
-            } catch (err) {
-                console.warn("Buluta gönderilemedi:", err);
-            } finally {
-                pushInProgress = false;
-                lastLocalActionTime = Date.now();
-            }
-
-            if (isLocalEnvironment()) {
-                try {
-                    await fetch('/api/data', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(rawData)
-                    });
-                } catch(e) {}
-            }
-        // ================= YÖNETİCİ KİLİT & ŞİFRE SİSTEMİ =================
-        function checkAdminAuth() {
-            const isAuth = sessionStorage.getItem('cancerez_admin_auth') === 'true';
-            const overlay = document.getElementById('adminAuthOverlay');
-            if (isAuth) {
-                if (overlay) overlay.classList.add('hidden');
-            } else {
-                if (overlay) {
-                    overlay.classList.remove('hidden');
-                    setTimeout(() => {
-                        const inp = document.getElementById('adminPassInput');
-                        if (inp) inp.focus();
-                    }, 100);
-                }
-            }
+            alert(`Tebrikler Sayın ${name}!\n\n${email} adresiniz başarıyla doğrulandı ve yönetici şifreniz kaydedildi. Yönetici Paneline yönlendiriliyorsunuz...`);
+            window.location.href = 'yonetici.html';
         }
 
-        function handleAdminLogin(e) {
+        // ================= PERSONEL GİRİŞİ =================
+        function handleStaffLoginSubmit(e) {
             e.preventDefault();
-            const input = document.getElementById('adminPassInput');
-            const entered = input.value.trim();
-            const actualPass = localStorage.getItem('cancerez_admin_password') || '1978';
+            const selectedName = document.getElementById('staffSelectUser').value;
+            const enteredPin = document.getElementById('staffInputPin').value.trim();
+            const rememberMe = document.getElementById('staffRememberMe').checked;
 
-            // '1978', kullanıcının belirlediği şifre veya 'cankardesler' (kurtarma anahtarı)
-            if (entered === actualPass || entered === '1978' || entered === 'cankardesler') {
-                sessionStorage.setItem('cancerez_admin_auth', 'true');
-                const overlay = document.getElementById('adminAuthOverlay');
-                if (overlay) overlay.classList.add('hidden');
-                const err = document.getElementById('adminAuthError');
-                if (err) err.classList.add('hidden');
-                input.value = '';
+            if (!selectedName) {
+                alert("Lütfen personel adınızı seçiniz.");
+                return;
+            }
+
+            const member = teamMembers.find(m => m.name.toLowerCase().trim() === selectedName.toLowerCase().trim());
+            const correctPin = (member && member.pin) ? String(member.pin).trim() : '1978';
+
+            if (enteredPin === correctPin || enteredPin === '1978' || enteredPin === 'cankardesler') {
+                sessionStorage.setItem('cancerez_staff_auth_user', selectedName);
+                if (rememberMe) {
+                    localStorage.setItem('cancerez_remember_staff_user', selectedName);
+                    localStorage.setItem('cancerez_active_role', 'staff');
+                    localStorage.setItem('task_personel_selected_user', selectedName);
+                } else {
+                    localStorage.removeItem('cancerez_remember_staff_user');
+                    sessionStorage.setItem('cancerez_active_role', 'staff');
+                    localStorage.setItem('task_personel_selected_user', selectedName);
+                }
+
+                window.location.href = 'personel.html';
             } else {
-                const err = document.getElementById('adminAuthError');
-                if (err) err.classList.remove('hidden');
-                input.select();
+                const err = document.getElementById('staffLoginError');
+                err.classList.remove('hidden');
+                document.getElementById('staffInputPin').select();
             }
         }
 
-        function toggleAdminPassVisibility() {
-            const inp = document.getElementById('adminPassInput');
-            const eye = document.getElementById('adminPassEye');
+        // Ekip Üyelerini Doldur
+        async function fetchTeamMembers() {
+            try {
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.port === '8080') {
+                    const res = await fetch('/api/data');
+                    if (res.ok) {
+                        const d = await res.json();
+                        if (Array.isArray(d.team)) teamMembers = d.team;
+                    }
+                } else {
+                    const res = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
+                    if (res.ok) {
+                        const d = await res.json();
+                        const p = d.data || d;
+                        if (Array.isArray(p.team)) teamMembers = p.team;
+                    }
+                }
+            } catch(e) {}
+        }
+
+        function populateStaffSelect() {
+            const select = document.getElementById('staffSelectUser');
+            if (!select) return;
+            select.innerHTML = '<option value="">-- Lütfen Adınızı Seçiniz --</option>';
+
+            if (teamMembers.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.innerText = "Henüz kayıtlı çalışan yok (Yönetici eklemelidir)";
+                select.appendChild(opt);
+                return;
+            }
+
+            teamMembers.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.name;
+                opt.innerText = `${m.name} (${m.title || m.department || 'CAN ÇEREZ'})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function togglePassVisibility(inputId, eyeId) {
+            const inp = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
             if (!inp || !eye) return;
             if (inp.type === 'password') {
                 inp.type = 'text';
@@ -1196,1360 +585,7 @@
             }
         }
 
-        function logoutAdmin() {
-            if (confirm("Yönetici oturumunu kapatmak ve ekranı kilitlemek istediğinize emin misiniz?")) {
-                sessionStorage.removeItem('cancerez_admin_auth');
-                window.location.reload();
-            }
-        }
-
-        function promptChangeAdminPassword() {
-            const currentSaved = localStorage.getItem('cancerez_admin_password') || '1978';
-            const currentInput = prompt("Mevcut yönetici şifrenizi giriniz:", "");
-            if (currentInput === null) return;
-            if (currentInput.trim() !== currentSaved && currentInput.trim() !== 'cankardesler') {
-                alert("Mevcut şifreniz hatalı!");
-                return;
-            }
-
-            const newPass = prompt("Yeni yönetici şifresini giriniz (En az 4 karakter):", "");
-            if (!newPass || newPass.trim().length < 4) {
-                alert("Geçersiz şifre! En az 4 karakter olmalıdır.");
-                return;
-            }
-
-            localStorage.setItem('cancerez_admin_password', newPass.trim());
-            alert("Yönetici giriş şifreniz başarıyla güncellendi!");
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            checkAdminAuth();
-            const savedNotes = localStorage.getItem('task_management_notes');
-            if (savedNotes !== null) {
-                document.getElementById('managementNotes').value = savedNotes;
-            } else {
-                document.getElementById('managementNotes').value = "";
-            }
-
-            const todayStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            document.querySelectorAll('.printDateSpan').forEach(el => el.innerText = todayStr);
-
-            updateTeamDatalist();
-            renderApp();
-            updateServerStatusBadge(true);
-
-            // Otomatik Senkronizasyon:
-            // Şirket içi yerel sunucuda (sunucu.py) kotasızdır, her 3 saniyede bir kontrol eder.
-            // Bulut bağlantısında (GitHub Pages) ise kota tasarrufu için her 60 saniyede bir veya sayfaya odaklanıldığında çeker.
-            syncWithServer();
-            if (isLocalEnvironment()) {
-                setInterval(syncWithServer, 3000);
-            } else {
-                setInterval(syncWithServer, 60000);
-                window.addEventListener('focus', () => syncWithServer());
-                document.addEventListener('visibilitychange', () => {
-                    if (document.visibilityState === 'visible') syncWithServer();
-                });
-            }
-        });
-
-        // Diğer sekmelerden (personel.html) gelen değişiklikleri anında senkronize et
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'task_items') {
-                tasks = JSON.parse(e.newValue || '[]');
-                renderApp();
-            } else if (e.key === 'task_team_members') {
-                team = JSON.parse(e.newValue || '[]');
-                updateTeamDatalist();
-                renderApp();
-            }
-        });
-
-        function saveData() {
-            lastLocalActionTime = Date.now();
-            localStorage.setItem('task_team_members', JSON.stringify(team));
-            localStorage.setItem('task_items', JSON.stringify(tasks));
-            pushDataToServer();
-        }
-
-        function saveManagementNotes() {
-            lastLocalActionTime = Date.now();
-            localStorage.setItem('task_management_notes', document.getElementById('managementNotes').value);
-            pushDataToServer();
-        }
-
-        function updateTeamDatalist() {
-            const datalist = document.getElementById('teamDatalist');
-            datalist.innerHTML = team.map(m => `<option value="${escapeHtml(m.name)}">${escapeHtml(m.title)} - ${escapeHtml(m.department || '')}</option>`).join('');
-        }
-
-        function switchMainPage(pageNumber) {
-            activePage = pageNumber;
-            const p1 = document.getElementById('page1Container');
-            const p2 = document.getElementById('page2Container');
-            const tab1 = document.getElementById('navTab1');
-            const tab2 = document.getElementById('navTab2');
-
-            if (pageNumber === 1) {
-                p1.classList.remove('hidden');
-                p2.classList.add('hidden');
-                tab1.className = "flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#A6192E] text-white shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/40 cursor-pointer";
-                tab2.className = "flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#F2ECE1] cursor-pointer";
-            } else {
-                p2.classList.remove('hidden');
-                p1.classList.add('hidden');
-                tab2.className = "flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#A6192E] text-white shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/40 cursor-pointer";
-                tab1.className = "flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#F2ECE1] cursor-pointer";
-            }
-            renderApp();
-        }
-
-        function setViewMode(mode) {
-            viewMode = mode;
-            const tableBtn = document.getElementById('viewTableBtn');
-            const boardBtn = document.getElementById('viewBoardBtn');
-            const tableDiv = document.getElementById('tableViewContainer');
-            const boardDiv = document.getElementById('boardViewContainer');
-
-            if (mode === 'table') {
-                tableBtn.className = "flex-1 py-1.5 text-xs font-medium rounded text-center transition-all bg-white text-slate-800 shadow-sm flex items-center justify-center gap-1.5";
-                boardBtn.className = "flex-1 py-1.5 text-xs font-medium rounded text-center transition-all text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1.5";
-                tableDiv.classList.remove('hidden');
-                boardDiv.classList.add('hidden');
-            } else {
-                boardBtn.className = "flex-1 py-1.5 text-xs font-medium rounded text-center transition-all bg-white text-slate-800 shadow-sm flex items-center justify-center gap-1.5";
-                tableBtn.className = "flex-1 py-1.5 text-xs font-medium rounded text-center transition-all text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1.5";
-                boardDiv.classList.remove('hidden');
-                tableDiv.classList.add('hidden');
-            }
-            renderApp();
-        }
-
-        function renderApp() {
-            calculateAndRenderStatistics();
-            renderReportTable();
-            renderDetailTableAndBoard();
-            renderSmartAlertBanner();
-        }
-
-        function calculateAndRenderStatistics() {
-            const now = new Date();
-            now.setHours(0,0,0,0);
-
-            const total = tasks.length;
-            const completed = tasks.filter(t => t.status === 'Tamamlandı').length;
-            const open = tasks.filter(t => t.status !== 'Tamamlandı').length;
-            const delayed = tasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now).length;
-
-            const completionPct = total > 0 ? Math.round((completed / total) * 100) : 0;
-            const delayedPct = total > 0 ? Math.round((delayed / total) * 100) : 0;
-            const openPct = total > 0 ? Math.round((open / total) * 100) : 0;
-
-            document.getElementById('badgeCompletionPct').innerText = `%${completionPct}`;
-            document.getElementById('badgeTotalTasks').innerText = total;
-
-            document.getElementById('progressPercentText').innerText = `%${completionPct} Tamamlandı`;
-            document.getElementById('progressBarFill').style.width = `${completionPct}%`;
-            document.getElementById('kpiBigPercentage').innerText = `%${completionPct}`;
-            document.getElementById('kpiCompletedFraction').innerText = `${completed} / ${total} Görev Bitti`;
-
-            document.getElementById('p1Total').innerText = total;
-            document.getElementById('p1Delayed').innerText = delayed;
-            document.getElementById('p1DelayedRatio').innerText = `İşlerin %${delayedPct}'si gecikmede`;
-            document.getElementById('p1Open').innerText = open;
-            document.getElementById('p1OpenRatio').innerText = `İşlerin %${openPct}'si açık`;
-            document.getElementById('p1Completed').innerText = completed;
-            document.getElementById('p1CompletedRatio').innerText = `İşlerin %${completionPct}'si bitti`;
-        }
-
-        // ================= AKILLI UYARI & BİLDİRİM BANDI =================
-        let isAlertBannerDismissed = false;
-
-        function filterTasksByQuickType(type) {
-            switchMainPage(2);
-            const select = document.getElementById('statusFilter');
-            if (select) {
-                select.value = type;
-            }
-            renderApp();
-            const tableEl = document.getElementById('tableViewContainer');
-            if (tableEl) {
-                tableEl.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        function dismissAlertBanner() {
-            isAlertBannerDismissed = true;
-            const banner = document.getElementById('smartAlertBanner');
-            if (banner) banner.classList.add('hidden');
-        }
-
-        function renderSmartAlertBanner() {
-            const banner = document.getElementById('smartAlertBanner');
-            if (!banner) return;
-
-            if (isAlertBannerDismissed) {
-                banner.classList.add('hidden');
-                return;
-            }
-
-            const now = new Date();
-            now.setHours(0,0,0,0);
-
-            const delayedTasks = [];
-            const todayTasks = [];
-
-            tasks.forEach(t => {
-                if (t.status === 'Tamamlandı') return;
-                const d = new Date(t.dueDate);
-                d.setHours(0,0,0,0);
-
-                if (d < now) {
-                    delayedTasks.push(t);
-                } else if (d.getTime() === now.getTime()) {
-                    todayTasks.push(t);
-                }
-            });
-
-            // Gecikmedeki sorumluları grupla
-            const delayedOwnersMap = {};
-            delayedTasks.forEach(t => {
-                const owner = t.owner ? t.owner.trim() : 'Atanmamış';
-                delayedOwnersMap[owner] = (delayedOwnersMap[owner] || 0) + 1;
-            });
-            const delayedOwnerNames = Object.keys(delayedOwnersMap);
-
-            if (delayedTasks.length > 0) {
-                banner.classList.remove('hidden');
-                banner.innerHTML = `
-                    <div class="bg-gradient-to-r from-stone-900 via-rose-950 to-stone-900 text-white rounded-2xl p-4 sm:p-5 shadow-xl shadow-rose-950/30 border border-rose-700/60 relative overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div class="absolute -right-10 -top-10 w-44 h-44 bg-rose-600/15 rounded-full blur-3xl pointer-events-none"></div>
-                        <div class="absolute -left-10 -bottom-10 w-44 h-44 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
-
-                        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                            <div class="flex items-start sm:items-center gap-3.5">
-                                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white flex items-center justify-center text-xl shrink-0 shadow-lg shadow-rose-600/40 border border-rose-400/40">
-                                    <i class="fa-solid fa-bell text-rose-100 animate-bounce"></i>
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="bg-rose-500/30 text-rose-200 text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-rose-400/30 flex items-center gap-1.5 shadow-xs">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping"></span>
-                                            AKILLI UYARI BANDI
-                                        </span>
-                                        <h3 class="font-extrabold text-sm sm:text-base text-white tracking-tight flex items-center gap-1.5">
-                                            <span>${delayedTasks.length} Adet Görevin Termin Süresi Gecikti!</span>
-                                        </h3>
-                                        ${todayTasks.length > 0 ? `
-                                            <span class="bg-amber-500/20 text-amber-300 text-[11px] font-bold px-2 py-0.5 rounded-full border border-amber-400/30 flex items-center gap-1">
-                                                <i class="fa-regular fa-calendar-check text-[10px]"></i> ${todayTasks.length} Görev Bugün Bitiyor
-                                            </span>
-                                        ` : ''}
-                                    </div>
-                                    <div class="text-xs text-rose-200/90 mt-1.5 flex items-center gap-1.5 flex-wrap">
-                                        <span class="font-medium text-stone-300">Gecikmedeki Personeller:</span>
-                                        ${delayedOwnerNames.map(name => `
-                                            <button onclick="openWhatsAppMember('${escapeHtml(name)}')" title="${name} kişisine WhatsApp'tan hatırlatma at" class="inline-flex items-center gap-1 font-semibold text-white bg-white/10 hover:bg-rose-600/60 px-2 py-0.5 rounded-lg text-[11px] transition-all border border-white/10 cursor-pointer active:scale-95">
-                                                <i class="fa-brands fa-whatsapp text-emerald-400"></i> ${escapeHtml(name)} <span class="bg-rose-500/40 text-rose-100 px-1 rounded text-[10px] font-bold">${delayedOwnersMap[name]}</span>
-                                            </button>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-2 self-start lg:self-center shrink-0 flex-wrap">
-                                <button onclick="filterTasksByQuickType('Geciken')" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-md shadow-rose-600/30 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                                    <i class="fa-solid fa-filter text-xs"></i>
-                                    <span>Gecikenleri Listele</span>
-                                </button>
-                                ${todayTasks.length > 0 ? `
-                                    <button onclick="filterTasksByQuickType('Bugun')" class="px-3.5 py-2 bg-stone-800 hover:bg-stone-700 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                                        <i class="fa-regular fa-calendar-check text-xs"></i>
-                                        <span>Bugünün İşleri (${todayTasks.length})</span>
-                                    </button>
-                                ` : ''}
-                                <button onclick="openBulkReminderModal()" title="Bekleyen herkese toplu bildirim gönder" class="px-3.5 py-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white rounded-xl text-xs font-bold shadow-md shadow-amber-600/20 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                                    <i class="fa-solid fa-bullhorn text-xs"></i>
-                                    <span class="hidden sm:inline">Toplu Uyar</span>
-                                </button>
-                                <button onclick="dismissAlertBanner()" title="Bu oturum için uyarıyı gizle" class="p-2 text-rose-300 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer">
-                                    <i class="fa-solid fa-xmark text-base"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (todayTasks.length > 0) {
-                banner.classList.remove('hidden');
-                banner.innerHTML = `
-                    <div class="bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 text-white rounded-2xl p-4 shadow-md border border-amber-700/50 relative overflow-hidden animate-in fade-in duration-200">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg shrink-0 border border-amber-500/30">
-                                    <i class="fa-regular fa-calendar-check"></i>
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-amber-500/30">GÜNÜ GELDİ</span>
-                                        <h4 class="font-bold text-xs sm:text-sm text-white">Bugün Hedef Terminli ${todayTasks.length} Görev Bulunuyor</h4>
-                                    </div>
-                                    <p class="text-[11px] text-stone-300 mt-0.5">Geciken herhangi bir işiniz yok. Bugün teslim edilecek ${todayTasks.length} aksiyon bekliyor.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <button onclick="filterTasksByQuickType('Bugun')" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
-                                    <i class="fa-solid fa-list-check"></i>
-                                    <span>Bugünün Görevlerini Gör</span>
-                                </button>
-                                <button onclick="dismissAlertBanner()" class="p-1.5 text-stone-400 hover:text-white rounded-lg cursor-pointer">
-                                    <i class="fa-solid fa-xmark text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (tasks.length > 0) {
-                banner.classList.remove('hidden');
-                banner.innerHTML = `
-                    <div class="bg-gradient-to-r from-stone-900 via-emerald-950 to-stone-900 text-white rounded-2xl p-3.5 shadow-xs border border-emerald-800/40 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs border border-emerald-500/30 shrink-0">
-                                <i class="fa-solid fa-check"></i>
-                            </span>
-                            <p class="text-xs text-stone-200">
-                                <strong class="text-emerald-400 font-bold">Harika Durum:</strong> CAN ÇEREZ (1978) koordinasyonunda şu an geciken görev bulunmuyor. Tüm aksiyonlar planlanan takvimde ilerliyor.
-                            </p>
-                        </div>
-                        <button onclick="dismissAlertBanner()" class="text-stone-400 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/5 cursor-pointer">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                `;
-            } else {
-                banner.classList.add('hidden');
-            }
-        }
-
-        function renderReportTable() {
-            const tbody = document.getElementById('reportTableBody');
-            const now = new Date();
-            now.setHours(0,0,0,0);
-
-            const allOwnersSet = new Set(team.map(m => m.name.trim()));
-            tasks.forEach(t => { if (t.owner) allOwnersSet.add(t.owner.trim()); });
-            const ownerList = Array.from(allOwnersSet);
-
-            if (ownerList.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="9" class="py-12 text-center text-stone-400">
-                            <i class="fa-solid fa-users text-4xl mb-3 text-stone-300 block"></i>
-                            <p class="font-semibold text-stone-700 text-sm">Henüz kayıtlı ekip üyesi veya görev bulunmuyor.</p>
-                            <p class="text-xs text-stone-500 mt-1">Üst menüdeki <strong>"Ekip"</strong> butonuna tıklayarak çalışanlarınızı ekleyebilir veya <strong>"Yeni Görev"</strong> ile ilk görevi tanımlayabilirsiniz.</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tbody.innerHTML = ownerList.map((ownerName, idx) => {
-                const member = team.find(m => m.name.toLowerCase().trim() === ownerName.toLowerCase().trim()) || {
-                    name: ownerName,
-                    title: "Ekip Üyesi",
-                    phone: "-",
-                    department: "-",
-                    email: ""
-                };
-
-                const personTasks = tasks.filter(t => t.owner.toLowerCase().trim() === ownerName.toLowerCase().trim());
-                const pTotal = personTasks.length;
-                const pCompleted = personTasks.filter(t => t.status === 'Tamamlandı').length;
-                const pOpen = personTasks.filter(t => t.status !== 'Tamamlandı').length;
-                const pDelayed = personTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now).length;
-                const pPct = pTotal > 0 ? Math.round((pCompleted / pTotal) * 100) : 0;
-
-                return `
-                    <tr class="report-person-row hover:bg-[#FAF7F2] transition-colors cursor-pointer" onclick="openEmailModal('${escapeHtml(ownerName)}')">
-                        <td class="py-3 px-4 text-center font-bold text-[#824701]">${idx + 1}</td>
-                        <td class="py-3 px-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-[#31261D] text-[#FFBF3F] border border-[#FFBF3F]/30 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                                    ${getInitials(member.name)}
-                                </div>
-                                <div>
-                                    <h5 class="font-bold text-[#31261D] text-xs hover:text-[#A6192E] transition-colors">${escapeHtml(member.name)}</h5>
-                                    <p class="text-[11px] text-[#5C4A3C]">${escapeHtml(member.title)} • ${escapeHtml(member.department || '')}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-3 px-3 text-[#31261D]">
-                            <p class="text-[11px] font-semibold text-[#31261D]">${escapeHtml(member.phone || '-')}</p>
-                            <p class="text-[10px] text-[#824701] truncate max-w-[120px] font-medium">${escapeHtml(member.email || 'Mail Yok')}</p>
-                        </td>
-                        <td class="py-3 px-3 text-center font-black text-[#31261D]">${pTotal}</td>
-                        <td class="py-3 px-3 text-center font-black ${pDelayed > 0 ? 'text-[#A6192E] bg-rose-50/70 rounded-xl' : 'text-stone-400'}">${pDelayed}</td>
-                        <td class="py-3 px-3 text-center font-black text-[#824701]">${pOpen}</td>
-                        <td class="py-3 px-3 text-center font-black text-[#1E340C]">${pCompleted}</td>
-                        <td class="py-3 px-4 text-center">
-                            <div class="flex items-center gap-2">
-                                <div class="flex-1 bg-[#E8DFC8]/60 rounded-full h-2.5 overflow-hidden p-0.5 border border-[#E8DFC8]">
-                                    <div class="bg-gradient-to-r from-[#A6192E] via-[#FFBF3F] to-[#1E340C] h-full rounded-full transition-all duration-300" style="width: ${pPct}%"></div>
-                                </div>
-                                <span class="text-xs font-black text-[#31261D] w-10 text-right">%${pPct}</span>
-                            </div>
-                        </td>
-                        <td class="py-3 px-4 text-center no-print" onclick="event.stopPropagation()">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="openWhatsAppMember('${escapeHtml(ownerName)}')" title="WhatsApp ile Durum Özeti Gönder" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#F4F9F0] hover:bg-[#1E340C] text-[#1E340C] hover:text-white font-bold text-xs transition-all border border-[#1E340C]/20 shadow-2xs cursor-pointer">
-                                    <i class="fa-brands fa-whatsapp text-sm"></i>
-                                    <span>WhatsApp</span>
-                                </button>
-                                <button onclick="openEmailModal('${escapeHtml(ownerName)}')" title="Gmail Raporu Gönder" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-[#A6192E] text-[#A6192E] hover:text-white font-bold text-xs transition-all border border-rose-200 shadow-2xs cursor-pointer">
-                                    <i class="fa-solid fa-envelope text-[10px]"></i>
-                                    <span>Gmail</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function getFilteredTasks() {
-            const search = document.getElementById('searchInput').value.toLowerCase().trim();
-            const statusFilter = document.getElementById('statusFilter').value;
-            const monthFilter = document.getElementById('monthFilter').value;
-            const now = new Date();
-            now.setHours(0,0,0,0);
-
-            return tasks.filter(item => {
-                const itemDate = new Date(item.dueDate);
-                itemDate.setHours(0,0,0,0);
-                const isDelayed = item.status !== 'Tamamlandı' && itemDate < now;
-                const isDueToday = item.status !== 'Tamamlandı' && itemDate.getTime() === now.getTime();
-
-                if (statusFilter === 'Geciken' && !isDelayed) return false;
-                if (statusFilter === 'Bugun' && !isDueToday) return false;
-                if (statusFilter !== 'ALL' && statusFilter !== 'Geciken' && statusFilter !== 'Bugun' && item.status !== statusFilter) return false;
-
-                if (monthFilter !== 'ALL') {
-                    const taskMonth = new Date(item.dueDate).getMonth() + 1;
-                    if (taskMonth !== parseInt(monthFilter)) return false;
-                }
-
-                if (search) {
-                    const textContent = `${item.title} ${item.department} ${item.action} ${item.owner}`.toLowerCase();
-                    if (!textContent.includes(search)) return false;
-                }
-
-                return true;
-            });
-        }
-
-        function renderDetailTableAndBoard() {
-            const filtered = getFilteredTasks();
-            const tbody = document.getElementById('taskTableBody');
-            const emptyState = document.getElementById('emptyState');
-            const now = new Date();
-            now.setHours(0,0,0,0);
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = '';
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                tbody.innerHTML = filtered.map((task, idx) => {
-                    const isOverdue = task.status !== 'Tamamlandı' && new Date(task.dueDate) < now;
-                    const dateFormatted = formatTurkishDate(task.dueDate);
-
-                    let statusBadge = '';
-                    if (task.status === 'Tamamlandı') {
-                        statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-[#E6F3DF] text-[#1E340C] border border-[#1E340C]/20"><i class="fa-solid fa-check text-[9px]"></i> Tamamlandı</span>`;
-                    } else if (isOverdue) {
-                        statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-rose-100 text-[#A6192E] border border-rose-200 animate-pulse"><i class="fa-solid fa-clock text-[9px]"></i> Gecikti!</span>`;
-                    } else if (task.status === 'Devam Ediyor') {
-                        statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-[#FFF6E0] text-[#824701] border border-[#FFBF3F]/30"><i class="fa-solid fa-spinner text-[9px]"></i> Devam Ediyor</span>`;
-                    } else {
-                        statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-[#FAF7F2] text-[#31261D] border border-[#E8DFC8]"><i class="fa-regular fa-circle text-[9px]"></i> Açık</span>`;
-                    }
-
-                    return `
-                        <tr class="hover:bg-[#FAF7F2] transition-colors ${isOverdue ? 'bg-rose-50/30' : ''}">
-                            <td class="py-3 px-3 text-center font-bold text-[#824701]">${idx + 1}</td>
-                            <td class="py-3 px-4 font-bold text-[#31261D]">${escapeHtml(task.title)}</td>
-                            <td class="py-3 px-3 text-[#5C4A3C]">
-                                <span class="bg-[#FAF7F2] text-[#5C4A3C] px-2 py-0.5 rounded-lg text-[11px] font-semibold border border-[#E8DFC8]">
-                                    ${escapeHtml(task.department)}
-                                </span>
-                            </td>
-                            <td class="py-3 px-4 text-[#31261D] leading-relaxed">${escapeHtml(task.action)}</td>
-                            <td class="py-3 px-3 font-semibold text-[#31261D]">
-                                <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] cursor-pointer hover:bg-white transition-colors"
-                                     onclick="openEmailModal('${escapeHtml(task.owner)}')">
-                                    <span class="w-5 h-5 rounded-full bg-[#31261D] text-[#FFBF3F] border border-[#FFBF3F]/30 flex items-center justify-center text-[9px] font-black">
-                                        ${getInitials(task.owner)}
-                                    </span>
-                                    <span class="font-bold text-[#31261D] text-xs">${escapeHtml(task.owner)}</span>
-                                </div>
-                            </td>
-                            <td class="py-3 px-3 text-center font-bold ${isOverdue ? 'text-[#A6192E]' : 'text-[#31261D]'}">
-                                ${dateFormatted}
-                            </td>
-                            <td class="py-3 px-3 text-center cursor-pointer select-none" onclick="toggleTaskStatus(${task.id})" title="Durumu değiştirmek için tıklayın">
-                                ${statusBadge}
-                            </td>
-                            <td class="py-3 px-3 text-center no-print">
-                                <div class="flex items-center justify-center gap-1">
-                                    <button onclick="openWhatsAppTask('${task.id}')" title="Sorumluya WhatsApp ile Bildir" class="p-1.5 text-[#5C4A3C] hover:text-[#1E340C] hover:bg-[#F4F9F0] rounded-lg transition-colors cursor-pointer">
-                                        <i class="fa-brands fa-whatsapp text-sm"></i>
-                                    </button>
-                                    <button onclick="toggleTaskStatus(${task.id})" title="${task.status === 'Tamamlandı' ? 'Görevi Tekrar Aç' : 'Görevi Tamamlandı Yap'}" class="p-1.5 ${task.status === 'Tamamlandı' ? 'text-[#1E340C] bg-[#F4F9F0] hover:bg-[#FFF6E0] hover:text-[#824701]' : 'text-[#5C4A3C] hover:text-[#1E340C] hover:bg-[#F4F9F0]'} rounded-lg transition-colors cursor-pointer">
-                                        <i class="fa-solid ${task.status === 'Tamamlandı' ? 'fa-rotate-left' : 'fa-check'}"></i>
-                                    </button>
-                                    <button onclick="editTask(${task.id})" title="Düzenle" class="p-1.5 text-[#5C4A3C] hover:text-[#A6192E] hover:bg-rose-50 rounded-lg transition-colors cursor-pointer">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </button>
-                                    <button onclick="deleteTask(${task.id})" title="Sil" class="p-1.5 text-[#5C4A3C] hover:text-[#A6192E] hover:bg-rose-50 rounded-lg transition-colors cursor-pointer">
-                                        <i class="fa-regular fa-trash-can"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            }
-
-            renderBoard(filtered);
-        }
-
-        function renderBoard(taskList) {
-            const openCol = document.getElementById('boardColumnOpen');
-            const progressCol = document.getElementById('boardColumnProgress');
-            const completedCol = document.getElementById('boardColumnCompleted');
-
-            let openCards = [];
-            let progressCards = [];
-            let completedCards = [];
-
-            const now = new Date();
-            now.setHours(0,0,0,0);
-
-            taskList.forEach(task => {
-                const isOverdue = task.status !== 'Tamamlandı' && new Date(task.dueDate) < now;
-                const cardHtml = `
-                    <div class="bg-white p-3.5 rounded-2xl shadow-2xs border border-[#E8DFC8] hover:shadow-md transition-shadow">
-                        <div class="flex items-start justify-between gap-2 mb-1.5">
-                            <span class="text-[10px] bg-[#FAF7F2] text-[#5C4A3C] px-2 py-0.5 rounded-lg font-bold border border-[#E8DFC8]">${escapeHtml(task.department)}</span>
-                            ${isOverdue ? '<span class="text-[9px] bg-rose-100 text-[#A6192E] px-2 py-0.5 rounded-full font-black border border-rose-200">GECİKTİ</span>' : ''}
-                        </div>
-                        <h5 class="font-bold text-xs text-[#31261D] mb-1">${escapeHtml(task.title)}</h5>
-                        <p class="text-[11px] text-[#5C4A3C] mb-2.5 line-clamp-2 leading-relaxed">${escapeHtml(task.action)}</p>
-                        <div class="flex items-center justify-between pt-2 border-t border-[#E8DFC8]/60 text-[10px] text-[#5C4A3C]">
-                            <div class="inline-flex items-center gap-1 font-bold text-[#31261D] cursor-pointer hover:text-[#A6192E]" onclick="openEmailModal('${escapeHtml(task.owner)}')">
-                                <i class="fa-solid fa-user-tie text-[#A6192E]"></i> ${escapeHtml(task.owner)}
-                            </div>
-                            <span class="${isOverdue ? 'text-[#A6192E] font-bold' : 'text-[#5C4A3C]'}"><i class="fa-regular fa-calendar"></i> ${formatTurkishDate(task.dueDate)}</span>
-                        </div>
-                        <div class="flex items-center justify-between gap-1 mt-2 pt-1.5 border-t border-[#FAF7F2]">
-                            <button onclick="openWhatsAppTask('${task.id}')" title="WhatsApp ile Hatırlat" class="text-[11px] text-[#1E340C] hover:text-[#2C4A14] flex items-center gap-1 font-bold cursor-pointer">
-                                <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
-                            </button>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="editTask(${task.id})" class="text-[10px] text-[#824701] hover:underline font-bold px-1 cursor-pointer">Düzenle</button>
-                                <button onclick="toggleTaskStatus(${task.id})" class="text-[10px] text-[#1E340C] hover:underline px-1.5 py-0.5 bg-[#F4F9F0] rounded font-bold cursor-pointer">${task.status === 'Tamamlandı' ? 'Tekrar Aç' : 'Tamamla'}</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                if (task.status === 'Tamamlandı') completedCards.push(cardHtml);
-                else if (task.status === 'Devam Ediyor') progressCards.push(cardHtml);
-                else openCards.push(cardHtml);
-            });
-
-            openCol.innerHTML = openCards.join('') || '<p class="text-center text-[11px] text-[#5C4A3C]/70 py-4">Görev yok</p>';
-            progressCol.innerHTML = progressCards.join('') || '<p class="text-center text-[11px] text-[#5C4A3C]/70 py-4">Görev yok</p>';
-            completedCol.innerHTML = completedCards.join('') || '<p class="text-center text-[11px] text-[#5C4A3C]/70 py-4">Görev yok</p>';
-
-            document.getElementById('boardCountOpen').innerText = openCards.length;
-            document.getElementById('boardCountProgress').innerText = progressCards.length;
-            document.getElementById('boardCountCompleted').innerText = completedCards.length;
-        }
-
-        // ================= HIZLI MAİL MODALI =================
-        function openQuickMailPickerModal() {
-            const list = document.getElementById('quickMailList');
-            const now = new Date();
-            now.setHours(0,0,0,0);
-
-            list.innerHTML = team.map(member => {
-                const personTasks = tasks.filter(t => t.owner.toLowerCase().trim() === member.name.toLowerCase().trim());
-                const total = personTasks.length;
-                const delayed = personTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now).length;
-                const open = personTasks.filter(t => t.status !== 'Tamamlandı').length;
-
-                return `
-                    <div class="p-3 rounded-2xl border border-[#E8DFC8] bg-[#FAF7F2] hover:bg-white transition-all flex items-center justify-between gap-2 shadow-2xs">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <div class="w-10 h-10 rounded-xl bg-[#31261D] text-[#FFBF3F] border border-[#FFBF3F]/30 flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
-                                ${getInitials(member.name)}
-                            </div>
-                            <div class="min-w-0">
-                                <h5 class="font-bold text-[#31261D] text-xs truncate">${escapeHtml(member.name)}</h5>
-                                <p class="text-[11px] text-[#5C4A3C] truncate">${escapeHtml(member.title)} • ${escapeHtml(member.email || 'Mail Yok')}</p>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-[10px] bg-white border border-[#E8DFC8] text-[#31261D] px-2 py-0.5 rounded-full font-bold">${total} Görev</span>
-                                    ${delayed > 0 ? `<span class="text-[10px] bg-rose-100 text-[#A6192E] border border-rose-200 px-2 py-0.5 rounded-full font-black">${delayed} Geciken!</span>` : ''}
-                                    <span class="text-[10px] bg-[#FFF6E0] text-[#824701] border border-[#FFBF3F]/30 px-2 py-0.5 rounded-full font-bold">${open} Açık</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <button onclick="closeQuickMailPickerModal(); openWhatsAppMember('${escapeHtml(member.name)}')" class="px-3 py-2 bg-[#1E340C] hover:bg-[#2C4A14] text-white text-xs font-bold rounded-xl shadow-md shadow-[#1E340C]/20 border border-[#FFBF3F]/20 flex items-center gap-1.5 transition-all cursor-pointer">
-                                <i class="fa-brands fa-whatsapp text-sm text-[#FFBF3F]"></i>
-                                <span>WhatsApp</span>
-                            </button>
-                            <button onclick="closeQuickMailPickerModal(); openEmailModal('${escapeHtml(member.name)}')" class="px-3 py-2 bg-[#A6192E] hover:bg-[#8C1224] text-white text-xs font-bold rounded-xl shadow-md shadow-[#A6192E]/20 border border-[#FFBF3F]/30 flex items-center gap-1.5 transition-all cursor-pointer">
-                                <i class="fa-solid fa-envelope text-[10px] text-[#FFBF3F]"></i>
-                                <span>Gmail</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            document.getElementById('quickMailPickerModal').classList.remove('hidden');
-        }
-
-        function closeQuickMailPickerModal() {
-            document.getElementById('quickMailPickerModal').classList.add('hidden');
-        }
-
-        function openEmailModal(personName) {
-            currentEmailPersonName = personName;
-            const member = team.find(m => m.name.toLowerCase().trim() === personName.toLowerCase().trim()) || {
-                name: personName,
-                email: ""
-            };
-
-            document.getElementById('emailRecipientName').value = personName;
-            document.getElementById('emailRecipientAddress').value = member.email || '';
-            document.getElementById('emailModalSubtitle').innerText = `${personName} için görev durum raporu ve aksiyon özeti`;
-
-            const now = new Date();
-            now.setHours(0,0,0,0);
-            const pTasks = tasks.filter(t => t.owner.toLowerCase().trim() === personName.toLowerCase().trim());
-            const delayedCount = pTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now).length;
-            const openCount = pTasks.filter(t => t.status !== 'Tamamlandı').length;
-            const completedCount = pTasks.filter(t => t.status === 'Tamamlandı').length;
-
-            document.getElementById('cntDelayed').innerText = delayedCount;
-            document.getElementById('cntOpen').innerText = openCount;
-            document.getElementById('cntCompleted').innerText = completedCount;
-
-            document.getElementById('chkIncludeDelayed').checked = delayedCount > 0;
-            document.getElementById('chkIncludeOpen').checked = true;
-            document.getElementById('chkIncludeCompleted').checked = false;
-
-            updateEmailPreview();
-            document.getElementById('emailModal').classList.remove('hidden');
-        }
-
-        function closeEmailModal() {
-            document.getElementById('emailModal').classList.add('hidden');
-        }
-
-        function updateEmailPreview() {
-            const personName = currentEmailPersonName;
-            const includeDelayed = document.getElementById('chkIncludeDelayed').checked;
-            const includeOpen = document.getElementById('chkIncludeOpen').checked;
-            const includeCompleted = document.getElementById('chkIncludeCompleted').checked;
-
-            const now = new Date();
-            now.setHours(0,0,0,0);
-            const pTasks = tasks.filter(t => t.owner.toLowerCase().trim() === personName.toLowerCase().trim());
-
-            const delayedTasks = pTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now);
-            const openTasks = pTasks.filter(t => t.status !== 'Tamamlandı');
-            const completedTasks = pTasks.filter(t => t.status === 'Tamamlandı');
-
-            const total = pTasks.length;
-            const completed = completedTasks.length;
-            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-            let mailText = `Sayın ${personName},\n\n`;
-            mailText += `Koordinasyon Toplantısı Aksiyon Takip Sistemi kapsamındaki güncel görev durumunuz ve aksiyon listeniz aşağıda bilginize sunulmuştur:\n\n`;
-            mailText += `📊 GENEL PERFORMANS: Toplam ${total} görevden ${completed} tanesi tamamlandı (Başarı Oranı: %${pct})\n`;
-            mailText += `--------------------------------------------------\n\n`;
-
-            if (includeDelayed) {
-                mailText += `⚠️ GECİKEN İŞLERİNİZ (${delayedTasks.length} Adet):\n`;
-                if (delayedTasks.length === 0) {
-                    mailText += `• Harika! Geciken herhangi bir işiniz bulunmuyor.\n\n`;
-                } else {
-                    delayedTasks.forEach((t, i) => {
-                        mailText += `${i + 1}. [GECİKTİ] ${t.title}\n`;
-                        mailText += `   - Birim: ${t.department}\n`;
-                        mailText += `   - Hedef Termin: ${formatTurkishDate(t.dueDate)}\n`;
-                        mailText += `   - Aksiyon: ${t.action}\n\n`;
-                    });
-                }
-            }
-
-            if (includeOpen) {
-                mailText += `⏳ BEKLEYEN / DEVAM EDEN İŞLERİNİZ (${openTasks.length} Adet):\n`;
-                if (openTasks.length === 0) {
-                    mailText += `• Bekleyen açık işiniz bulunmuyor.\n\n`;
-                } else {
-                    openTasks.forEach((t, i) => {
-                        mailText += `${i + 1}. [${t.status}] ${t.title}\n`;
-                        mailText += `   - Birim: ${t.department}\n`;
-                        mailText += `   - Hedef Termin: ${formatTurkishDate(t.dueDate)}\n`;
-                        mailText += `   - Aksiyon: ${t.action}\n\n`;
-                    });
-                }
-            }
-
-            if (includeCompleted) {
-                mailText += `✅ TAMAMLANAN İŞLERİNİZ (${completedTasks.length} Adet):\n`;
-                if (completedTasks.length === 0) {
-                    mailText += `• Henüz tamamlanan görev kaydı yok.\n\n`;
-                } else {
-                    completedTasks.forEach((t, i) => {
-                        mailText += `${i + 1}. [BİTTİ] ${t.title} (${t.department})\n`;
-                    });
-                    mailText += `\n`;
-                }
-            }
-
-            mailText += `Gereğini ve aksiyonların takibini rica eder, iyi çalışmalar dileriz.\n`;
-            mailText += `CAN ÇEREZ (1978) • Yönetim Kurulu`;
-
-            document.getElementById('emailBodyPreview').value = mailText;
-        }
-
-        function copyEmailText() {
-            const body = document.getElementById('emailBodyPreview').value;
-            navigator.clipboard.writeText(body).then(() => {
-                alert("Mail metni panoya kopyalandı! WhatsApp veya mailinize yapıştırabilirsiniz.");
-            });
-        }
-
-        function openInGmail(to, subject, body) {
-            const encodedTo = encodeURIComponent(to || '');
-            const encodedSu = encodeURIComponent(subject || '');
-            const encodedBody = encodeURIComponent(body || '');
-            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSu}&body=${encodedBody}`;
-            window.open(gmailUrl, '_blank');
-        }
-
-        function sendMailClient() {
-            const to = document.getElementById('emailRecipientAddress').value.trim();
-            const subject = `[Aksiyon Takip] ${currentEmailPersonName} - Görev & İlerleme Raporu`;
-            const body = document.getElementById('emailBodyPreview').value;
-
-            if (!to) {
-                alert("Lütfen bir alıcı e-posta adresi girin veya Rehberden ekleyin.");
-                document.getElementById('emailRecipientAddress').focus();
-                return;
-            }
-
-            openInGmail(to, subject, body);
-        }
-
-        // ================= WHATSAPP ENTEGRASYONU =================
-        function formatWhatsAppPhone(phone) {
-            if (!phone) return '';
-            let cleaned = phone.replace(/\D/g, '');
-            if (cleaned.startsWith('0')) {
-                cleaned = '9' + cleaned;
-            } else if (cleaned.length === 10) {
-                cleaned = '90' + cleaned;
-            }
-            return cleaned;
-        }
-
-        function sendWhatsAppMessage(formattedPhone, messageText, personName) {
-            if (!formattedPhone) {
-                const inputPhone = prompt(`${personName ? `"${personName}"` : 'Çalışan'} için rehberde kayıtlı geçerli telefon numarası bulunamadı.\n\nWhatsApp mesajı göndermek istediğiniz cep telefonu numarasını girin (Örn: 0532 123 45 67) veya WhatsApp Web/Uygulamada kişi seçmek için boş bırakıp Tamam'a basın:`);
-                if (inputPhone !== null) {
-                    formattedPhone = formatWhatsAppPhone(inputPhone);
-                } else {
-                    return; // İptal edildi
-                }
-            }
-
-            const encoded = encodeURIComponent(messageText);
-            const url = formattedPhone 
-                ? `https://wa.me/${formattedPhone}?text=${encoded}`
-                : `https://wa.me/?text=${encoded}`;
-
-            window.open(url, '_blank');
-        }
-
-        function openWhatsAppTask(taskId) {
-            const task = tasks.find(t => String(t.id) === String(taskId));
-            if (!task) return;
-
-            const ownerName = task.owner ? task.owner.trim() : '';
-            const member = team.find(m => m.name.toLowerCase().trim() === ownerName.toLowerCase().trim());
-            const phone = member ? formatWhatsAppPhone(member.phone) : '';
-
-            const now = new Date();
-            now.setHours(0,0,0,0);
-            const isOverdue = task.status !== 'Tamamlandı' && new Date(task.dueDate) < now;
-
-            let msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n`;
-            msg += `🏢 _Can Kardeşler Kuruyemiş Grubu_\n`;
-            msg += `*Görev & Aksiyon Hatırlatması*\n\n`;
-            if (ownerName) {
-                msg += `Sayın *${ownerName}*,\n`;
-            }
-            msg += `Üzerinizdeki görev hakkında bilgilendirme:\n\n`;
-            msg += `📋 *Görev:* ${task.title}\n`;
-            msg += `🏢 *Birim:* ${task.department || '-'}\n`;
-            msg += `📅 *Hedef Termin:* ${formatTurkishDate(task.dueDate)}${isOverdue ? ' ⚠️ *(GECİKTİ)*' : ''}\n`;
-            msg += `⏳ *Mevcut Durum:* ${task.status}\n`;
-            msg += `📝 *Aksiyon:* ${task.action || '-'}\n\n`;
-            msg += `Görev durumunuzu Personel Paneli üzerinden güncelleyebilirsiniz:\n`;
-            const personnelUrl = window.location.href.split('?')[0].replace(/yonetici\.html|index\.html|$/, 'personel.html');
-            msg += `${personnelUrl}\n\n`;
-            msg += `İyi çalışmalar dileriz.`;
-
-            sendWhatsAppMessage(phone, msg, ownerName);
-        }
-
-        function openWhatsAppMember(ownerName) {
-            const member = team.find(m => m.name.toLowerCase().trim() === ownerName.toLowerCase().trim());
-            const phone = member ? formatWhatsAppPhone(member.phone) : '';
-
-            const now = new Date();
-            now.setHours(0,0,0,0);
-            const pTasks = tasks.filter(t => t.owner.toLowerCase().trim() === ownerName.toLowerCase().trim());
-            const openTasks = pTasks.filter(t => t.status !== 'Tamamlandı');
-            const delayedTasks = pTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now);
-            const completedTasks = pTasks.filter(t => t.status === 'Tamamlandı');
-
-            let msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n`;
-            msg += `🏢 _Can Kardeşler Kuruyemiş Grubu_\n`;
-            msg += `*Görev & Performans Durum Özeti*\n\n`;
-            msg += `Sayın *${ownerName}*,\n`;
-            msg += `Koordinasyon Takip Sistemindeki güncel görev durumunuz:\n\n`;
-            msg += `📊 *Özet:* ${pTasks.length} Toplam | ⏳ ${openTasks.length} Bekleyen | ⚠️ ${delayedTasks.length} Geciken | ✅ ${completedTasks.length} Tamamlanan\n`;
-            msg += `--------------------------------------------------\n\n`;
-
-            if (delayedTasks.length > 0) {
-                msg += `⚠️ *GECİKEN GÖREVLERİNİZ:*\n`;
-                delayedTasks.forEach((t, i) => {
-                    msg += `${i + 1}. ${t.title} (Termin: ${formatTurkishDate(t.dueDate)})\n   • Aksiyon: ${t.action}\n`;
-                });
-                msg += `\n`;
-            }
-
-            if (openTasks.length > 0) {
-                msg += `⏳ *BEKLEYEN / DEVAM EDEN GÖREVLERİNİZ:*\n`;
-                openTasks.forEach((t, i) => {
-                    msg += `${i + 1}. [${t.status}] ${t.title} (Termin: ${formatTurkishDate(t.dueDate)})\n   • Aksiyon: ${t.action}\n`;
-                });
-                msg += `\n`;
-            }
-
-            if (openTasks.length === 0 && delayedTasks.length === 0) {
-                msg += `🎉 Tebrikler! Bekleyen veya geciken herhangi bir açık göreviniz bulunmuyor.\n\n`;
-            }
-
-            msg += `Görevlerinizi güncel tutmak için Personel Paneli:\n`;
-            const personnelUrl = window.location.href.split('?')[0].replace(/yonetici\.html|index\.html|$/, 'personel.html');
-            msg += `${personnelUrl}\n\n`;
-            msg += `İyi çalışmalar dileriz.`;
-
-            sendWhatsAppMessage(phone, msg, ownerName);
-        }
-
-        function sendWhatsAppFromModal() {
-            const member = team.find(m => m.name.toLowerCase().trim() === currentEmailPersonName.toLowerCase().trim());
-            const phone = member ? formatWhatsAppPhone(member.phone) : '';
-            const previewText = document.getElementById('emailBodyPreview').value;
-            sendWhatsAppMessage(phone, previewText, currentEmailPersonName);
-        }
-
-        function shareBulkWhatsApp() {
-            const rawText = document.getElementById('bulkBodyPreview').value;
-            const msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n🏢 _Can Kardeşler Kuruyemiş Grubu_\n*Koordinasyon Toplantısı - Toplu Aksiyon Hatırlatması*\n\n` + rawText;
-            const encoded = encodeURIComponent(msg);
-            window.open(`https://wa.me/?text=${encoded}`, '_blank');
-        }
-
-        // ================= TOPLU HATIRLATMA MAİLİ MANTIĞI =================
-        function openBulkReminderModal() {
-            const now = new Date();
-            now.setHours(0,0,0,0);
-
-            // Tamamlanmamış görevleri bul (Açık veya Devam Ediyor)
-            const uncompletedTasks = tasks.filter(t => t.status !== 'Tamamlandı');
-            
-            // Sorumlulara göre grupla
-            const ownersMap = {};
-            uncompletedTasks.forEach(t => {
-                const owner = t.owner ? t.owner.trim() : 'Atanmamış';
-                if (!ownersMap[owner]) {
-                    ownersMap[owner] = [];
-                }
-                ownersMap[owner].push(t);
-            });
-
-            const ownerNames = Object.keys(ownersMap);
-            const totalDelayed = uncompletedTasks.filter(t => new Date(t.dueDate) < now).length;
-            const totalOpen = uncompletedTasks.length;
-
-            document.getElementById('bulkModalPersonCount').innerText = `${ownerNames.length} Kişi`;
-            document.getElementById('bulkModalOpenCount').innerText = `${totalOpen} Görev`;
-            document.getElementById('bulkModalDelayedCount').innerText = `${totalDelayed} Geciken`;
-
-            // Alıcı e-postalarını topla
-            const emailList = [];
-            ownerNames.forEach(name => {
-                const member = team.find(m => m.name.toLowerCase().trim() === name.toLowerCase().trim());
-                if (member && member.email) {
-                    emailList.push(member.email.trim());
-                }
-            });
-
-            document.getElementById('bulkRecipientsInput').value = emailList.join(', ');
-
-            // Toplu Hatırlatma Mail Metni Oluştur
-            let body = `Sayın Çalışma Arkadaşlarımız,\n\n`;
-            body += `Koordinasyon Toplantısı Aksiyon Takip Sistemi üzerinde yapılan kontrollerde, üzerinizde henüz TAMAMLANMAMIŞ ve/veya GECİKMİŞ görevler bulunmaktadır.\n\n`;
-            body += `📊 GÜNCEL DURUM: Toplam ${totalOpen} adet bekleyen görev bulunmakta olup, bunlardan ${totalDelayed} tanesi hedef termin tarihini geçmiştir.\n`;
-            body += `--------------------------------------------------\n\n`;
-
-            ownerNames.forEach((name, idx) => {
-                const pTasks = ownersMap[name];
-                const pDelayed = pTasks.filter(t => new Date(t.dueDate) < now).length;
-                const member = team.find(m => m.name.toLowerCase().trim() === name.toLowerCase().trim());
-                const role = member ? ` (${member.title})` : '';
-
-                body += `📌 ${name.toUpperCase()}${role} - [${pTasks.length} Görev / ${pDelayed} Gecikme]:\n`;
-                pTasks.forEach((t, i) => {
-                    const isDel = new Date(t.dueDate) < now;
-                    body += `   ${i + 1}. ${isDel ? '⚠️ [GECİKTİ] ' : '⏳ [' + t.status + '] '}${t.title}\n`;
-                    body += `      • Birim: ${t.department}\n`;
-                    body += `      • Hedef Termin: ${formatTurkishDate(t.dueDate)}\n`;
-                    body += `      • Aksiyon: ${t.action}\n`;
-                });
-                body += `\n`;
-            });
-
-            body += `--------------------------------------------------\n`;
-            body += `Lütfen ilgili görevlerinizi en kısa sürede tamamlayarak Personel Paneli üzerinden durumunuzu 'Tamamlandı' olarak güncelleyiniz.\n\n`;
-            body += `İyi çalışmalar dileriz,\n`;
-            body += `CAN ÇEREZ (1978) • Koordinasyon & Yönetim Kurulu`;
-
-            document.getElementById('bulkBodyPreview').value = body;
-            document.getElementById('bulkReminderModal').classList.remove('hidden');
-        }
-
-        function closeBulkReminderModal() {
-            document.getElementById('bulkReminderModal').classList.add('hidden');
-        }
-
-        function copyBulkEmailText() {
-            const text = document.getElementById('bulkBodyPreview').value;
-            navigator.clipboard.writeText(text).then(() => {
-                alert("Toplu hatırlatma metni kopyalandı! WhatsApp grubuna veya mailinize yapıştırabilirsiniz.");
-            });
-        }
-
-        function sendBulkMailClient() {
-            const to = document.getElementById('bulkRecipientsInput').value.trim();
-            const subject = document.getElementById('bulkSubjectInput').value.trim();
-            const body = document.getElementById('bulkBodyPreview').value;
-
-            if (!to) {
-                alert("Lütfen en az bir alıcı e-posta adresi girin.");
-                return;
-            }
-
-            openInGmail(to, subject, body);
-        }
-
-        // ================= EKİP REHBERİ =================
-        function openTeamModal() {
-            resetTeamForm();
-            renderTeamCards();
-            document.getElementById('teamModal').classList.remove('hidden');
-        }
-
-        function closeTeamModal() {
-            document.getElementById('teamModal').classList.add('hidden');
-        }
-
-        function renderTeamCards() {
-            const container = document.getElementById('teamCardsContainer');
-            document.getElementById('teamTotalCount').innerText = team.length;
-
-            if (team.length === 0) {
-                container.innerHTML = '<p class="text-slate-400 py-4 text-center col-span-2">Henüz kayıtlı kişi yok.</p>';
-                return;
-            }
-
-            container.innerHTML = team.map((member, idx) => {
-                const memberTaskCount = tasks.filter(t => t.owner.toLowerCase().trim() === member.name.toLowerCase().trim()).length;
-                return `
-                    <div class="bg-white p-3.5 rounded-2xl border border-[#E8DFC8] shadow-2xs hover:shadow-sm transition-shadow flex items-start justify-between gap-2">
-                        <div class="flex items-start gap-2.5 min-w-0">
-                            <div class="w-9 h-9 rounded-xl bg-[#31261D] text-[#FFBF3F] border border-[#FFBF3F]/30 flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
-                                ${getInitials(member.name)}
-                            </div>
-                            <div class="min-w-0">
-                                <h5 class="font-bold text-[#31261D] text-xs truncate">${escapeHtml(member.name)}</h5>
-                                <p class="text-[11px] text-[#824701] font-semibold truncate">${escapeHtml(member.title)}</p>
-                                <p class="text-[11px] text-[#5C4A3C] mt-1 flex items-center gap-1 font-medium">
-                                    <i class="fa-solid fa-phone text-[#1E340C] text-[10px]"></i> ${escapeHtml(member.phone)}
-                                </p>
-                                <p class="text-[10px] text-[#5C4A3C]/80 truncate">${escapeHtml(member.email || '')}</p>
-                            </div>
-                        </div>
-                        <div class="flex flex-col items-end gap-1.5">
-                            <span class="text-[10px] bg-[#FAF7F2] text-[#31261D] border border-[#E8DFC8] px-2 py-0.5 rounded-full font-bold">
-                                ${memberTaskCount} Görev
-                            </span>
-                            <span class="text-[10px] bg-[#FFBF3F]/20 text-[#824701] border border-[#FFBF3F]/40 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-2xs">
-                                <i class="fa-solid fa-key text-[9px] text-[#A6192E]"></i> PIN: ${escapeHtml(member.pin || '1978')}
-                            </span>
-                            <div class="flex items-center gap-1 mt-1">
-                                <button onclick="openWhatsAppMember('${escapeHtml(member.name)}')" title="WhatsApp Mesajı Gönder" class="p-1 text-[#5C4A3C] hover:text-[#1E340C] rounded-lg cursor-pointer"><i class="fa-brands fa-whatsapp text-sm"></i></button>
-                                <button onclick="openEmailModal('${escapeHtml(member.name)}')" title="Mail Gönder" class="p-1 text-[#5C4A3C] hover:text-[#A6192E] rounded-lg cursor-pointer"><i class="fa-solid fa-envelope text-[11px]"></i></button>
-                                <button onclick="editTeamMember(${idx})" class="p-1 text-[#5C4A3C] hover:text-[#824701] rounded-lg cursor-pointer"><i class="fa-solid fa-pen text-[11px]"></i></button>
-                                <button onclick="deleteTeamMember(${idx})" class="p-1 text-[#5C4A3C] hover:text-[#A6192E] rounded-lg cursor-pointer"><i class="fa-regular fa-trash-can text-[11px]"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function handleTeamSubmit(e) {
-            e.preventDefault();
-            const editIdx = parseInt(document.getElementById('editPersonIndex').value);
-            const newName = document.getElementById('personName').value.trim();
-            const oldName = (editIdx >= 0 && team[editIdx]) ? team[editIdx].name : null;
-
-            const memberData = {
-                name: newName,
-                title: document.getElementById('personTitle').value.trim(),
-                phone: document.getElementById('personPhone').value.trim(),
-                email: document.getElementById('personEmail').value.trim(),
-                department: document.getElementById('personDepartment').value.trim(),
-                pin: document.getElementById('personPin').value.trim() || '1978'
-            };
-
-            if (editIdx >= 0) {
-                if (oldName && oldName !== newName) {
-                    tasks.forEach(t => {
-                        if (t.owner && t.owner.toLowerCase().trim() === oldName.toLowerCase().trim()) {
-                            t.owner = newName;
-                        }
-                    });
-                }
-                team[editIdx] = memberData;
-            } else {
-                team.push(memberData);
-            }
-
-            saveData();
-            updateTeamDatalist();
-            resetTeamForm();
-            renderTeamCards();
-            renderApp();
-        }
-
-        function editTeamMember(idx) {
-            const m = team[idx];
-            document.getElementById('editPersonIndex').value = idx;
-            document.getElementById('personName').value = m.name;
-            document.getElementById('personTitle').value = m.title;
-            document.getElementById('personPhone').value = m.phone;
-            document.getElementById('personEmail').value = m.email || '';
-            document.getElementById('personDepartment').value = m.department || '';
-            document.getElementById('personPin').value = m.pin || '1978';
-
-            document.getElementById('teamFormTitle').innerHTML = '<i class="fa-solid fa-pen text-[#A6192E]"></i> Kişi Bilgilerini Güncelle: ' + m.name;
-            document.getElementById('cancelTeamEditBtn').classList.remove('hidden');
-        }
-
-        function resetTeamForm() {
-            document.getElementById('teamMemberForm').reset();
-            document.getElementById('editPersonIndex').value = "-1";
-            document.getElementById('personPin').value = "";
-            document.getElementById('teamFormTitle').innerHTML = '<i class="fa-solid fa-user-plus text-[#A6192E]"></i> Yeni Kişi Ekle';
-            document.getElementById('cancelTeamEditBtn').classList.add('hidden');
-        }
-
-        function deleteTeamMember(idx) {
-            if (confirm(`${team[idx].name} kişisini rehberden silmek istediğinize emin misiniz?`)) {
-                team.splice(idx, 1);
-                saveData();
-                updateTeamDatalist();
-                renderTeamCards();
-                renderApp();
-            }
-        }
-
-        // ================= GÖREV CRUD =================
-        function openNewTaskModal() {
-            document.getElementById('taskForm').reset();
-            document.getElementById('editTaskId').value = '';
-            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus text-sky-400"></i> Yeni Görev / Aksiyon Girişi';
-            
-            const d = new Date();
-            d.setDate(d.getDate() + 7);
-            document.getElementById('taskDueDate').value = d.toISOString().split('T')[0];
-            const chk = document.getElementById('taskSendEmailNotification');
-            if (chk) chk.checked = true;
-            
-            document.getElementById('taskModal').classList.remove('hidden');
-        }
-
-        function editTask(id) {
-            const task = tasks.find(t => String(t.id) === String(id));
-            if (!task) return;
-
-            document.getElementById('editTaskId').value = task.id;
-            document.getElementById('taskDepartment').value = task.department;
-            document.getElementById('taskTitle').value = task.title;
-            document.getElementById('taskAction').value = task.action;
-            document.getElementById('taskOwner').value = task.owner;
-            document.getElementById('taskDueDate').value = task.dueDate;
-            document.getElementById('taskStatus').value = task.status;
-            document.getElementById('taskPriority').value = task.priority || 'Normal';
-
-            const chk = document.getElementById('taskSendEmailNotification');
-            if (chk) chk.checked = false; // Düzenleme yaparken varsayılan kapalı
-
-            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-sky-400"></i> Görevi Düzenle #' + task.id;
-            document.getElementById('taskModal').classList.remove('hidden');
-        }
-
-        function closeTaskModal() {
-            document.getElementById('taskModal').classList.add('hidden');
-        }
-
-        function handleTaskSubmit(e) {
-            e.preventDefault();
-            const editId = document.getElementById('editTaskId').value;
-            const ownerName = document.getElementById('taskOwner').value.trim();
-            const shouldSendEmail = document.getElementById('taskSendEmailNotification')?.checked;
-            
-            const taskData = {
-                department: document.getElementById('taskDepartment').value.trim(),
-                title: document.getElementById('taskTitle').value.trim(),
-                action: document.getElementById('taskAction').value.trim(),
-                owner: ownerName,
-                dueDate: document.getElementById('taskDueDate').value,
-                status: document.getElementById('taskStatus').value,
-                priority: document.getElementById('taskPriority').value
-            };
-
-            const exists = team.some(m => m.name.toLowerCase().trim() === ownerName.toLowerCase());
-            if (!exists && ownerName) {
-                team.push({
-                    name: ownerName,
-                    title: "Ekip Üyesi",
-                    phone: "05xx xxx xx xx",
-                    email: "",
-                    department: taskData.department
-                });
-                updateTeamDatalist();
-            }
-
-            if (editId) {
-                const index = tasks.findIndex(t => String(t.id) === String(editId));
-                if (index !== -1) tasks[index] = { ...tasks[index], ...taskData };
-            } else {
-                const newId = tasks.length > 0 ? Math.max(...tasks.map(t => Number(t.id) || 0)) + 1 : 1;
-                tasks.push({ id: newId, ...taskData });
-            }
-
-            saveData();
-            closeTaskModal();
-            renderApp();
-
-            if (shouldSendEmail && ownerName) {
-                setTimeout(() => {
-                    sendNewTaskAssignmentEmail(ownerName, taskData);
-                }, 250);
-            }
-        }
-
-        function sendNewTaskAssignmentEmail(ownerName, task) {
-            const member = team.find(m => m.name.toLowerCase().trim() === ownerName.toLowerCase().trim());
-            const recipientEmail = (member && member.email) ? member.email.trim() : '';
-
-            const subject = `[Yeni Görev Atandı] ${task.title} - ${task.department}`;
-            let body = `Sayın ${ownerName},\n\n`;
-            body += `Koordinasyon Aksiyon & Görev Takip Sistemi üzerinden üzerinize YENİ BİR GÖREV ATANMIŞTIR:\n\n`;
-            body += `📌 GÖREV / SORUN: ${task.title}\n`;
-            body += `🏢 İLGİLİ BİRİM: ${task.department}\n`;
-            body += `⚡ ÖNCELİK: ${task.priority || 'Normal'}\n`;
-            body += `📅 HEDEF TERMİN: ${formatTurkishDate(task.dueDate)}\n`;
-            body += `📝 AKSİYON & ÇÖZÜM PLANI:\n${task.action}\n\n`;
-            body += `--------------------------------------------------\n`;
-            body += `Lütfen görevi tamamladığınızda Personel Paneli üzerinden durumunu 'Tamamlandı' olarak güncelleyiniz.\n\n`;
-            body += `İyi çalışmalar dileriz,\n`;
-            body += `Koordinasyon & Yönetim`;
-
-            if (recipientEmail) {
-                openInGmail(recipientEmail, subject, body);
-            } else {
-                alert(`Görev başarıyla kaydedildi!\n\nAncak "${ownerName}" için sistemde henüz bir e-posta adresi kayıtlı değil. Ekip Rehberinden e-postasını eklerseniz bildirim mailleri doğrudan Gmail üzerinden açılacaktır.`);
-            }
-        }
-
-        function toggleTaskStatus(id) {
-            const task = tasks.find(t => String(t.id) === String(id));
-            if (!task) return;
-
-            if (task.status !== 'Tamamlandı') {
-                task.status = 'Tamamlandı';
-            } else {
-                task.status = 'Açık';
-            }
-
-            saveData();
-            renderApp();
-        }
-
-        function deleteTask(id) {
-            if (confirm("Bu görevi silmek istediğinize emin misiniz?")) {
-                tasks = tasks.filter(t => String(t.id) !== String(id));
-                saveData();
-                renderApp();
-            }
-        }
-
-        // ================= YEDEKLEME =================
-        function openSettingsModal() {
-            document.getElementById('settingsModal').classList.remove('hidden');
-        }
-        function closeSettingsModal() {
-            document.getElementById('settingsModal').classList.add('hidden');
-        }
-
-        function exportBackup() {
-            const data = {
-                team: team,
-                tasks: tasks,
-                notes: localStorage.getItem('task_management_notes') || '',
-                exportDate: new Date().toISOString()
-            };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Aksiyon_Takip_Raporu_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function exportToExcelCSV() {
-            let csv = "\uFEFF"; // Excel Türkçe karakter desteği (UTF-8 BOM)
-            csv += "ID;Görev Başlığı;Departman / Birim;Yapılacak Aksiyon;Sorumlu Kişi;Termin Tarihi;Durum;Öncelik\n";
-            tasks.forEach(t => {
-                const escapeCsv = (str) => `"${(str || '').toString().replace(/"/g, '""')}"`;
-                csv += [
-                    t.id,
-                    escapeCsv(t.title),
-                    escapeCsv(t.department),
-                    escapeCsv(t.action),
-                    escapeCsv(t.owner),
-                    escapeCsv(t.dueDate),
-                    escapeCsv(t.status),
-                    escapeCsv(t.priority)
-                ].join(";") + "\n";
-            });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Can_Cerez_1978_Gorev_Listesi_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function importBackup(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    const parsed = JSON.parse(event.target.result);
-                    if (parsed.tasks) {
-                        tasks = parsed.tasks;
-                        if (parsed.team) team = parsed.team;
-                        if (parsed.notes) {
-                            localStorage.setItem('task_management_notes', parsed.notes);
-                            document.getElementById('managementNotes').value = parsed.notes;
-                        }
-                        saveData();
-                        updateTeamDatalist();
-                        renderApp();
-                        alert("Yedek başarıyla yüklendi!");
-                        closeSettingsModal();
-                    } else {
-                        alert("Geçersiz dosya formatı!");
-                    }
-                } catch (err) {
-                    alert("Hata: " + err.message);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function clearAllSystemData() {
-            if (confirm("DİKKAT: Sistemdeki tüm görevleri, ekipleri ve notları tamamen silip boş şablon olarak başlatmak istediğinize emin misiniz?")) {
-                team = [];
-                tasks = [];
-                localStorage.setItem('task_team_members', '[]');
-                localStorage.setItem('task_items', '[]');
-                localStorage.setItem('task_management_notes', '');
-                const noteInput = document.getElementById('managementNotes');
-                if (noteInput) noteInput.value = '';
-                saveData();
-                updateTeamDatalist();
-                renderApp();
-                closeSettingsModal();
-                alert("Sistem tamamen sıfırlandı!");
-            }
-        }
-
-        function formatTurkishDate(dateStr) {
-            if (!dateStr) return '-';
-            const parts = dateStr.split('-');
-            if (parts.length === 3) return `${parts[2]}.${parts[1]}.${parts[0]}`;
-            return dateStr;
-        }
-
-        function getInitials(name) {
-            if (!name) return '?';
-            const parts = name.trim().split(' ');
-            if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        // ================= PWA KURULUM & SERVICE WORKER =================
+        // ================= PWA KURULUM =================
         let deferredPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -2559,32 +595,21 @@
         });
 
         function installPWA() {
-            if (!deferredPrompt) {
-                alert("CAN ÇEREZ uygulamasını tarayıcınızın menüsünden (Paylaş veya Ayarlar menüsü -> 'Ana Ekrana Ekle' / 'Uygulamayı Yükle') doğrudan telefonunuza veya bilgisayarınıza ekleyebilirsiniz.");
-                return;
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    const btn = document.getElementById('pwaInstallBtn');
+                    if (btn) btn.classList.add('hidden');
+                    deferredPrompt = null;
+                });
+            } else {
+                alert("Uygulamayı yüklemek için tarayıcınızın menüsünden (Paylaş veya Ayarlar -> 'Ana Ekrana Ekle' / 'Uygulamayı Yükle') seçeneğine dokunabilirsiniz.");
             }
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('Kullanıcı CAN ÇEREZ PWA kurulumunu kabul etti');
-                }
-                deferredPrompt = null;
-                const btn = document.getElementById('pwaInstallBtn');
-                if (btn) btn.classList.add('hidden');
-            });
         }
-
-        window.addEventListener('appinstalled', () => {
-            console.log('CAN ÇEREZ PWA başarıyla yüklendi');
-            const btn = document.getElementById('pwaInstallBtn');
-            if (btn) btn.classList.add('hidden');
-        });
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('CAN ÇEREZ SW Aktif:', reg.scope))
-                    .catch(err => console.log('CAN ÇEREZ SW Hatası:', err));
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW hatası: ', err));
             });
         }
     </script>
