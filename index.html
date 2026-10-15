@@ -332,7 +332,14 @@
     <!-- JAVASCRIPT: PORTAL & GİRİŞ MANTIĞI -->
     <script>
         const CLOUD_DB_URL = localStorage.getItem('cancerez_cloud_db_url') || "https://extendsclass.com/api/json-storage/bin/aecadfa";
+        const DEFAULT_INIT_TEAM = [
+            { id: 1, name: "Ahmet Can", role: "Şube Sorumlusu", phone: "05551234567", pin: "1978", status: "aktif" }
+        ];
         let teamMembers = JSON.parse(localStorage.getItem('task_team_members')) || [];
+        if (!teamMembers || teamMembers.length === 0) {
+            teamMembers = DEFAULT_INIT_TEAM;
+            localStorage.setItem('task_team_members', JSON.stringify(teamMembers));
+        }
         let currentGeneratedOtp = null;
 
         // Sayfa yüklendiğinde ekip üyelerini çek ve personel listesini doldur

@@ -1058,11 +1058,35 @@
 
     <!-- JAVASCRIPT KODLARI -->
     <script>
-        const INITIAL_TEAM = [];
-        const INITIAL_TASKS = [];
+        const DEFAULT_INIT_TEAM = [
+            { id: 1, name: "Ahmet Can", role: "Şube Sorumlusu", phone: "05551234567", pin: "1978", status: "aktif" }
+        ];
+        const DEFAULT_INIT_TASKS = [
+            {
+                id: 1729000000001,
+                title: "Günlük Çerez Reyon Düzeni ve Tazelik Kontrolü",
+                desc: "Sabah açılışında tüm kuruyemiş reyonlarının kontrol edilmesi ve etiketlerin düzenlenmesi.",
+                category: "Operasyon",
+                priority: "Yuksek",
+                assignee: "Ahmet Can",
+                deadline: "2026-10-16",
+                status: "beklemede",
+                createdAt: "2026-10-16T08:00:00.000Z"
+            }
+        ];
 
         let team = JSON.parse(localStorage.getItem('task_team_members')) || [];
         let tasks = JSON.parse(localStorage.getItem('task_items')) || [];
+
+        if (!team || team.length === 0) {
+            team = DEFAULT_INIT_TEAM;
+            localStorage.setItem('task_team_members', JSON.stringify(team));
+        }
+        if (!tasks || tasks.length === 0) {
+            tasks = DEFAULT_INIT_TASKS;
+            localStorage.setItem('task_items', JSON.stringify(tasks));
+        }
+
         let activePage = 1;
         let viewMode = "table";
         let currentEmailPersonName = "";
