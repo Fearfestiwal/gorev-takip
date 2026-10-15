@@ -478,10 +478,23 @@
 
             <!-- FİLTRE VE ARAMA PANELİ -->
             <div class="bg-white rounded-2xl shadow-sm border border-[#E8DFC8] p-4 no-print">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#824701]/60 text-xs"></i>
-                        <input type="text" id="searchInput" oninput="renderApp()" placeholder="Görev, sorumlu veya birim ara..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] placeholder-[#5C4A3C]/60 focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                        <input type="text" id="searchInput" oninput="renderApp()" placeholder="Görev, şube veya sorumlu ara..." class="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] placeholder-[#5C4A3C]/60 focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                    </div>
+
+                    <div>
+                        <select id="branchFilter" onchange="renderApp()" class="w-full px-3 py-2 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] text-[#31261D] font-medium">
+                            <option value="ALL">📍 Tüm Şubeler / Lokasyonlar</option>
+                            <option value="Merkez / Genel">Merkez / Genel</option>
+                            <option value="Alsancak Şubesi">Alsancak Şubesi</option>
+                            <option value="Karşıyaka Şubesi">Karşıyaka Şubesi</option>
+                            <option value="Bornova Şubesi">Bornova Şubesi</option>
+                            <option value="Göztepe Şubesi">Göztepe Şubesi</option>
+                            <option value="Kavurma & Üretim Tesisi">Kavurma & Üretim Tesisi</option>
+                            <option value="Merkez Depo & Lojistik">Merkez Depo & Lojistik</option>
+                        </select>
                     </div>
 
                     <div>
@@ -917,6 +930,34 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-[#31261D] mb-1">
+                            <i class="fa-solid fa-location-dot text-[#A6192E] mr-1"></i>Şube / Lokasyon *
+                        </label>
+                        <select id="taskBranch" class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-medium focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                            <option value="Merkez / Genel">Merkez / Genel</option>
+                            <option value="Alsancak Şubesi">Alsancak Şubesi</option>
+                            <option value="Karşıyaka Şubesi">Karşıyaka Şubesi</option>
+                            <option value="Bornova Şubesi">Bornova Şubesi</option>
+                            <option value="Göztepe Şubesi">Göztepe Şubesi</option>
+                            <option value="Kavurma & Üretim Tesisi">Kavurma & Üretim Tesisi</option>
+                            <option value="Merkez Depo & Lojistik">Merkez Depo & Lojistik</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[#31261D] mb-1">
+                            <i class="fa-solid fa-arrows-rotate text-blue-600 mr-1"></i>Tekrarlama / Rutin
+                        </label>
+                        <select id="taskRecurrence" class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-medium focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                            <option value="none">Tek Seferlik (Rutin Değil)</option>
+                            <option value="daily">🔄 Günlük Rutin (Her Gün)</option>
+                            <option value="weekly">🔄 Haftalık Rutin (Her Hafta)</option>
+                            <option value="monthly">🔄 Aylık Rutin (Her Ay)</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div>
                     <label class="block font-bold text-[#31261D] mb-1">Çözüm / Aksiyon Planı *</label>
                     <textarea id="taskAction" rows="2" placeholder="Yapılacak somut işi yazın..." required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] leading-relaxed"></textarea>
@@ -964,6 +1005,40 @@
                     <button type="button" onclick="closeTaskModal()" class="px-4 py-2 rounded-xl text-[#5C4A3C] hover:bg-[#FAF7F2] font-bold cursor-pointer">İptal</button>
                     <button type="submit" class="px-5 py-2 rounded-xl bg-[#A6192E] hover:bg-[#8C1224] text-white font-black shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/30 cursor-pointer">Kaydet</button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- GÖREV NOTLARI VE YORUM MODALI -->
+    <div id="taskCommentsModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150 flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
+                <div class="min-w-0 pr-3">
+                    <h3 class="font-bold text-sm sm:text-base flex items-center gap-2 truncate">
+                        <i class="fa-solid fa-comments text-[#FFBF3F]"></i>
+                        <span id="commentModalTaskTitle" class="truncate">Görev Notları & Durum</span>
+                    </h3>
+                    <p id="commentModalTaskSub" class="text-[11px] text-[#E8DFC8] mt-0.5 truncate"></p>
+                </div>
+                <button onclick="closeTaskCommentsModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer shrink-0">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Comments List Body (scrollable) -->
+            <div id="commentModalList" class="p-4 sm:p-5 overflow-y-auto flex-1 space-y-3 bg-[#FAF7F2] min-h-[220px] max-h-[420px]">
+                <!-- Dinamik Notlar -->
+            </div>
+
+            <!-- Footer: Add Comment Form -->
+            <form onsubmit="submitTaskComment(event)" class="p-3 sm:p-4 bg-white border-t border-[#E8DFC8] flex items-center gap-2 shrink-0">
+                <input type="hidden" id="commentModalTaskId">
+                <input type="text" id="commentModalInput" placeholder="Durum notu veya mesaj yazın..." required autocomplete="off" class="flex-1 px-3.5 py-2.5 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                <button type="submit" class="px-4 py-2.5 bg-[#A6192E] hover:bg-[#8C1224] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5 shrink-0">
+                    <span>Gönder</span>
+                    <i class="fa-solid fa-paper-plane text-[11px]"></i>
+                </button>
             </form>
         </div>
     </div>
@@ -1111,7 +1186,18 @@
                 dueDate: "2026-10-16",
                 deadline: "2026-10-16",
                 status: "Devam Ediyor",
-                createdAt: "2026-10-16T08:00:00.000Z"
+                createdAt: "2026-10-16T08:00:00.000Z",
+                branch: "Alsancak Şubesi",
+                recurrence: "daily",
+                comments: [
+                    {
+                        id: "c_1",
+                        author: "Yönetici",
+                        role: "admin",
+                        text: "Sabah açılışından önce taze kavrulmuş ürünlerin öne dizildiğinden ve reyon etiketlerinin güncel olduğundan emin olalım.",
+                        createdAt: "2026-10-16T08:15:00.000Z"
+                    }
+                ]
             }
         ];
 
@@ -1123,6 +1209,9 @@
             const dueDate = t.dueDate || t.deadline || new Date().toISOString().split('T')[0];
             let status = t.status || 'Devam Ediyor';
             if (status === 'beklemede') status = 'Devam Ediyor';
+            const branch = (t.branch || 'Merkez / Genel').trim();
+            const recurrence = t.recurrence || 'none';
+            const comments = Array.isArray(t.comments) ? t.comments : [];
             return {
                 ...t,
                 id: t.id || Date.now(),
@@ -1136,13 +1225,70 @@
                 dueDate: dueDate,
                 deadline: dueDate,
                 status: status,
-                priority: t.priority || 'Normal'
+                priority: t.priority || 'Normal',
+                branch: branch,
+                recurrence: recurrence,
+                comments: comments
             };
         }
 
         function normalizeTasks(arr) {
             if (!Array.isArray(arr)) return [];
             return arr.map(normalizeTask).filter(Boolean);
+        }
+
+        function getBranchBadgeHtml(branch) {
+            const b = branch || 'Merkez / Genel';
+            return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200/80"><i class="fa-solid fa-location-dot text-[9px] text-[#A6192E]"></i> ${escapeHtml(b)}</span>`;
+        }
+
+        function getRecurrenceBadgeHtml(recurrence) {
+            if (!recurrence || recurrence === 'none') return '';
+            let text = 'Rutin';
+            if (recurrence === 'daily') text = 'Günlük Rutin';
+            else if (recurrence === 'weekly') text = 'Haftalık Rutin';
+            else if (recurrence === 'monthly') text = 'Aylık Rutin';
+            return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-800 border border-blue-200"><i class="fa-solid fa-arrows-rotate text-[9px]"></i> ${text}</span>`;
+        }
+
+        function getNextRecurrenceDate(currentDueDateStr, recurrenceType) {
+            const baseDate = new Date(currentDueDateStr || Date.now());
+            const validBase = isNaN(baseDate.getTime()) ? new Date() : baseDate;
+            const nextDate = new Date(validBase);
+            if (recurrenceType === 'daily') {
+                nextDate.setDate(nextDate.getDate() + 1);
+            } else if (recurrenceType === 'weekly') {
+                nextDate.setDate(nextDate.getDate() + 7);
+            } else if (recurrenceType === 'monthly') {
+                nextDate.setMonth(nextDate.getMonth() + 1);
+            }
+            return nextDate.toISOString().split('T')[0];
+        }
+
+        function handleTaskRecurrenceOnComplete(task, actorRoleName) {
+            if (!task.recurrence || task.recurrence === 'none') {
+                task.status = 'Tamamlandı';
+                return false;
+            }
+
+            const oldDueDate = task.dueDate;
+            const nextDueDate = getNextRecurrenceDate(oldDueDate, task.recurrence);
+            task.dueDate = nextDueDate;
+            task.deadline = nextDueDate;
+            task.status = 'Devam Ediyor';
+
+            const recurrenceLabel = task.recurrence === 'daily' ? 'Günlük' : (task.recurrence === 'weekly' ? 'Haftalık' : 'Aylık');
+
+            if (!Array.isArray(task.comments)) task.comments = [];
+            task.comments.push({
+                id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                author: actorRoleName || 'Yönetici',
+                role: 'system',
+                text: `🔄 [${recurrenceLabel} Rutin] Görev başarıyla tamamlandı. Bir sonraki döneme ait yeni termin: ${formatTurkishDate(nextDueDate)} olarak güncellendi.`,
+                createdAt: new Date().toISOString()
+            });
+
+            return true;
         }
 
         function getDeletedTaskIds() {
@@ -1322,6 +1468,10 @@
 
                     if (changed) {
                         renderApp();
+                        if (activeCommentTaskId) {
+                            const curTask = tasks.find(t => String(t.id) === String(activeCommentTaskId));
+                            if (curTask) renderTaskCommentsList(curTask);
+                        }
                     }
                     updateServerStatusBadge(true);
                     if (isManual) alert("Veriler başarıyla eşitlendi!");
@@ -1566,8 +1716,14 @@
         // Diğer sekmelerden (personel.html) gelen değişiklikleri anında senkronize et
         window.addEventListener('storage', (e) => {
             if (e.key === 'task_items') {
-                tasks = JSON.parse(e.newValue || '[]');
+                const deletedIds = getDeletedTaskIds();
+                const raw = JSON.parse(e.newValue || '[]');
+                tasks = normalizeTasks(raw.filter(t => !deletedIds.includes(String(t.id))));
                 renderApp();
+                if (activeCommentTaskId) {
+                    const curTask = tasks.find(t => String(t.id) === String(activeCommentTaskId));
+                    if (curTask) renderTaskCommentsList(curTask);
+                }
             } else if (e.key === 'task_team_members') {
                 team = JSON.parse(e.newValue || '[]');
                 updateTeamDatalist();
@@ -1981,6 +2137,8 @@
                         <div class="space-y-1.5 flex-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
                                 ${badge}
+                                ${getBranchBadgeHtml(task.branch)}
+                                ${getRecurrenceBadgeHtml(task.recurrence)}
                                 <span class="text-[10px] font-bold bg-[#FAF7F2] text-[#31261D] px-2 py-0.5 rounded border border-[#E8DFC8]">
                                     ${escapeHtml(task.department || 'Birim')}
                                 </span>
@@ -2000,6 +2158,10 @@
                         </div>
 
                         <div class="flex items-center gap-2 self-end md:self-center shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#E8DFC8] w-full md:w-auto justify-end flex-wrap">
+                            <button onclick="openTaskCommentsModal(${task.id})" class="px-3 py-1.5 bg-[#FAF7F2] hover:bg-blue-50 text-blue-900 font-bold text-xs rounded-xl border border-blue-200 transition-all cursor-pointer flex items-center gap-1.5">
+                                <i class="fa-regular fa-comment-dots text-blue-700"></i>
+                                <span>Notlar (${(task.comments && task.comments.length) || 0})</span>
+                            </button>
                             <button onclick="editTask(${task.id})" class="px-3 py-1.5 bg-[#FAF7F2] hover:bg-[#F2ECE0] text-[#31261D] font-bold text-xs rounded-xl border border-[#E8DFC8] transition-all cursor-pointer flex items-center gap-1">
                                 <i class="fa-solid fa-pen-to-square text-[#A6192E]"></i>
                                 <span>Düzenle</span>
@@ -2019,6 +2181,7 @@
 
         function getFilteredTasks() {
             const search = document.getElementById('searchInput').value.toLowerCase().trim();
+            const branchFilter = document.getElementById('branchFilter')?.value || 'ALL';
             const statusFilter = document.getElementById('statusFilter').value;
             const monthFilter = document.getElementById('monthFilter').value;
             const now = new Date();
@@ -2030,6 +2193,7 @@
                 const isDelayed = item.status !== 'Tamamlandı' && itemDate < now;
                 const isDueToday = item.status !== 'Tamamlandı' && itemDate.getTime() === now.getTime();
 
+                if (branchFilter !== 'ALL' && (item.branch || 'Merkez / Genel') !== branchFilter) return false;
                 if (statusFilter === 'Geciken' && !isDelayed) return false;
                 if (statusFilter === 'Bugun' && !isDueToday) return false;
                 if (statusFilter !== 'ALL' && statusFilter !== 'Geciken' && statusFilter !== 'Bugun' && item.status !== statusFilter) return false;
@@ -2040,7 +2204,7 @@
                 }
 
                 if (search) {
-                    const textContent = `${item.title} ${item.department} ${item.action} ${item.owner}`.toLowerCase();
+                    const textContent = `${item.title} ${item.department} ${item.action} ${item.owner} ${item.branch || ''}`.toLowerCase();
                     if (!textContent.includes(search)) return false;
                 }
 
@@ -2078,11 +2242,19 @@
                     return `
                         <tr class="hover:bg-[#FAF7F2] transition-colors ${isOverdue ? 'bg-rose-50/30' : ''}">
                             <td class="py-3 px-3 text-center font-bold text-[#824701]">${idx + 1}</td>
-                            <td class="py-3 px-4 font-bold text-[#31261D]">${escapeHtml(task.title)}</td>
+                            <td class="py-3 px-4 font-bold text-[#31261D]">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    ${getRecurrenceBadgeHtml(task.recurrence)}
+                                    <span>${escapeHtml(task.title)}</span>
+                                </div>
+                            </td>
                             <td class="py-3 px-3 text-[#5C4A3C]">
-                                <span class="bg-[#FAF7F2] text-[#5C4A3C] px-2 py-0.5 rounded-lg text-[11px] font-semibold border border-[#E8DFC8]">
-                                    ${escapeHtml(task.department)}
-                                </span>
+                                <div class="space-y-1">
+                                    <div>${getBranchBadgeHtml(task.branch)}</div>
+                                    <span class="bg-[#FAF7F2] text-[#5C4A3C] px-2 py-0.5 rounded-lg text-[11px] font-semibold border border-[#E8DFC8] inline-block">
+                                        ${escapeHtml(task.department)}
+                                    </span>
+                                </div>
                             </td>
                             <td class="py-3 px-4 text-[#31261D] leading-relaxed">${escapeHtml(task.action)}</td>
                             <td class="py-3 px-3 font-semibold text-[#31261D]">
@@ -2102,6 +2274,10 @@
                             </td>
                             <td class="py-3 px-3 text-center no-print">
                                 <div class="flex items-center justify-center gap-1">
+                                    <button onclick="openTaskCommentsModal(${task.id})" title="Görev Notları & Yorumlar (${(task.comments && task.comments.length) || 0})" class="p-1.5 text-[#5C4A3C] hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer relative">
+                                        <i class="fa-regular fa-comment-dots text-sm"></i>
+                                        ${(task.comments && task.comments.length > 0) ? `<span class="absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[9px] min-w-[16px] h-4 px-1 flex items-center justify-center font-bold">${task.comments.length}</span>` : ''}
+                                    </button>
                                     <button onclick="openWhatsAppTask('${task.id}')" title="Sorumluya WhatsApp ile Bildir" class="p-1.5 text-[#5C4A3C] hover:text-[#1E340C] hover:bg-[#F4F9F0] rounded-lg transition-colors cursor-pointer">
                                         <i class="fa-brands fa-whatsapp text-sm"></i>
                                     </button>
@@ -2140,11 +2316,17 @@
                 const isOverdue = task.status !== 'Tamamlandı' && new Date(task.dueDate) < now;
                 const cardHtml = `
                     <div class="bg-white p-3.5 rounded-2xl shadow-2xs border border-[#E8DFC8] hover:shadow-md transition-shadow">
-                        <div class="flex items-start justify-between gap-2 mb-1.5">
-                            <span class="text-[10px] bg-[#FAF7F2] text-[#5C4A3C] px-2 py-0.5 rounded-lg font-bold border border-[#E8DFC8]">${escapeHtml(task.department)}</span>
+                        <div class="flex items-start justify-between gap-1.5 mb-1.5 flex-wrap">
+                            <div class="flex items-center gap-1 flex-wrap">
+                                ${getBranchBadgeHtml(task.branch)}
+                                <span class="text-[10px] bg-[#FAF7F2] text-[#5C4A3C] px-2 py-0.5 rounded-lg font-bold border border-[#E8DFC8]">${escapeHtml(task.department)}</span>
+                            </div>
                             ${isOverdue ? '<span class="text-[9px] bg-rose-100 text-[#A6192E] px-2 py-0.5 rounded-full font-black border border-rose-200">GECİKTİ</span>' : ''}
                         </div>
-                        <h5 class="font-bold text-xs text-[#31261D] mb-1">${escapeHtml(task.title)}</h5>
+                        <div class="flex items-center gap-1 mb-1 flex-wrap">
+                            ${getRecurrenceBadgeHtml(task.recurrence)}
+                            <h5 class="font-bold text-xs text-[#31261D]">${escapeHtml(task.title)}</h5>
+                        </div>
                         <p class="text-[11px] text-[#5C4A3C] mb-2.5 line-clamp-2 leading-relaxed">${escapeHtml(task.action)}</p>
                         <div class="flex items-center justify-between pt-2 border-t border-[#E8DFC8]/60 text-[10px] text-[#5C4A3C]">
                             <div class="inline-flex items-center gap-1 font-bold text-[#31261D] cursor-pointer hover:text-[#A6192E]" onclick="openEmailModal('${escapeHtml(task.owner)}')">
@@ -2152,11 +2334,15 @@
                             </div>
                             <span class="${isOverdue ? 'text-[#A6192E] font-bold' : 'text-[#5C4A3C]'}"><i class="fa-regular fa-calendar"></i> ${formatTurkishDate(task.dueDate)}</span>
                         </div>
-                        <div class="flex items-center justify-between gap-1 mt-2 pt-1.5 border-t border-[#FAF7F2]">
-                            <button onclick="openWhatsAppTask('${task.id}')" title="WhatsApp ile Hatırlat" class="text-[11px] text-[#1E340C] hover:text-[#2C4A14] flex items-center gap-1 font-bold cursor-pointer">
-                                <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+                        <div class="flex items-center justify-between gap-1 mt-2 pt-1.5 border-t border-[#FAF7F2] flex-wrap">
+                            <button onclick="openTaskCommentsModal(${task.id})" class="text-[10px] text-blue-700 hover:text-blue-900 font-bold flex items-center gap-1 cursor-pointer">
+                                <i class="fa-regular fa-comment-dots"></i>
+                                <span>Notlar (${(task.comments && task.comments.length) || 0})</span>
                             </button>
-                            <div class="flex items-center gap-1.5">
+                            <div class="flex items-center gap-1.5 ml-auto">
+                                <button onclick="openWhatsAppTask('${task.id}')" title="WhatsApp ile Hatırlat" class="text-[11px] text-[#1E340C] hover:text-[#2C4A14] flex items-center gap-1 font-bold cursor-pointer">
+                                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                                </button>
                                 <button onclick="editTask(${task.id})" class="text-[10px] text-[#824701] hover:underline font-bold px-1 cursor-pointer">Düzenle</button>
                                 <button onclick="toggleTaskStatus(${task.id})" class="text-[10px] text-[#1E340C] hover:underline px-1.5 py-0.5 bg-[#F4F9F0] rounded font-bold cursor-pointer">${task.status === 'Tamamlandı' ? 'Tekrar Aç' : 'Tamamla'}</button>
                             </div>
@@ -2758,6 +2944,9 @@
             document.getElementById('editTaskId').value = '';
             document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus text-[#FFBF3F]"></i> Yeni Görev / Aksiyon Girişi';
             
+            document.getElementById('taskBranch').value = 'Merkez / Genel';
+            document.getElementById('taskRecurrence').value = 'none';
+
             const d = new Date();
             d.setDate(d.getDate() + 7);
             document.getElementById('taskDueDate').value = d.toISOString().split('T')[0];
@@ -2783,6 +2972,8 @@
             document.getElementById('taskDueDate').value = task.dueDate;
             document.getElementById('taskStatus').value = task.status;
             document.getElementById('taskPriority').value = task.priority || 'Normal';
+            document.getElementById('taskBranch').value = task.branch || 'Merkez / Genel';
+            document.getElementById('taskRecurrence').value = task.recurrence || 'none';
 
             const chk = document.getElementById('taskSendEmailNotification');
             if (chk) chk.checked = false; // Düzenleme yaparken varsayılan kapalı
@@ -2816,7 +3007,9 @@
                 owner: ownerName,
                 dueDate: document.getElementById('taskDueDate').value,
                 status: document.getElementById('taskStatus').value,
-                priority: document.getElementById('taskPriority').value
+                priority: document.getElementById('taskPriority').value,
+                branch: document.getElementById('taskBranch').value,
+                recurrence: document.getElementById('taskRecurrence').value
             };
 
             const exists = team.some(m => m.name.toLowerCase().trim() === ownerName.toLowerCase());
@@ -2836,7 +3029,7 @@
                 if (index !== -1) tasks[index] = { ...tasks[index], ...taskData };
             } else {
                 const newId = tasks.length > 0 ? Math.max(...tasks.map(t => Number(t.id) || 0)) + 1 : 1;
-                tasks.push({ id: newId, ...taskData });
+                tasks.push({ id: newId, comments: [], ...taskData });
             }
 
             saveData();
@@ -2859,6 +3052,7 @@
             body += `Koordinasyon Aksiyon & Görev Takip Sistemi üzerinden üzerinize YENİ BİR GÖREV ATANMIŞTIR:\n\n`;
             body += `📌 GÖREV / SORUN: ${task.title}\n`;
             body += `🏢 İLGİLİ BİRİM: ${task.department}\n`;
+            body += `📍 ŞUBE / LOKASYON: ${task.branch || 'Merkez / Genel'}\n`;
             body += `⚡ ÖNCELİK: ${task.priority || 'Normal'}\n`;
             body += `📅 HEDEF TERMİN: ${formatTurkishDate(task.dueDate)}\n`;
             body += `📝 AKSİYON & ÇÖZÜM PLANI:\n${task.action}\n\n`;
@@ -2879,7 +3073,14 @@
             if (!task) return;
 
             if (task.status !== 'Tamamlandı') {
-                task.status = 'Tamamlandı';
+                if (task.recurrence && task.recurrence !== 'none') {
+                    const isRec = handleTaskRecurrenceOnComplete(task, 'Yönetici');
+                    if (isRec) {
+                        alert(`🎉 Rutin Görev Başarıyla Tamamlandı!\n\nBir sonraki döneme ait yeni termin tarihi (${formatTurkishDate(task.dueDate)}) olarak güncellendi ve görev aktif tutuldu.`);
+                    }
+                } else {
+                    task.status = 'Tamamlandı';
+                }
             } else {
                 task.status = 'Açık';
             }
@@ -2898,6 +3099,138 @@
                 renderApp();
                 await pushDataToServer();
             }
+        }
+
+        // ================= GÖREV YORUM VE DURUM NOTLARI =================
+        let activeCommentTaskId = null;
+
+        function openTaskCommentsModal(taskId) {
+            const task = tasks.find(t => String(t.id) === String(taskId));
+            if (!task) return;
+
+            activeCommentTaskId = task.id;
+            document.getElementById('commentModalTaskId').value = task.id;
+            document.getElementById('commentModalTaskTitle').innerText = task.title;
+            document.getElementById('commentModalTaskSub').innerHTML = `
+                <span>📍 ${escapeHtml(task.branch || 'Merkez / Genel')}</span> • 
+                <span>👤 ${escapeHtml(task.owner)}</span> • 
+                <span class="font-bold">${task.status}</span>
+            `;
+
+            renderTaskCommentsList(task);
+
+            const m = document.getElementById('taskCommentsModal');
+            if (m) {
+                m.style.setProperty('display', 'flex', 'important');
+                m.classList.remove('hidden');
+            }
+
+            setTimeout(() => {
+                const inp = document.getElementById('commentModalInput');
+                if (inp) {
+                    inp.value = '';
+                    inp.focus();
+                }
+            }, 100);
+        }
+
+        function closeTaskCommentsModal() {
+            const m = document.getElementById('taskCommentsModal');
+            if (m) {
+                m.style.setProperty('display', 'none', 'important');
+                m.classList.add('hidden');
+            }
+            activeCommentTaskId = null;
+        }
+
+        function renderTaskCommentsList(task) {
+            const listEl = document.getElementById('commentModalList');
+            if (!listEl) return;
+
+            const comments = Array.isArray(task.comments) ? task.comments : [];
+            if (comments.length === 0) {
+                listEl.innerHTML = `
+                    <div class="py-8 text-center text-[#5C4A3C]">
+                        <i class="fa-regular fa-comment-dots text-3xl text-stone-300 mb-2 block"></i>
+                        <p class="font-bold text-xs text-[#31261D]">Henüz durum notu veya yorum eklenmemiş</p>
+                        <p class="text-[11px] text-stone-500 mt-0.5">Yönetici veya sorumlu personel buradan anlık görev gelişmeleri ve notları paylaşabilir.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = comments.map(c => {
+                const isSystem = c.role === 'system';
+                const isAdmin = c.role === 'admin' || (c.author && c.author.toLowerCase().includes('yönetici'));
+
+                if (isSystem) {
+                    return `
+                        <div class="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-[11px] flex items-center gap-2">
+                            <span class="shrink-0 font-bold">${escapeHtml(c.text)}</span>
+                            <span class="text-[9px] text-blue-700 ml-auto shrink-0">${formatCommentDate(c.createdAt)}</span>
+                        </div>
+                    `;
+                }
+
+                const roleBadge = isAdmin
+                    ? `<span class="bg-[#31261D] text-[#FFBF3F] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#FFBF3F]/30">👔 Yönetici</span>`
+                    : `<span class="bg-[#1E340C] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">👤 Personel</span>`;
+
+                return `
+                    <div class="p-3 rounded-2xl border ${isAdmin ? 'bg-white border-[#E8DFC8]' : 'bg-[#FFFDF9] border-[#FFBF3F]/40'} shadow-2xs space-y-1">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-bold text-xs text-[#31261D]">${escapeHtml(c.author || 'Kullanıcı')}</span>
+                                ${roleBadge}
+                            </div>
+                            <span class="text-[10px] text-stone-400 font-medium">${formatCommentDate(c.createdAt)}</span>
+                        </div>
+                        <p class="text-xs text-[#31261D] leading-relaxed whitespace-pre-wrap">${escapeHtml(c.text)}</p>
+                    </div>
+                `;
+            }).join('');
+
+            listEl.scrollTop = listEl.scrollHeight;
+        }
+
+        function formatCommentDate(isoStr) {
+            if (!isoStr) return '';
+            try {
+                const d = new Date(isoStr);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                const hours = String(d.getHours()).padStart(2, '0');
+                const mins = String(d.getMinutes()).padStart(2, '0');
+                return `${day}.${month}.${year} ${hours}:${mins}`;
+            } catch(e) {
+                return '';
+            }
+        }
+
+        function submitTaskComment(e) {
+            e.preventDefault();
+            const taskId = document.getElementById('commentModalTaskId').value;
+            const input = document.getElementById('commentModalInput');
+            const text = (input ? input.value : '').trim();
+            if (!text || !taskId) return;
+
+            const task = tasks.find(t => String(t.id) === String(taskId));
+            if (!task) return;
+
+            if (!Array.isArray(task.comments)) task.comments = [];
+            task.comments.push({
+                id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                author: 'Yönetici',
+                role: 'admin',
+                text: text,
+                createdAt: new Date().toISOString()
+            });
+
+            input.value = '';
+            saveData();
+            renderTaskCommentsList(task);
+            renderApp();
         }
 
         // ================= YEDEKLEME =================

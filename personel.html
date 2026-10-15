@@ -389,6 +389,40 @@
         </div>
     </div>
 
+    <!-- GÖREV NOTLARI VE YORUM MODALI (PERSONEL) -->
+    <div id="taskCommentsModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150 flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
+                <div class="min-w-0 pr-3">
+                    <h3 class="font-bold text-sm sm:text-base flex items-center gap-2 truncate">
+                        <i class="fa-solid fa-comments text-[#FFBF3F]"></i>
+                        <span id="commentModalTaskTitle" class="truncate">Görev Notları & Gelişmeler</span>
+                    </h3>
+                    <p id="commentModalTaskSub" class="text-[11px] text-[#E8DFC8] mt-0.5 truncate"></p>
+                </div>
+                <button onclick="closeTaskCommentsModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer shrink-0">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Comments List Body (scrollable) -->
+            <div id="commentModalList" class="p-4 sm:p-5 overflow-y-auto flex-1 space-y-3 bg-[#FAF7F2] min-h-[220px] max-h-[420px]">
+                <!-- Dinamik Notlar -->
+            </div>
+
+            <!-- Footer: Add Comment Form -->
+            <form onsubmit="submitTaskComment(event)" class="p-3 sm:p-4 bg-white border-t border-[#E8DFC8] flex items-center gap-2 shrink-0">
+                <input type="hidden" id="commentModalTaskId">
+                <input type="text" id="commentModalInput" placeholder="Yöneticiye durum notu veya mesaj yazın..." required autocomplete="off" class="flex-1 px-3.5 py-2.5 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                <button type="submit" class="px-4 py-2.5 bg-[#A6192E] hover:bg-[#8C1224] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5 shrink-0">
+                    <span>Gönder</span>
+                    <i class="fa-solid fa-paper-plane text-[11px]"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- CAN ÇEREZ & CAN KARDEŞLER KURUMSAL FOOTER -->
     <footer class="py-6 border-t border-[#E8DFC8] bg-[#FAF7F2] text-center text-xs text-[#5C4A3C] no-print mt-auto">
         <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -429,7 +463,18 @@
                 dueDate: "2026-10-16",
                 deadline: "2026-10-16",
                 status: "Devam Ediyor",
-                createdAt: "2026-10-16T08:00:00.000Z"
+                createdAt: "2026-10-16T08:00:00.000Z",
+                branch: "Alsancak Şubesi",
+                recurrence: "daily",
+                comments: [
+                    {
+                        id: "c_1",
+                        author: "Yönetici",
+                        role: "admin",
+                        text: "Sabah açılışından önce taze kavrulmuş ürünlerin öne dizildiğinden ve reyon etiketlerinin güncel olduğundan emin olalım.",
+                        createdAt: "2026-10-16T08:15:00.000Z"
+                    }
+                ]
             }
         ];
 
@@ -441,6 +486,9 @@
             const dueDate = t.dueDate || t.deadline || new Date().toISOString().split('T')[0];
             let status = t.status || 'Devam Ediyor';
             if (status === 'beklemede') status = 'Devam Ediyor';
+            const branch = (t.branch || 'Merkez / Genel').trim();
+            const recurrence = t.recurrence || 'none';
+            const comments = Array.isArray(t.comments) ? t.comments : [];
             return {
                 ...t,
                 id: t.id || Date.now(),
@@ -454,13 +502,70 @@
                 dueDate: dueDate,
                 deadline: dueDate,
                 status: status,
-                priority: t.priority || 'Normal'
+                priority: t.priority || 'Normal',
+                branch: branch,
+                recurrence: recurrence,
+                comments: comments
             };
         }
 
         function normalizeTasks(arr) {
             if (!Array.isArray(arr)) return [];
             return arr.map(normalizeTask).filter(Boolean);
+        }
+
+        function getBranchBadgeHtml(branch) {
+            const b = branch || 'Merkez / Genel';
+            return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200/80"><i class="fa-solid fa-location-dot text-[9px] text-[#A6192E]"></i> ${escapeHtml(b)}</span>`;
+        }
+
+        function getRecurrenceBadgeHtml(recurrence) {
+            if (!recurrence || recurrence === 'none') return '';
+            let text = 'Rutin';
+            if (recurrence === 'daily') text = 'Günlük Rutin';
+            else if (recurrence === 'weekly') text = 'Haftalık Rutin';
+            else if (recurrence === 'monthly') text = 'Aylık Rutin';
+            return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-800 border border-blue-200"><i class="fa-solid fa-arrows-rotate text-[9px]"></i> ${text}</span>`;
+        }
+
+        function getNextRecurrenceDate(currentDueDateStr, recurrenceType) {
+            const baseDate = new Date(currentDueDateStr || Date.now());
+            const validBase = isNaN(baseDate.getTime()) ? new Date() : baseDate;
+            const nextDate = new Date(validBase);
+            if (recurrenceType === 'daily') {
+                nextDate.setDate(nextDate.getDate() + 1);
+            } else if (recurrenceType === 'weekly') {
+                nextDate.setDate(nextDate.getDate() + 7);
+            } else if (recurrenceType === 'monthly') {
+                nextDate.setMonth(nextDate.getMonth() + 1);
+            }
+            return nextDate.toISOString().split('T')[0];
+        }
+
+        function handleTaskRecurrenceOnComplete(task, actorRoleName) {
+            if (!task.recurrence || task.recurrence === 'none') {
+                task.status = 'Tamamlandı';
+                return false;
+            }
+
+            const oldDueDate = task.dueDate;
+            const nextDueDate = getNextRecurrenceDate(oldDueDate, task.recurrence);
+            task.dueDate = nextDueDate;
+            task.deadline = nextDueDate;
+            task.status = 'Devam Ediyor';
+
+            const recurrenceLabel = task.recurrence === 'daily' ? 'Günlük' : (task.recurrence === 'weekly' ? 'Haftalık' : 'Aylık');
+
+            if (!Array.isArray(task.comments)) task.comments = [];
+            task.comments.push({
+                id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                author: actorRoleName || 'Personel',
+                role: 'system',
+                text: `🔄 [${recurrenceLabel} Rutin] Görev personel tarafından tamamlandı. Bir sonraki döneme ait yeni termin: ${formatTurkishDate(nextDueDate)} olarak yenilendi.`,
+                createdAt: new Date().toISOString()
+            });
+
+            return true;
         }
 
         function getDeletedTaskIds() {
@@ -633,6 +738,10 @@
                         } else {
                             showUserSelectionScreen();
                         }
+                        if (activeCommentTaskId) {
+                            const curTask = tasks.find(t => String(t.id) === String(activeCommentTaskId));
+                            if (curTask) renderTaskCommentsList(curTask);
+                        }
                     }
                     updatePersonelServerBadge(true);
                     if (isManual) alert("Görevler başarıyla eşitlendi!");
@@ -716,8 +825,14 @@
         // Yönetici sekmesinde bir görev eklendiğinde veya değiştiğinde anında güncelle
         window.addEventListener('storage', (e) => {
             if (e.key === 'task_items') {
-                tasks = normalizeTasks(JSON.parse(e.newValue || '[]'));
+                const deletedIds = getDeletedTaskIds();
+                const raw = JSON.parse(e.newValue || '[]');
+                tasks = normalizeTasks(raw.filter(t => !deletedIds.includes(String(t.id))));
                 if (currentSelectedUser) renderPersonalDashboard(currentSelectedUser);
+                if (activeCommentTaskId) {
+                    const curTask = tasks.find(t => String(t.id) === String(activeCommentTaskId));
+                    if (curTask) renderTaskCommentsList(curTask);
+                }
             } else if (e.key === 'task_team_members') {
                 team = JSON.parse(e.newValue || '[]');
                 if (!currentSelectedUser) showUserSelectionScreen();
@@ -1127,6 +1242,8 @@
                     <div class="p-4 sm:p-5 rounded-2xl border ${isOverdue ? 'border-[#A6192E]/40 bg-[#FFF5F6]' : isCompleted ? 'border-[#1E340C]/30 bg-[#F4F8F1]' : 'border-[#E8DFC8] bg-white'} shadow-2xs hover:shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div class="space-y-1.5 flex-1 min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
+                                ${getBranchBadgeHtml(task.branch)}
+                                ${getRecurrenceBadgeHtml(task.recurrence)}
                                 <span class="text-[10px] font-semibold bg-[#FAF7F2] text-[#31261D] px-2 py-0.5 rounded border border-[#E8DFC8]">
                                     ${escapeHtml(task.department)}
                                 </span>
@@ -1144,21 +1261,25 @@
                             </p>
                         </div>
 
-                        <!-- Butonlar (Durum güncelleme & WhatsApp bildirim) -->
+                        <!-- Butonlar (Durum güncelleme & Yorumlar & WhatsApp bildirim) -->
                         <div class="flex items-center gap-2 self-end md:self-center shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#E8DFC8] w-full md:w-auto justify-end flex-wrap">
-                            <button onclick="notifyTaskWhatsApp(${task.id})" title="Bu görevin durumunu WhatsApp'tan yöneticiye bildir" class="px-3 py-2 rounded-xl border border-[#1E340C]/30 bg-[#F4F8F1] hover:bg-[#E7F0E1] text-[#1E340C] text-xs font-semibold transition-colors flex items-center gap-1.5">
+                            <button onclick="openTaskCommentsModal(${task.id})" class="px-3 py-2 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-900 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
+                                <i class="fa-regular fa-comment-dots text-blue-700"></i>
+                                <span>Notlar (${(task.comments && task.comments.length) || 0})</span>
+                            </button>
+                            <button onclick="notifyTaskWhatsApp(${task.id})" title="Bu görevin durumunu WhatsApp'tan yöneticiye bildir" class="px-3 py-2 rounded-xl border border-[#1E340C]/30 bg-[#F4F8F1] hover:bg-[#E7F0E1] text-[#1E340C] text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
                                 <i class="fa-brands fa-whatsapp text-sm"></i>
                                 <span class="hidden sm:inline">WhatsApp</span>
                             </button>
                             ${task.status === 'Tamamlandı' ? `
-                                <button onclick="setTaskStatus(${task.id}, 'Açık')" class="px-3.5 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-xs font-semibold hover:bg-[#F2ECE0] transition-colors flex items-center gap-1.5">
+                                <button onclick="setTaskStatus(${task.id}, 'Açık')" class="px-3.5 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-xs font-semibold hover:bg-[#F2ECE0] transition-colors flex items-center gap-1.5 cursor-pointer">
                                     <i class="fa-solid fa-rotate-left"></i> Tekrar Aç
                                 </button>
                             ` : `
-                                <button onclick="setTaskStatus(${task.id}, 'Devam Ediyor')" class="px-3.5 py-2 rounded-xl border border-[#FFBF3F]/50 bg-[#FFF9ED] text-[#824701] text-xs font-semibold hover:bg-[#FFF3D6] transition-colors flex items-center gap-1.5 ${task.status === 'Devam Ediyor' ? 'ring-2 ring-[#FFBF3F]' : ''}">
+                                <button onclick="setTaskStatus(${task.id}, 'Devam Ediyor')" class="px-3.5 py-2 rounded-xl border border-[#FFBF3F]/50 bg-[#FFF9ED] text-[#824701] text-xs font-semibold hover:bg-[#FFF3D6] transition-colors flex items-center gap-1.5 cursor-pointer ${task.status === 'Devam Ediyor' ? 'ring-2 ring-[#FFBF3F]' : ''}">
                                     <i class="fa-solid fa-spinner"></i> Devam Ediyor
                                 </button>
-                                <button onclick="setTaskStatus(${task.id}, 'Tamamlandı')" class="px-4 py-2 rounded-xl bg-[#1E340C] hover:bg-[#2c4c11] text-white text-xs font-bold shadow-md shadow-[#1E340C]/25 transition-all flex items-center gap-1.5 active:scale-95">
+                                <button onclick="setTaskStatus(${task.id}, 'Tamamlandı')" class="px-4 py-2 rounded-xl bg-[#1E340C] hover:bg-[#2c4c11] text-white text-xs font-bold shadow-md shadow-[#1E340C]/25 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
                                     <i class="fa-solid fa-check"></i> Tamamla
                                 </button>
                             `}
@@ -1171,10 +1292,149 @@
         function setTaskStatus(taskId, status) {
             const task = tasks.find(t => String(t.id) === String(taskId));
             if (task) {
-                task.status = status;
+                if (status === 'Tamamlandı' && task.recurrence && task.recurrence !== 'none') {
+                    const isRec = handleTaskRecurrenceOnComplete(task, currentSelectedUser || 'Personel');
+                    if (isRec) {
+                        alert(`🎉 Tebrikler!\n\nRutin görev tamamlandı olarak kaydedildi. Bir sonraki döneme ait yeni termin tarihi (${formatTurkishDate(task.dueDate)}) olarak otomatik yenilendi ve görev listenizde aktif kalmaya devam ediyor.`);
+                    }
+                } else {
+                    task.status = status;
+                }
                 saveTasks();
                 renderPersonalDashboard(currentSelectedUser);
             }
+        }
+
+        // ================= GÖREV YORUM VE DURUM NOTLARI (PERSONEL) =================
+        let activeCommentTaskId = null;
+
+        function openTaskCommentsModal(taskId) {
+            const task = tasks.find(t => String(t.id) === String(taskId));
+            if (!task) return;
+
+            activeCommentTaskId = task.id;
+            document.getElementById('commentModalTaskId').value = task.id;
+            document.getElementById('commentModalTaskTitle').innerText = task.title;
+            document.getElementById('commentModalTaskSub').innerHTML = `
+                <span>📍 ${escapeHtml(task.branch || 'Merkez / Genel')}</span> • 
+                <span>👤 ${escapeHtml(task.owner)}</span> • 
+                <span class="font-bold">${task.status}</span>
+            `;
+
+            renderTaskCommentsList(task);
+
+            const m = document.getElementById('taskCommentsModal');
+            if (m) {
+                m.style.setProperty('display', 'flex', 'important');
+                m.classList.remove('hidden');
+            }
+
+            setTimeout(() => {
+                const inp = document.getElementById('commentModalInput');
+                if (inp) {
+                    inp.value = '';
+                    inp.focus();
+                }
+            }, 100);
+        }
+
+        function closeTaskCommentsModal() {
+            const m = document.getElementById('taskCommentsModal');
+            if (m) {
+                m.style.setProperty('display', 'none', 'important');
+                m.classList.add('hidden');
+            }
+            activeCommentTaskId = null;
+        }
+
+        function renderTaskCommentsList(task) {
+            const listEl = document.getElementById('commentModalList');
+            if (!listEl) return;
+
+            const comments = Array.isArray(task.comments) ? task.comments : [];
+            if (comments.length === 0) {
+                listEl.innerHTML = `
+                    <div class="py-8 text-center text-[#5C4A3C]">
+                        <i class="fa-regular fa-comment-dots text-3xl text-stone-300 mb-2 block"></i>
+                        <p class="font-bold text-xs text-[#31261D]">Henüz durum notu eklenmemiş</p>
+                        <p class="text-[11px] text-stone-500 mt-0.5">Yöneticinizle bu görev hakkında anlık notlar ve gelişmeler paylaşabilirsiniz.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = comments.map(c => {
+                const isSystem = c.role === 'system';
+                const isAdmin = c.role === 'admin' || (c.author && c.author.toLowerCase().includes('yönetici'));
+
+                if (isSystem) {
+                    return `
+                        <div class="p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-[11px] flex items-center gap-2">
+                            <span class="shrink-0 font-bold">${escapeHtml(c.text)}</span>
+                            <span class="text-[9px] text-blue-700 ml-auto shrink-0">${formatCommentDate(c.createdAt)}</span>
+                        </div>
+                    `;
+                }
+
+                const roleBadge = isAdmin
+                    ? `<span class="bg-[#31261D] text-[#FFBF3F] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#FFBF3F]/30">👔 Yönetici</span>`
+                    : `<span class="bg-[#1E340C] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">👤 Personel</span>`;
+
+                return `
+                    <div class="p-3 rounded-2xl border ${isAdmin ? 'bg-white border-[#E8DFC8]' : 'bg-[#FFFDF9] border-[#FFBF3F]/40'} shadow-2xs space-y-1">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-bold text-xs text-[#31261D]">${escapeHtml(c.author || 'Kullanıcı')}</span>
+                                ${roleBadge}
+                            </div>
+                            <span class="text-[10px] text-stone-400 font-medium">${formatCommentDate(c.createdAt)}</span>
+                        </div>
+                        <p class="text-xs text-[#31261D] leading-relaxed whitespace-pre-wrap">${escapeHtml(c.text)}</p>
+                    </div>
+                `;
+            }).join('');
+
+            listEl.scrollTop = listEl.scrollHeight;
+        }
+
+        function formatCommentDate(isoStr) {
+            if (!isoStr) return '';
+            try {
+                const d = new Date(isoStr);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                const hours = String(d.getHours()).padStart(2, '0');
+                const mins = String(d.getMinutes()).padStart(2, '0');
+                return `${day}.${month}.${year} ${hours}:${mins}`;
+            } catch(e) {
+                return '';
+            }
+        }
+
+        function submitTaskComment(e) {
+            e.preventDefault();
+            const taskId = document.getElementById('commentModalTaskId').value;
+            const input = document.getElementById('commentModalInput');
+            const text = (input ? input.value : '').trim();
+            if (!text || !taskId) return;
+
+            const task = tasks.find(t => String(t.id) === String(taskId));
+            if (!task) return;
+
+            if (!Array.isArray(task.comments)) task.comments = [];
+            task.comments.push({
+                id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                author: currentSelectedUser || 'Personel',
+                role: 'staff',
+                text: text,
+                createdAt: new Date().toISOString()
+            });
+
+            input.value = '';
+            saveTasks();
+            renderTaskCommentsList(task);
+            if (currentSelectedUser) renderPersonalDashboard(currentSelectedUser);
         }
 
         // ================= WHATSAPP BİLDİRİM ENTEGRASYONU =================

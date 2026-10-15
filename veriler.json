@@ -26,7 +26,18 @@
       "dueDate": "2026-10-16",
       "deadline": "2026-10-16",
       "status": "Devam Ediyor",
-      "createdAt": "2026-10-16T08:00:00.000Z"
+      "createdAt": "2026-10-16T08:00:00.000Z",
+      "branch": "Alsancak Şubesi",
+      "recurrence": "daily",
+      "comments": [
+        {
+          "id": "c_1",
+          "author": "Yönetici",
+          "role": "admin",
+          "text": "Sabah açılışından önce taze kavrulmuş ürünlerin öne dizildiğinden ve reyon etiketlerinin güncel olduğundan emin olalım.",
+          "createdAt": "2026-10-16T08:15:00.000Z"
+        }
+      ]
     }
   ],
   "notes": "CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan) - Can Kardeşler Kuruluşudur.\n7/24 Kesintisiz Bulut Senkronizasyonu Devrede.",
