@@ -439,13 +439,6 @@
 
     <!-- JAVASCRIPT KODLARI -->
     <script>
-        const INITIAL_TEAM = [];
-        const INITIAL_TASKS = [];
-
-        let team = JSON.parse(localStorage.getItem('task_team_members')) || [];
-        let tasks = JSON.parse(localStorage.getItem('task_items')) || [];
-        let currentSelectedUser = localStorage.getItem('task_personel_selected_user') || '';
-
         const DEFAULT_INIT_TEAM = [
             { id: 1, name: "Ahmet Can", role: "Şube Sorumlusu", title: "Şube Sorumlusu", department: "Şube Operasyon", phone: "05551234567", email: "ahmetcan@cancerez.com.tr", pin: "1978", status: "aktif" }
         ];
@@ -632,6 +625,8 @@
             team = [];
             localStorage.setItem('task_team_members', '[]');
         }
+
+        let currentSelectedUser = localStorage.getItem('task_personel_selected_user') || '';
 
         const CLOUD_DB_URL = localStorage.getItem('cancerez_cloud_db_url') || "https://extendsclass.com/api/json-storage/bin/aecadfa";
         let lastLocalActionTime = parseInt(localStorage.getItem('cancerez_last_local_action') || '0', 10);
@@ -863,11 +858,11 @@
 
             if (team.length === 0) {
                 list.innerHTML = `
-                    <div class="p-8 text-center text-[#5C4A3C] space-y-3">
-                        <i class="fa-solid fa-users text-4xl text-[#E8DFC8]"></i>
+                    <div class="p-6 text-center text-[#5C4A3C] space-y-2">
+                        <i class="fa-solid fa-users text-3xl text-[#E8DFC8]"></i>
                         <p class="text-sm font-bold text-[#31261D]">Henüz Kayıtlı Personel Bulunmuyor</p>
                         <p class="text-xs text-[#5C4A3C] max-w-sm mx-auto">
-                            Sistemde atanmış çalışan listesi bulunamadı. Lütfen şirket yöneticiniz ile iletişime geçiniz.
+                            Aşağıdaki yeşil <strong>"Aramıza Yeni Katıldım"</strong> butonuna tıklayarak ilk personel kaydınızı hemen oluşturabilirsiniz.
                         </p>
                     </div>
                 `;
