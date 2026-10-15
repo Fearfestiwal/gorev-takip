@@ -212,7 +212,7 @@
     </main>
 
     <!-- PERSONEL PIN GİRİŞ MODALI -->
-    <div id="userPinModal" class="fixed inset-0 bg-[#241A13]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div id="userPinModal" class="fixed inset-0 bg-[#241A13]/90 backdrop-blur-md z-50 items-center justify-center p-4" style="display: none;">
         <div class="max-w-sm w-full bg-[#31261D] rounded-3xl border border-[#FFBF3F]/40 shadow-2xl p-6 text-center text-white relative overflow-hidden animate-in fade-in zoom-in duration-150">
             <!-- Arka plan efektleri -->
             <div class="absolute -right-12 -top-12 w-36 h-36 bg-[#A6192E]/25 rounded-full blur-2xl pointer-events-none"></div>
@@ -544,7 +544,10 @@
             document.getElementById('modalPinAvatar').innerText = getInitials(name);
             document.getElementById('staffPinInput').value = '';
             document.getElementById('staffPinError').classList.add('hidden');
-            document.getElementById('userPinModal').classList.remove('hidden');
+            const modal = document.getElementById('userPinModal');
+            modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
             setTimeout(() => {
                 const inp = document.getElementById('staffPinInput');
                 if (inp) inp.focus();
@@ -552,7 +555,10 @@
         }
 
         function closeUserPinModal() {
-            document.getElementById('userPinModal').classList.add('hidden');
+            const modal = document.getElementById('userPinModal');
+            modal.style.setProperty('display', 'none', 'important');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
             pendingPinPerson = null;
         }
 

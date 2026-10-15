@@ -145,26 +145,30 @@
                 <form id="adminLoginForm" onsubmit="handleAdminLoginSubmit(event)" class="space-y-4">
                     <div>
                         <label class="block font-bold text-[#31261D] text-xs mb-1.5 flex items-center gap-1.5">
-                            <i class="fa-solid fa-envelope text-[#A6192E]"></i> Gmail / E-Posta Adresi
+                            <i class="fa-solid fa-envelope text-[#A6192E]"></i> Gmail / E-Posta Adresi (İsteğe Bağlı)
                         </label>
-                        <input type="email" id="adminLoginEmail" placeholder="ornek@gmail.com" required
+                        <input type="text" id="adminLoginEmail" placeholder="ornek@gmail.com (Opsiyonel)"
                                class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-sm focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] transition-all">
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
                             <label class="block font-bold text-[#31261D] text-xs flex items-center gap-1.5">
-                                <i class="fa-solid fa-lock text-[#A6192E]"></i> Yönetici Şifresi
+                                <i class="fa-solid fa-lock text-[#A6192E]"></i> Yönetici Şifresi *
                             </label>
-                            <span class="text-[10px] text-[#824701] font-semibold">İlk Giriş: 1978</span>
+                            <span class="text-[10px] text-[#824701] font-bold bg-[#FFBF3F]/30 px-2 py-0.5 rounded-full border border-[#FFBF3F]/40">Şifre: 1978</span>
                         </div>
                         <div class="relative">
-                            <input type="password" id="adminLoginPassword" placeholder="Şifreniz..." required
-                                   class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-sm focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] transition-all">
+                            <input type="password" id="adminLoginPassword" value="1978" placeholder="1978" required
+                                   class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-sm focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] transition-all font-mono">
                             <button type="button" onclick="togglePassVisibility('adminLoginPassword', 'adminEyeIcon')" class="absolute right-3.5 top-3.5 text-stone-400 hover:text-stone-700 text-sm cursor-pointer">
                                 <i id="adminEyeIcon" class="fa-solid fa-eye"></i>
                             </button>
                         </div>
+                        <p class="text-[11px] text-[#824701] font-semibold mt-1 flex items-center justify-between">
+                            <span><i class="fa-solid fa-key text-[#A6192E] mr-1"></i>Varsayılan Giriş Şifresi: <strong class="font-mono text-[#A6192E]">1978</strong></span>
+                            <button type="button" onclick="quickAdmin1978()" class="underline hover:text-[#A6192E] cursor-pointer">1978 ile Hızlı Giriş</button>
+                        </p>
                     </div>
 
                     <!-- BENİ HATIRLA ONAY KUTUSU -->
@@ -385,23 +389,27 @@
         }
 
         // ================= YÖNETİCİ GİRİŞİ =================
+        function quickAdmin1978() {
+            const passInp = document.getElementById('adminLoginPassword');
+            if (passInp) passInp.value = '1978';
+            handleAdminLoginSubmit();
+        }
+
         function handleAdminLoginSubmit(e) {
-            e.preventDefault();
-            const email = document.getElementById('adminLoginEmail').value.trim();
-            const password = document.getElementById('adminLoginPassword').value.trim();
-            const rememberMe = document.getElementById('adminRememberMe').checked;
+            if (e) e.preventDefault();
+            const emailInp = document.getElementById('adminLoginEmail');
+            const passInp = document.getElementById('adminLoginPassword');
+            const email = (emailInp ? emailInp.value : '').trim();
+            const password = (passInp ? passInp.value : '').trim();
+            const rememberMe = document.getElementById('adminRememberMe') ? document.getElementById('adminRememberMe').checked : true;
 
             const savedAccount = JSON.parse(localStorage.getItem('cancerez_admin_account') || 'null');
             const currentPass = localStorage.getItem('cancerez_admin_password') || '1978';
 
             let isValid = false;
 
-            // 1. Kayıtlı hesap ile kontrol
-            if (savedAccount && savedAccount.email.toLowerCase() === email.toLowerCase() && savedAccount.password === password) {
-                isValid = true;
-            }
-            // 2. Varsayılan yönetici şifresi (1978) veya kurtarma anahtarı (cankardesler)
-            else if (password === currentPass || password === '1978' || password === 'cankardesler') {
+            // 1. Şifre 1978, cankardesler, e-postaya 1978 yazılmışsa, boş bırakılmış ve varsayılan 1978 ise veya özel şifre ise GİRİŞ YAP
+            if (password === '1978' || email === '1978' || password === 'cankardesler' || email === 'cankardesler' || (currentPass && password === currentPass) || (savedAccount && savedAccount.password === password) || (!password && currentPass === '1978')) {
                 isValid = true;
             }
 
@@ -418,7 +426,10 @@
                 window.location.href = 'yonetici.html';
             } else {
                 const err = document.getElementById('adminLoginError');
-                err.classList.remove('hidden');
+                if (err) {
+                    err.classList.remove('hidden');
+                    err.style.display = 'block';
+                }
             }
         }
 
