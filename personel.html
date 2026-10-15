@@ -52,9 +52,9 @@
                         <span class="hidden sm:inline">WhatsApp ile Bildir</span>
                         <span class="sm:hidden">WhatsApp</span>
                     </button>
-                    <button onclick="notifyManagerMail()" title="Mail ile Bildir" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-medium border border-stone-700 transition-all flex items-center gap-1.5">
+                    <button onclick="notifyManagerMail()" title="Gmail ile Bildir" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-medium border border-stone-700 transition-all flex items-center gap-1.5">
                         <i class="fa-solid fa-envelope text-xs"></i>
-                        <span class="hidden md:inline">Mail</span>
+                        <span class="hidden md:inline">Gmail</span>
                     </button>
                 </div>
             </div>
@@ -628,13 +628,17 @@
             const completed = userTasks.filter(t => t.status === 'Tamamlandı').length;
             const total = userTasks.length;
 
-            const subject = encodeURIComponent(`[Bilgilendirme] ${currentSelectedUser} - Görev Durum Güncellemesi`);
+            const subject = `[Bilgilendirme] ${currentSelectedUser} - Görev Durum Güncellemesi`;
             let body = `Sayın Yönetici,\n\n`;
             body += `${currentSelectedUser} olarak üzerimdeki görevlerin son durumunu bildirmek isterim:\n`;
             body += `Toplam ${total} görevimden ${completed} tanesi tamamlanmıştır.\n\n`;
             body += `Detaylı listeyi sistemden inceleyebilirsiniz.\nİyi çalışmalar dilerim.`;
 
-            window.location.href = `mailto:yonetim@cankardesler.com?subject=${subject}&body=${encodeURIComponent(body)}`;
+            const encodedTo = encodeURIComponent('yonetim@cankardesler.com');
+            const encodedSu = encodeURIComponent(subject);
+            const encodedBody = encodeURIComponent(body);
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSu}&body=${encodedBody}`;
+            window.open(gmailUrl, '_blank');
         }
 
         function formatTurkishDate(dateStr) {

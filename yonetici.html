@@ -533,7 +533,7 @@
                         </button>
                         <button type="button" onclick="sendBulkMailClient()" class="px-5 py-2 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white rounded-xl font-bold shadow-md shadow-rose-600/30 flex items-center gap-2 transition-all">
                             <i class="fa-solid fa-paper-plane"></i>
-                            <span>Outlook'ta Aç</span>
+                            <span>Gmail'de Aç ve Gönder</span>
                         </button>
                     </div>
                 </div>
@@ -640,9 +640,9 @@
                             <i class="fa-brands fa-whatsapp text-sm"></i>
                             <span>WhatsApp ile Gönder</span>
                         </button>
-                        <button type="button" onclick="sendMailClient()" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl font-semibold shadow-md shadow-sky-600/30 flex items-center gap-2 transition-all">
+                        <button type="button" onclick="sendMailClient()" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-semibold shadow-md shadow-rose-600/30 flex items-center gap-2 transition-all">
                             <i class="fa-solid fa-envelope"></i>
-                            <span>Outlook'ta Aç</span>
+                            <span>Gmail'de Aç</span>
                         </button>
                     </div>
                 </div>
@@ -1233,9 +1233,9 @@
                                     <i class="fa-brands fa-whatsapp text-sm"></i>
                                     <span>WhatsApp</span>
                                 </button>
-                                <button onclick="openEmailModal('${escapeHtml(ownerName)}')" title="Mail Gönder" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white font-medium text-xs transition-all shadow-2xs">
-                                    <i class="fa-solid fa-paper-plane text-[10px]"></i>
-                                    <span>Mail</span>
+                                <button onclick="openEmailModal('${escapeHtml(ownerName)}')" title="Gmail Raporu Gönder" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white font-medium text-xs transition-all shadow-2xs">
+                                    <i class="fa-solid fa-envelope text-[10px]"></i>
+                                    <span>Gmail</span>
                                 </button>
                             </div>
                         </td>
@@ -1434,9 +1434,9 @@
                                 <i class="fa-brands fa-whatsapp text-sm"></i>
                                 <span>WhatsApp</span>
                             </button>
-                            <button onclick="closeQuickMailPickerModal(); openEmailModal('${escapeHtml(member.name)}')" class="px-3 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-600/20 flex items-center gap-1.5 transition-all">
-                                <i class="fa-solid fa-paper-plane text-[10px]"></i>
-                                <span>Mail</span>
+                            <button onclick="closeQuickMailPickerModal(); openEmailModal('${escapeHtml(member.name)}')" class="px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-md shadow-rose-600/20 flex items-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-envelope text-[10px]"></i>
+                                <span>Gmail</span>
                             </button>
                         </div>
                     </div>
@@ -1560,10 +1560,18 @@
             });
         }
 
+        function openInGmail(to, subject, body) {
+            const encodedTo = encodeURIComponent(to || '');
+            const encodedSu = encodeURIComponent(subject || '');
+            const encodedBody = encodeURIComponent(body || '');
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSu}&body=${encodedBody}`;
+            window.open(gmailUrl, '_blank');
+        }
+
         function sendMailClient() {
             const to = document.getElementById('emailRecipientAddress').value.trim();
-            const subject = encodeURIComponent(`[Aksiyon Takip] ${currentEmailPersonName} - Görev & İlerleme Raporu`);
-            const body = encodeURIComponent(document.getElementById('emailBodyPreview').value);
+            const subject = `[Aksiyon Takip] ${currentEmailPersonName} - Görev & İlerleme Raporu`;
+            const body = document.getElementById('emailBodyPreview').value;
 
             if (!to) {
                 alert("Lütfen bir alıcı e-posta adresi girin veya Rehberden ekleyin.");
@@ -1571,7 +1579,7 @@
                 return;
             }
 
-            window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+            openInGmail(to, subject, body);
         }
 
         // ================= WHATSAPP ENTEGRASYONU =================
@@ -1777,15 +1785,15 @@
 
         function sendBulkMailClient() {
             const to = document.getElementById('bulkRecipientsInput').value.trim();
-            const subject = encodeURIComponent(document.getElementById('bulkSubjectInput').value.trim());
-            const body = encodeURIComponent(document.getElementById('bulkBodyPreview').value);
+            const subject = document.getElementById('bulkSubjectInput').value.trim();
+            const body = document.getElementById('bulkBodyPreview').value;
 
             if (!to) {
                 alert("Lütfen en az bir alıcı e-posta adresi girin.");
                 return;
             }
 
-            window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+            openInGmail(to, subject, body);
         }
 
         // ================= EKİP REHBERİ =================
@@ -1995,7 +2003,7 @@
             const member = team.find(m => m.name.toLowerCase().trim() === ownerName.toLowerCase().trim());
             const recipientEmail = (member && member.email) ? member.email.trim() : '';
 
-            const subject = encodeURIComponent(`[Yeni Görev Atandı] ${task.title} - ${task.department}`);
+            const subject = `[Yeni Görev Atandı] ${task.title} - ${task.department}`;
             let body = `Sayın ${ownerName},\n\n`;
             body += `Koordinasyon Aksiyon & Görev Takip Sistemi üzerinden üzerinize YENİ BİR GÖREV ATANMIŞTIR:\n\n`;
             body += `📌 GÖREV / SORUN: ${task.title}\n`;
@@ -2008,12 +2016,10 @@
             body += `İyi çalışmalar dileriz,\n`;
             body += `Koordinasyon & Yönetim`;
 
-            const encodedBody = encodeURIComponent(body);
-
             if (recipientEmail) {
-                window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${encodedBody}`;
+                openInGmail(recipientEmail, subject, body);
             } else {
-                alert(`Görev başarıyla kaydedildi!\n\nAncak "${ownerName}" için sistemde henüz bir e-posta adresi kayıtlı değil. Ekip Rehberinden e-postasını eklerseniz bildirim mailleri doğrudan açılacaktır.`);
+                alert(`Görev başarıyla kaydedildi!\n\nAncak "${ownerName}" için sistemde henüz bir e-posta adresi kayıtlı değil. Ekip Rehberinden e-postasını eklerseniz bildirim mailleri doğrudan Gmail üzerinden açılacaktır.`);
             }
         }
 
