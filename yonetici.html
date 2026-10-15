@@ -2429,6 +2429,9 @@
                             <span class="text-[10px] bg-[#FFBF3F]/20 text-[#824701] border border-[#FFBF3F]/40 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 shadow-2xs">
                                 <i class="fa-solid fa-key text-[9px] text-[#A6192E]"></i> PIN: ${escapeHtml(member.pin || '1978')}
                             </span>
+                            <button onclick="resetStaffPinDirect(${idx})" title="Şifre Sıfırla / Güncelle" class="px-2 py-0.5 text-[10px] bg-amber-500/15 text-amber-900 hover:bg-amber-500/30 border border-amber-300 rounded-lg font-bold flex items-center gap-1 cursor-pointer transition-all active:scale-95">
+                                <i class="fa-solid fa-rotate-left text-[9px] text-[#A6192E]"></i> Şifre Değiştir
+                            </button>
                             <div class="flex items-center gap-1 mt-1">
                                 <button onclick="openWhatsAppMember('${escapeHtml(member.name)}')" title="WhatsApp Mesajı Gönder" class="p-1 text-[#5C4A3C] hover:text-[#1E340C] rounded-lg cursor-pointer"><i class="fa-brands fa-whatsapp text-sm"></i></button>
                                 <button onclick="openEmailModal('${escapeHtml(member.name)}')" title="Mail Gönder" class="p-1 text-[#5C4A3C] hover:text-[#A6192E] rounded-lg cursor-pointer"><i class="fa-solid fa-envelope text-[11px]"></i></button>
@@ -2439,6 +2442,24 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        function resetStaffPinDirect(idx) {
+            const m = team[idx];
+            if (!m) return;
+            const currentPin = m.pin || '1978';
+            const newPin = prompt(`"${m.name}" personeli için yeni PIN / Şifre belirleyin:\n\n(Şu anki PIN: ${currentPin})\n\n(Personel şifresini unuttuysa buradan güncelleyebilirsiniz):`, currentPin);
+            if (newPin !== null) {
+                const trimmed = newPin.trim();
+                if (trimmed.length < 4) {
+                    alert("Şifre en az 4 haneli olmalıdır.");
+                    return;
+                }
+                m.pin = trimmed;
+                saveData();
+                renderTeamCards();
+                alert(`"${m.name}" personelinin şifresi başarıyla "${trimmed}" olarak güncellendi! Personel yeni şifresiyle giriş yapabilir.`);
+            }
         }
 
         function handleTeamSubmit(e) {

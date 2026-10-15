@@ -127,9 +127,15 @@
                 </p>
             </div>
 
-            <div class="bg-white rounded-3xl shadow-sm border border-[#E8DFC8] p-4 sm:p-6">
+            <div class="bg-white rounded-3xl shadow-sm border border-[#E8DFC8] p-4 sm:p-6 space-y-4">
                 <div id="selectionCardsList" class="space-y-2.5">
                     <!-- JS çalışanları kartlar halinde dolduracak -->
+                </div>
+
+                <div class="pt-3 border-t border-[#E8DFC8]">
+                    <button type="button" onclick="openStaffSelfRegisterModal()" class="w-full py-3.5 bg-gradient-to-r from-[#1E340C] to-[#2E4F14] hover:from-[#2E4F14] hover:to-[#1E340C] text-[#FFBF3F] font-black text-xs sm:text-sm rounded-2xl border border-[#FFBF3F]/30 shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95">
+                        <i class="fa-solid fa-user-plus text-[#FFBF3F]"></i> Aramıza Yeni Katıldım (Personel Kaydı Oluştur)
+                    </button>
                 </div>
             </div>
         </div>
@@ -241,6 +247,13 @@
                         <i class="fa-solid fa-triangle-exclamation mr-1 text-[#FFBF3F]"></i> Hatalı PIN kodu!
                     </div>
 
+                    <div class="flex items-center justify-between text-[11px] pt-1">
+                        <button type="button" onclick="openStaffForgotPinFromModal()" class="text-[#FFBF3F] hover:underline flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-circle-question"></i> Şifremi Unuttum
+                        </button>
+                        <span class="text-[10px] text-stone-400">Yöneticiniz sıfırlayabilir</span>
+                    </div>
+
                     <div class="flex items-center gap-2 pt-1">
                         <button type="button" onclick="closeUserPinModal()" class="flex-1 py-2.5 bg-[#46372A] hover:bg-[#574434] text-[#E5DCD0] rounded-xl font-bold text-xs transition-colors cursor-pointer">
                             İptal
@@ -251,6 +264,88 @@
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+
+    <!-- YENİ PERSONEL KENDİ KENDİNE KAYIT MODALI -->
+    <div id="staffSelfRegisterModal" class="fixed inset-0 bg-[#241A13]/90 backdrop-blur-md z-50 items-center justify-center p-4" style="display: none;">
+        <div class="max-w-md w-full bg-white rounded-3xl border border-[#E8DFC8] shadow-2xl p-6 relative overflow-hidden animate-in fade-in zoom-in duration-150 text-[#31261D]">
+            <div class="flex items-center justify-between pb-3 border-b border-[#E8DFC8]">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-[#1E340C] text-[#FFBF3F] flex items-center justify-center font-black text-base shadow-md">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm sm:text-base text-[#31261D]">Yeni Personel Kaydı</h3>
+                        <p class="text-[11px] text-[#5C4A3C]">Can Çerez Ekip Listesine Kaydolun</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeStaffSelfRegisterModal()" class="w-8 h-8 rounded-full bg-[#FAF7F2] text-[#5C4A3C] hover:text-[#A6192E] flex items-center justify-center cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleSelfRegisterSubmit(event)" class="space-y-3 pt-3">
+                <div class="bg-[#FFFDF7] p-2.5 rounded-xl border border-[#FFBF3F]/40 text-[#824701] text-[11px] flex items-start gap-2">
+                    <i class="fa-solid fa-circle-info text-sm mt-0.5 text-[#1E340C] shrink-0"></i>
+                    <span>Bilgilerinizi ve unutmayacağınız bir şifre giriniz. Şifrenizi unutursanız şirket yöneticiniz anında görebilir veya değiştirebilir.</span>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-xs text-[#31261D] mb-1">Adınız ve Soyadınız *</label>
+                    <input type="text" id="selfRegName" placeholder="Örn: Ayşe Demir" required
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-sm focus:outline-none focus:ring-2 focus:ring-[#1E340C]">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-xs text-[#31261D] mb-1">Telefon Numarası *</label>
+                        <input type="tel" id="selfRegPhone" placeholder="05XX XXX XX XX" required
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-sm focus:outline-none focus:ring-2 focus:ring-[#1E340C]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-xs text-[#31261D] mb-1">E-posta (İsteğe Bağlı)</label>
+                        <input type="email" id="selfRegEmail" placeholder="ornek@gmail.com"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-sm focus:outline-none focus:ring-2 focus:ring-[#1E340C]">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-xs text-[#31261D] mb-1">Şirketteki Göreviniz / Unvanınız</label>
+                    <select id="selfRegRole" class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#1E340C]">
+                        <option value="Satış Danışmanı">Şube Satış Danışmanı</option>
+                        <option value="Kasiyer">Kasiyer</option>
+                        <option value="Reyon Görevlisi">Reyon Görevlisi / Düzen</option>
+                        <option value="Depo & Stok Sorumlusu">Depo & Stok Sorumlusu</option>
+                        <option value="Barista / Servis">Barista / Servis Görevlisi</option>
+                        <option value="Şube Personeli">Genel Şube Personeli</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-xs text-[#31261D] mb-1">Şifre/PIN (En az 4 hane) *</label>
+                        <input type="password" id="selfRegPin" placeholder="Örn: 2026" required minlength="4" maxlength="10"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-sm text-center font-mono font-black tracking-widest focus:outline-none focus:ring-2 focus:ring-[#1E340C]">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-xs text-[#31261D] mb-1">Şifre Tekrarı *</label>
+                        <input type="password" id="selfRegPinConfirm" placeholder="Tekrar yazınız" required minlength="4" maxlength="10"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-sm text-center font-mono font-black tracking-widest focus:outline-none focus:ring-2 focus:ring-[#1E340C]">
+                    </div>
+                </div>
+
+                <div id="selfRegError" class="hidden text-xs text-[#A6192E] font-bold bg-rose-50 border border-rose-200 p-2.5 rounded-xl"></div>
+
+                <div class="flex items-center gap-2 pt-2">
+                    <button type="button" onclick="closeStaffSelfRegisterModal()" class="w-1/3 py-2.5 rounded-xl border border-[#E8DFC8] text-[#5C4A3C] font-bold text-xs hover:bg-[#FAF7F2] cursor-pointer">
+                        Vazgeç
+                    </button>
+                    <button type="submit" class="w-2/3 py-2.5 bg-gradient-to-r from-[#1E340C] to-[#2E4F14] hover:from-[#2E4F14] hover:to-[#1E340C] text-[#FFBF3F] font-bold text-xs rounded-xl shadow-md border border-[#FFBF3F]/30 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95">
+                        <i class="fa-solid fa-check"></i> Kaydı Tamamla & Başla
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -654,6 +749,106 @@
                 const err = document.getElementById('staffPinError');
                 if (err) err.classList.remove('hidden');
                 document.getElementById('staffPinInput').select();
+            }
+        }
+
+        // ================= YENİ PERSONEL KENDİ KENDİNE KAYIT =================
+        function openStaffSelfRegisterModal() {
+            document.getElementById('selfRegError').classList.add('hidden');
+            document.getElementById('selfRegName').value = '';
+            document.getElementById('selfRegPhone').value = '';
+            document.getElementById('selfRegEmail').value = '';
+            document.getElementById('selfRegPin').value = '';
+            document.getElementById('selfRegPinConfirm').value = '';
+            const m = document.getElementById('staffSelfRegisterModal');
+            m.style.setProperty('display', 'flex', 'important');
+        }
+
+        function closeStaffSelfRegisterModal() {
+            const m = document.getElementById('staffSelfRegisterModal');
+            m.style.setProperty('display', 'none', 'important');
+        }
+
+        async function handleSelfRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('selfRegName').value.trim();
+            const phone = document.getElementById('selfRegPhone').value.trim();
+            const email = document.getElementById('selfRegEmail').value.trim();
+            const role = document.getElementById('selfRegRole').value.trim() || 'Personel';
+            const pin = document.getElementById('selfRegPin').value.trim();
+            const pinConfirm = document.getElementById('selfRegPinConfirm').value.trim();
+            const errBox = document.getElementById('selfRegError');
+
+            errBox.classList.add('hidden');
+
+            if (!name) {
+                errBox.innerText = "Lütfen adınızı ve soyadınızı giriniz.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+            if (!phone) {
+                errBox.innerText = "Lütfen telefon numaranızı giriniz.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+            if (pin.length < 4) {
+                errBox.innerText = "Şifreniz en az 4 haneli olmalıdır.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+            if (pin !== pinConfirm) {
+                errBox.innerText = "Girdiğiniz şifreler eşleşmiyor! Lütfen kontrol ediniz.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            const existing = team.find(m => m.name.toLowerCase().trim() === name.toLowerCase().trim());
+            if (existing) {
+                errBox.innerText = `"${name}" adına kayıtlı bir personel profili zaten var! Lütfen listeden adınızı seçip şifrenizle giriş yapınız.`;
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            const newMember = {
+                id: Date.now(),
+                name: name,
+                title: role,
+                role: role,
+                phone: phone,
+                email: email,
+                department: role,
+                pin: pin,
+                status: 'aktif',
+                registeredSelf: true,
+                createdAt: new Date().toISOString()
+            };
+
+            team.push(newMember);
+            lastKnownTeam = team;
+            localStorage.setItem('task_team_members', JSON.stringify(team));
+            pushDataToServer();
+
+            closeStaffSelfRegisterModal();
+
+            // Oturumu açıp hemen dashboard'a yönlendir
+            sessionStorage.setItem('cancerez_staff_auth_user', name);
+            localStorage.setItem('cancerez_remember_staff_user', name);
+            localStorage.setItem('cancerez_active_role', 'staff');
+            currentSelectedUser = name;
+            localStorage.setItem('task_personel_selected_user', name);
+
+            alert(`Hoş geldiniz ${name}! Personel kaydınız başarıyla oluşturuldu.`);
+            renderPersonalDashboard(name);
+        }
+
+        function openStaffForgotPinFromModal() {
+            const userName = pendingPinPerson || '';
+            const msg = userName 
+                ? `Merhaba, Can Çerez Görev Takip Sistemi'nde "${userName}" adına kayıtlı personel giriş şifremi unuttum. Sıfırlayabilir misiniz?` 
+                : `Merhaba, Can Çerez Görev Takip Sistemi personel giriş şifremi unuttum. Sıfırlayabilir misiniz?`;
+            
+            if (confirm("Şifrenizi unuttuysanız şirket yöneticiniz kendi Yönetici Paneli'nden şifrenizi anında görebilir veya değiştirebilir.\n\nYöneticinizle WhatsApp üzerinden iletişime geçmek ister misiniz?")) {
+                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             }
         }
 
