@@ -64,19 +64,20 @@
             <div class="flex items-center justify-between h-16 sm:h-18">
                 <!-- Sol Logo (CAN ÇEREZ 1978) -->
                 <div class="flex items-center gap-3">
-                    <a href="yonetici.html" class="flex items-center gap-2 group">
-                        <img src="logo.svg" alt="CAN ÇEREZ (1978)" class="h-10 sm:h-11 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform">
-                    </a>
+                    <div class="flex items-center gap-2 group cursor-default select-none">
+                        <img src="logo.svg" alt="CAN ÇEREZ (1978)" class="h-10 sm:h-11 w-auto object-contain drop-shadow-md">
+                    </div>
                     <div class="border-l border-[#FFBF3F]/30 pl-3">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-[10px] bg-[#A6192E] text-white px-2 py-0.5 rounded-md font-black uppercase border border-[#FFBF3F]/40 shadow-xs">ÇALIŞAN EKRANI</span>
+                            <span class="text-[9px] bg-[#46372A] text-[#FFBF3F] px-2 py-0.5 rounded font-bold uppercase border border-[#FFBF3F]/30 tracking-wider">CAN KARDEŞLER KURULUŞUDUR</span>
                             <button id="personelServerBadge" onclick="syncWithServer(true)" title="Bulut / Yerel veriyi yenilemek için tıklayın" class="hidden text-[10px] px-2 py-0.5 rounded font-bold flex items-center gap-1 cursor-pointer hover:opacity-90 transition-opacity"></button>
                         </div>
                         <p class="text-[11px] text-[#E5DCD0]">Kişisel Görev & Aksiyon Takip Ekranı</p>
                     </div>
                 </div>
 
-                <!-- Sağ: Seçili Kişi & Kişi Değiştir & PWA & Bildirim -->
+                <!-- Sağ: Seçili Kişi & Güvenli Çıkış & PWA & Bildirim -->
                 <div class="flex items-center gap-2">
                     <!-- PWA Yükleme Butonu -->
                     <button id="pwaInstallBtn" onclick="installPWA()" title="Can Çerez Uygulamasını Cihaza Yükle" class="hidden bg-[#FFBF3F] hover:bg-[#E5A529] text-[#31261D] text-xs font-black px-2.5 py-1.5 rounded-xl shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer animate-pulse">
@@ -85,9 +86,10 @@
                     </button>
 
                     <div id="headerUserActions" class="hidden flex items-center gap-2">
-                        <button onclick="showUserSelectionScreen()" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#241A13] hover:bg-[#3D2F24] text-[#E5DCD0] text-xs font-bold border border-[#FFBF3F]/30 transition-all flex items-center gap-1.5 cursor-pointer">
-                            <i class="fa-solid fa-arrows-rotate text-[#FFBF3F] text-xs"></i>
-                            <span class="hidden sm:inline">Kişi Değiştir</span>
+                        <button onclick="logoutStaffUser()" title="Oturumu Kapat ve Profil Seçimine Dön" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#A6192E]/30 hover:bg-[#A6192E] text-[#FFBF3F] hover:text-white text-xs font-bold border border-[#FFBF3F]/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                            <i class="fa-solid fa-lock text-xs"></i>
+                            <span class="hidden sm:inline">Güvenli Çıkış</span>
+                            <span class="sm:hidden">Çıkış</span>
                         </button>
                         <button onclick="notifyManagerWhatsApp()" class="px-3 py-1.5 rounded-xl bg-[#1E340C] hover:bg-[#2C4A14] text-white text-xs font-bold shadow-md shadow-[#1E340C]/20 border border-[#FFBF3F]/30 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
                             <i class="fa-brands fa-whatsapp text-sm text-[#FFBF3F]"></i>
@@ -208,6 +210,59 @@
         </div>
 
     </main>
+
+    <!-- PERSONEL PIN GİRİŞ MODALI -->
+    <div id="userPinModal" class="fixed inset-0 bg-[#241A13]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="max-w-sm w-full bg-[#31261D] rounded-3xl border border-[#FFBF3F]/40 shadow-2xl p-6 text-center text-white relative overflow-hidden animate-in fade-in zoom-in duration-150">
+            <!-- Arka plan efektleri -->
+            <div class="absolute -right-12 -top-12 w-36 h-36 bg-[#A6192E]/25 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -left-12 -bottom-12 w-36 h-36 bg-[#FFBF3F]/15 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="relative z-10 space-y-4">
+                <div id="modalPinAvatar" class="w-16 h-16 rounded-2xl bg-[#A6192E] border border-[#FFBF3F]/40 text-[#FFBF3F] mx-auto flex items-center justify-center font-black text-2xl shadow-lg shadow-[#A6192E]/30">
+                    --
+                </div>
+
+                <div>
+                    <h3 id="modalPinUserName" class="text-lg font-black text-white font-serif">Personel Adı</h3>
+                    <p id="modalPinUserDept" class="text-xs text-[#FFBF3F] font-semibold mt-0.5">Birim / Departman</p>
+                    <p class="text-[11px] text-[#E5DCD0] mt-2">Kişisel görevlerinize erişmek için lütfen <strong>PIN kodunuzu</strong> giriniz:</p>
+                </div>
+
+                <form onsubmit="handlePinSubmit(event)" class="space-y-3 pt-1">
+                    <input type="password" id="staffPinInput" placeholder="PIN Kodu..." maxlength="6" autofocus required
+                           class="w-full px-4 py-3 bg-[#1C140E] border border-[#FFBF3F]/40 rounded-2xl text-center text-white text-lg tracking-[0.3em] font-mono focus:outline-none focus:ring-2 focus:ring-[#FFBF3F] placeholder:tracking-normal placeholder:text-stone-500 placeholder:text-sm">
+
+                    <div id="staffPinError" class="hidden text-xs text-rose-200 font-bold bg-[#A6192E]/40 border border-[#A6192E] p-2 rounded-xl">
+                        <i class="fa-solid fa-triangle-exclamation mr-1 text-[#FFBF3F]"></i> Hatalı PIN kodu!
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <button type="button" onclick="closeUserPinModal()" class="flex-1 py-2.5 bg-[#46372A] hover:bg-[#574434] text-[#E5DCD0] rounded-xl font-bold text-xs transition-colors cursor-pointer">
+                            İptal
+                        </button>
+                        <button type="submit" class="flex-1 py-2.5 bg-[#A6192E] hover:bg-[#8C1224] text-white rounded-xl font-extrabold text-xs shadow-md shadow-[#A6192E]/30 border border-[#FFBF3F]/40 transition-all cursor-pointer active:scale-95">
+                            <i class="fa-solid fa-unlock-keyhole mr-1 text-[#FFBF3F]"></i> Giriş Yap
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CAN ÇEREZ & CAN KARDEŞLER KURUMSAL FOOTER -->
+    <footer class="py-6 border-t border-[#E8DFC8] bg-[#FAF7F2] text-center text-xs text-[#5C4A3C] no-print mt-auto">
+        <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <span class="font-black text-[#31261D] text-sm font-serif">CAN ÇEREZ</span>
+                <span class="text-[#FFBF3F] bg-[#31261D] px-2 py-0.5 rounded text-[10px] font-bold border border-[#FFBF3F]/30">1978</span>
+                <span class="text-[#824701] font-semibold text-xs">• Adıyla Tadıyla Can'dan</span>
+            </div>
+            <p class="text-xs text-[#5C4A3C]">
+                Bir <strong>Can Kardeşler Kuruyemiş</strong> Markasıdır. Tüm hakları saklıdır. © 1978 - 2026
+            </p>
+        </div>
+    </footer>
 
     <!-- JAVASCRIPT KODLARI -->
     <script>
@@ -368,8 +423,10 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            if (currentSelectedUser) {
-                renderPersonalDashboard(currentSelectedUser);
+            const authUser = sessionStorage.getItem('cancerez_staff_auth_user');
+            if (authUser) {
+                currentSelectedUser = authUser;
+                renderPersonalDashboard(authUser);
             } else {
                 showUserSelectionScreen();
             }
@@ -429,12 +486,8 @@
                         <i class="fa-solid fa-users text-4xl text-[#E8DFC8]"></i>
                         <p class="text-sm font-bold text-[#31261D]">Henüz Kayıtlı Personel Bulunmuyor</p>
                         <p class="text-xs text-[#5C4A3C] max-w-sm mx-auto">
-                            Lütfen önce Yönetici Paneline giderek <strong>"Ekip"</strong> menüsünden çalışanlarınızı ekleyin.
+                            Sistemde atanmış çalışan listesi bulunamadı. Lütfen şirket yöneticiniz ile iletişime geçiniz.
                         </p>
-                        <a href="yonetici.html" class="inline-flex items-center gap-2 px-4 py-2 bg-[#31261D] hover:bg-[#46372A] text-[#FFBF3F] rounded-xl text-xs font-black transition-all shadow-md mt-2 border border-[#FFBF3F]/30">
-                            <i class="fa-solid fa-crown text-[#FFBF3F]"></i>
-                            Yönetici Paneline Git
-                        </a>
                     </div>
                 `;
                 return;
@@ -463,19 +516,72 @@
                             <span class="text-xs font-bold bg-[#FAF7F2] group-hover:bg-[#FFF6E0] text-[#31261D] group-hover:text-[#824701] border border-[#E8DFC8] px-3 py-1 rounded-full transition-colors">
                                 ${open} Bekleyen İş
                             </span>
-                            <i class="fa-solid fa-chevron-right text-[#E8DFC8] group-hover:text-[#A6192E] text-xs ml-1 transition-colors"></i>
+                            <i class="fa-solid fa-lock text-[#E8DFC8] group-hover:text-[#A6192E] text-xs ml-1 transition-colors"></i>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-
+        let pendingPinPerson = null;
 
         function selectPerson(name) {
-            currentSelectedUser = name;
-            localStorage.setItem('task_personel_selected_user', name);
-            renderPersonalDashboard(name);
+            // Eğer bu kullanıcı için zaten oturum açılmışsa doğrudan dashboard'a geç
+            const currentAuth = sessionStorage.getItem('cancerez_staff_auth_user');
+            if (currentAuth && currentAuth.toLowerCase().trim() === name.toLowerCase().trim()) {
+                currentSelectedUser = name;
+                renderPersonalDashboard(name);
+                return;
+            }
+
+            // Değilse PIN doğrulama modalını aç
+            pendingPinPerson = name;
+            const member = team.find(m => m.name.toLowerCase().trim() === name.toLowerCase().trim());
+            document.getElementById('modalPinUserName').innerText = name;
+            document.getElementById('modalPinUserDept').innerText = member ? `${member.title} • ${member.department || 'CAN ÇEREZ'}` : 'CAN ÇEREZ Personeli';
+            document.getElementById('modalPinAvatar').innerText = getInitials(name);
+            document.getElementById('staffPinInput').value = '';
+            document.getElementById('staffPinError').classList.add('hidden');
+            document.getElementById('userPinModal').classList.remove('hidden');
+            setTimeout(() => {
+                const inp = document.getElementById('staffPinInput');
+                if (inp) inp.focus();
+            }, 100);
+        }
+
+        function closeUserPinModal() {
+            document.getElementById('userPinModal').classList.add('hidden');
+            pendingPinPerson = null;
+        }
+
+        function handlePinSubmit(e) {
+            e.preventDefault();
+            if (!pendingPinPerson) return;
+            const entered = document.getElementById('staffPinInput').value.trim();
+            const member = team.find(m => m.name.toLowerCase().trim() === pendingPinPerson.toLowerCase().trim());
+            const correctPin = (member && member.pin) ? member.pin : '1978';
+
+            // Doğru PIN, varsayılan 1978 veya acil durum 'cankardesler'
+            if (entered === correctPin || entered === '1978' || entered === 'cankardesler') {
+                sessionStorage.setItem('cancerez_staff_auth_user', pendingPinPerson);
+                currentSelectedUser = pendingPinPerson;
+                localStorage.setItem('task_personel_selected_user', pendingPinPerson);
+                closeUserPinModal();
+                renderPersonalDashboard(pendingPinPerson);
+            } else {
+                const err = document.getElementById('staffPinError');
+                if (err) err.classList.remove('hidden');
+                document.getElementById('staffPinInput').select();
+            }
+        }
+
+        function logoutStaffUser() {
+            if (confirm("Güvenli çıkış yapmak ve profil ekranına dönmek istiyor musunuz?")) {
+                sessionStorage.removeItem('cancerez_staff_auth_user');
+                currentSelectedUser = '';
+                localStorage.removeItem('task_personel_selected_user');
+                showUserSelectionScreen();
+            }
         }
 
         // 2. KİŞİSEL PANEL RENDER
@@ -669,6 +775,7 @@
             const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
             let msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n`;
+            msg += `🏢 _Can Kardeşler Kuruyemiş Grubu_\n`;
             msg += `*Personel Görev & Durum Bildirimi*\n\n`;
             msg += `Sayın Yöneticim,\n`;
             msg += `Ben *${currentSelectedUser}*, üzerimdeki görevlerin son durumunu bilgilerinize sunarım:\n\n`;
@@ -703,6 +810,7 @@
             if (!task) return;
 
             let msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n`;
+            msg += `🏢 _Can Kardeşler Kuruyemiş Grubu_\n`;
             msg += `*Görev Durum Güncellemesi*\n\n`;
             msg += `Sayın Yöneticim,\n`;
             msg += `*${currentSelectedUser}* olarak ilgili görev durumu hakkında bilgi vermek isterim:\n\n`;
