@@ -413,21 +413,55 @@
         let currentSelectedUser = localStorage.getItem('task_personel_selected_user') || '';
 
         const DEFAULT_INIT_TEAM = [
-            { id: 1, name: "Ahmet Can", role: "Şube Sorumlusu", phone: "05551234567", pin: "1978", status: "aktif" }
+            { id: 1, name: "Ahmet Can", role: "Şube Sorumlusu", title: "Şube Sorumlusu", department: "Şube Operasyon", phone: "05551234567", email: "ahmetcan@cancerez.com.tr", pin: "1978", status: "aktif" }
         ];
         const DEFAULT_INIT_TASKS = [
             {
                 id: 1729000000001,
                 title: "Günlük Çerez Reyon Düzeni ve Tazelik Kontrolü",
+                action: "Sabah açılışında tüm kuruyemiş reyonlarının kontrol edilmesi ve etiketlerin düzenlenmesi.",
                 desc: "Sabah açılışında tüm kuruyemiş reyonlarının kontrol edilmesi ve etiketlerin düzenlenmesi.",
-                category: "Operasyon",
-                priority: "Yuksek",
+                department: "Şube Operasyon",
+                category: "Şube Operasyon",
+                priority: "Yüksek",
+                owner: "Ahmet Can",
                 assignee: "Ahmet Can",
+                dueDate: "2026-10-16",
                 deadline: "2026-10-16",
-                status: "beklemede",
+                status: "Devam Ediyor",
                 createdAt: "2026-10-16T08:00:00.000Z"
             }
         ];
+
+        function normalizeTask(t) {
+            if (!t) return null;
+            const owner = (t.owner || t.assignee || 'Ahmet Can').trim();
+            const action = t.action || t.desc || t.title || 'Aksiyon belirtilmedi';
+            const department = t.department || t.category || 'Şube Operasyon';
+            const dueDate = t.dueDate || t.deadline || new Date().toISOString().split('T')[0];
+            let status = t.status || 'Devam Ediyor';
+            if (status === 'beklemede') status = 'Devam Ediyor';
+            return {
+                ...t,
+                id: t.id || Date.now(),
+                title: t.title || 'Görev',
+                owner: owner,
+                assignee: owner,
+                action: action,
+                desc: action,
+                department: department,
+                category: department,
+                dueDate: dueDate,
+                deadline: dueDate,
+                status: status,
+                priority: t.priority || 'Normal'
+            };
+        }
+
+        function normalizeTasks(arr) {
+            if (!Array.isArray(arr)) return [];
+            return arr.map(normalizeTask).filter(Boolean);
+        }
 
         if (!team || team.length === 0) {
             team = DEFAULT_INIT_TEAM;
@@ -435,6 +469,9 @@
         }
         if (!tasks || tasks.length === 0) {
             tasks = DEFAULT_INIT_TASKS;
+            localStorage.setItem('task_items', JSON.stringify(tasks));
+        } else {
+            tasks = normalizeTasks(tasks);
             localStorage.setItem('task_items', JSON.stringify(tasks));
         }
 
@@ -504,9 +541,10 @@
                     let changed = false;
 
                     if (Array.isArray(data.tasks)) {
-                        const serverTasksStr = JSON.stringify(data.tasks);
+                        const normalizedServerTasks = normalizeTasks(data.tasks);
+                        const serverTasksStr = JSON.stringify(normalizedServerTasks);
                         if (serverTasksStr !== JSON.stringify(tasks)) {
-                            tasks = data.tasks;
+                            tasks = normalizedServerTasks;
                             localStorage.setItem('task_items', serverTasksStr);
                             changed = true;
                         }
@@ -619,7 +657,7 @@
         // Yönetici sekmesinde bir görev eklendiğinde veya değiştiğinde anında güncelle
         window.addEventListener('storage', (e) => {
             if (e.key === 'task_items') {
-                tasks = JSON.parse(e.newValue || '[]');
+                tasks = normalizeTasks(JSON.parse(e.newValue || '[]'));
                 if (currentSelectedUser) renderPersonalDashboard(currentSelectedUser);
             } else if (e.key === 'task_team_members') {
                 team = JSON.parse(e.newValue || '[]');
@@ -663,7 +701,7 @@
             }
 
             list.innerHTML = team.map(member => {
-                const userTasks = tasks.filter(t => t.owner.toLowerCase().trim() === member.name.toLowerCase().trim());
+                const userTasks = tasks.filter(t => (t.owner || t.assignee || '').toLowerCase().trim() === member.name.toLowerCase().trim());
                 const total = userTasks.length;
                 const delayed = userTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now).length;
                 const open = userTasks.filter(t => t.status !== 'Tamamlandı').length;
@@ -939,7 +977,7 @@
             const now = new Date();
             now.setHours(0,0,0,0);
 
-            const userTasks = tasks.filter(t => t.owner.toLowerCase().trim() === name.toLowerCase().trim());
+            const userTasks = tasks.filter(t => (t.owner || t.assignee || '').toLowerCase().trim() === name.toLowerCase().trim());
             const total = userTasks.length;
             const completed = userTasks.filter(t => t.status === 'Tamamlandı').length;
             const open = userTasks.filter(t => t.status !== 'Tamamlandı').length;
@@ -1105,7 +1143,7 @@
 
         function notifyManagerWhatsApp() {
             if (!currentSelectedUser) return;
-            const userTasks = tasks.filter(t => t.owner.toLowerCase().trim() === currentSelectedUser.toLowerCase().trim());
+            const userTasks = tasks.filter(t => (t.owner || t.assignee || '').toLowerCase().trim() === currentSelectedUser.toLowerCase().trim());
             const total = userTasks.length;
             const completed = userTasks.filter(t => t.status === 'Tamamlandı').length;
             const openTasks = userTasks.filter(t => t.status !== 'Tamamlandı');
@@ -1177,7 +1215,7 @@
         }
 
         function notifyManagerMail() {
-            const userTasks = tasks.filter(t => t.owner.toLowerCase().trim() === currentSelectedUser.toLowerCase().trim());
+            const userTasks = tasks.filter(t => (t.owner || t.assignee || '').toLowerCase().trim() === currentSelectedUser.toLowerCase().trim());
             const completed = userTasks.filter(t => t.status === 'Tamamlandı').length;
             const total = userTasks.length;
 

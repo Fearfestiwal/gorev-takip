@@ -4,7 +4,10 @@
       "id": 1,
       "name": "Ahmet Can",
       "role": "Şube Sorumlusu",
+      "title": "Şube Sorumlusu",
+      "department": "Şube Operasyon",
       "phone": "05551234567",
+      "email": "ahmetcan@cancerez.com.tr",
       "pin": "1978",
       "status": "aktif"
     }
@@ -13,12 +16,16 @@
     {
       "id": 1729000000001,
       "title": "Günlük Çerez Reyon Düzeni ve Tazelik Kontrolü",
+      "action": "Sabah açılışında tüm kuruyemiş reyonlarının kontrol edilmesi ve etiketlerin düzenlenmesi.",
       "desc": "Sabah açılışında tüm kuruyemiş reyonlarının kontrol edilmesi ve etiketlerin düzenlenmesi.",
-      "category": "Operasyon",
-      "priority": "Yuksek",
+      "department": "Şube Operasyon",
+      "category": "Şube Operasyon",
+      "priority": "Yüksek",
+      "owner": "Ahmet Can",
       "assignee": "Ahmet Can",
+      "dueDate": "2026-10-16",
       "deadline": "2026-10-16",
-      "status": "beklemede",
+      "status": "Devam Ediyor",
       "createdAt": "2026-10-16T08:00:00.000Z"
     }
   ],

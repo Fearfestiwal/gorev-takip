@@ -250,8 +250,8 @@
 
                 <button id="navTab2" onclick="switchMainPage(2)" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#F2ECE1] cursor-pointer">
                     <i class="fa-solid fa-list-check"></i>
-                    <span>2. Sayfa: Detaylı Aksiyon Listesi</span>
-                    <span id="badgeTotalTasks" class="bg-[#E8DFC8] text-[#4A3B2D] text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+                    <span>2. Sayfa: Görev & Aksiyon Listesi</span>
+                    <span id="badgeTotalTasks" class="bg-[#E8DFC8] text-[#4A3B2D] text-[11px] px-2 py-0.5 rounded-full font-bold">0 Görev</span>
                 </button>
             </div>
     </div>
@@ -317,20 +317,22 @@
                 </div>
             </div>
 
-            <!-- 4'lü Özet Kartları -->
+            <!-- 4'lü Özet Kartları (Tıklanabilir ve Göreve Yönlendirir) -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#E8DFC8] flex items-center justify-between">
+                <div onclick="switchMainPage(2)" title="Tüm görevleri listele" class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#E8DFC8] hover:border-[#A6192E] hover:shadow-md transition-all cursor-pointer flex items-center justify-between group">
                     <div>
-                        <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Toplam Görev</span>
+                        <span class="text-xs font-bold text-stone-500 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fa-solid fa-list-check text-[#A6192E]"></i> Toplam Görev
+                        </span>
                         <h3 id="p1Total" class="text-2xl sm:text-3xl font-black text-stone-900 mt-1">0</h3>
-                        <p class="text-[11px] text-stone-400 mt-0.5">Sistemdeki tüm kayıtlar</p>
+                        <p class="text-[11px] text-[#A6192E] font-bold mt-0.5 group-hover:underline">Görevleri Gör ↗</p>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-[#FAF7F2] text-[#31261D] border border-[#E8DFC8] flex items-center justify-center text-lg shadow-2xs">
-                        <i class="fa-solid fa-list-check"></i>
+                    <div class="w-12 h-12 rounded-xl bg-[#FAF7F2] text-[#31261D] group-hover:bg-[#A6192E] group-hover:text-white transition-colors border border-[#E8DFC8] flex items-center justify-center text-lg shadow-2xs">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     </div>
                 </div>
 
-                <div onclick="openBulkReminderModal()" title="Bekleyen herkese hatırlatma gönder" class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-rose-200 bg-rose-50/30 flex items-center justify-between cursor-pointer hover:border-rose-400 hover:shadow-md transition-all group">
+                <div onclick="filterTasksByQuickType('Geciken')" title="Geciken görevleri listele" class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-rose-200 bg-rose-50/30 flex items-center justify-between cursor-pointer hover:border-rose-400 hover:shadow-md transition-all group">
                     <div>
                         <span class="text-xs font-bold text-[#A6192E] uppercase tracking-wider flex items-center gap-1.5">
                             <i class="fa-solid fa-triangle-exclamation"></i> Geciken İşler
@@ -342,11 +344,11 @@
                         <div class="w-12 h-12 rounded-xl bg-rose-100 text-[#A6192E] flex items-center justify-center text-lg animate-pulse group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-clock-rotate-left"></i>
                         </div>
-                        <span class="text-[10px] font-extrabold text-[#A6192E] bg-rose-200/80 px-2 py-0.5 rounded-full">Uyar ↗</span>
+                        <span class="text-[10px] font-extrabold text-[#A6192E] bg-rose-200/80 px-2 py-0.5 rounded-full">Listele ↗</span>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#FFBF3F]/40 bg-[#FFFDF7] flex items-center justify-between">
+                <div onclick="filterTasksByQuickType('Devam Ediyor')" title="Bekleyen görevleri listele" class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#FFBF3F]/40 bg-[#FFFDF7] hover:border-[#FFBF3F] hover:shadow-md transition-all cursor-pointer flex items-center justify-between group">
                     <div>
                         <span class="text-xs font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
                             <i class="fa-solid fa-hourglass-half"></i> Bekleyen İşler
@@ -354,12 +356,15 @@
                         <h3 id="p1Open" class="text-2xl sm:text-3xl font-black text-amber-700 mt-1">0</h3>
                         <p id="p1OpenRatio" class="text-[11px] text-amber-700 font-semibold mt-0.5">İşlerin %0'ı açık</p>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-[#FFF6E0] text-[#D8991D] border border-[#FFBF3F]/30 flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-spinner"></i>
+                    <div class="flex flex-col items-end gap-1">
+                        <div class="w-12 h-12 rounded-xl bg-[#FFF6E0] text-[#D8991D] group-hover:bg-[#FFBF3F] group-hover:text-[#31261D] transition-colors border border-[#FFBF3F]/30 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-spinner"></i>
+                        </div>
+                        <span class="text-[10px] font-extrabold text-[#824701] bg-[#FFF3D6] px-2 py-0.5 rounded-full">Listele ↗</span>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#1E340C]/30 bg-[#F4F9F0] flex items-center justify-between">
+                <div onclick="filterTasksByQuickType('Tamamlandı')" title="Tamamlanan görevleri listele" class="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#1E340C]/30 bg-[#F4F9F0] hover:border-[#1E340C] hover:shadow-md transition-all cursor-pointer flex items-center justify-between group">
                     <div>
                         <span class="text-xs font-bold text-[#1E340C] uppercase tracking-wider flex items-center gap-1.5">
                             <i class="fa-solid fa-circle-check"></i> Tamamlanan
@@ -367,8 +372,11 @@
                         <h3 id="p1Completed" class="text-2xl sm:text-3xl font-black text-[#1E340C] mt-1">0</h3>
                         <p id="p1CompletedRatio" class="text-[11px] text-[#2C4A14] font-semibold mt-0.5">İşlerin %0'ı bitti</p>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-[#E6F3DF] text-[#1E340C] border border-[#1E340C]/20 flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-trophy text-[#FFBF3F]"></i>
+                    <div class="flex flex-col items-end gap-1">
+                        <div class="w-12 h-12 rounded-xl bg-[#E6F3DF] text-[#1E340C] border border-[#1E340C]/20 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-trophy text-[#FFBF3F]"></i>
+                        </div>
+                        <span class="text-[10px] font-extrabold text-[#1E340C] bg-[#E0EED7] px-2 py-0.5 rounded-full">Listele ↗</span>
                     </div>
                 </div>
             </div>
@@ -418,6 +426,34 @@
                         </thead>
                         <tbody id="reportTableBody" class="divide-y divide-[#E8DFC8]/50"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- SAYFA 1: HIZLI GÖREV & AKSİYON LİSTESİ ÖZETİ -->
+            <div class="bg-white rounded-3xl shadow-sm border border-[#E8DFC8] overflow-hidden">
+                <div class="px-6 py-4 bg-[#F7F2EA] border-b border-[#E8DFC8] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h3 class="font-bold text-[#31261D] text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-[#A6192E]"></i>
+                            Aktif Görevler & Aksiyon Listesi (1. Sayfa Hızlı Bakış)
+                        </h3>
+                        <p class="text-xs text-stone-500 mt-0.5">
+                            Sistemdeki görevleri burada anında görebilir, düzenleyebilir veya 2. sayfaya geçerek filtreleme & kart panosunu kullanabilirsiniz.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="openNewTaskModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#1E340C] hover:bg-[#2b4b12] text-white font-bold text-xs rounded-xl shadow-md border border-[#FFBF3F]/30 transition-all cursor-pointer hover:scale-105 active:scale-95">
+                            <i class="fa-solid fa-plus text-[#FFBF3F]"></i>
+                            <span>Yeni Görev Ekle</span>
+                        </button>
+                        <button onclick="switchMainPage(2)" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#A6192E] hover:bg-[#8C1224] text-white font-bold text-xs rounded-xl shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/30 transition-all cursor-pointer hover:scale-105 active:scale-95">
+                            <span>2. Sayfa: Tüm Görevleri Listele</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="page1QuickTasksContainer" class="p-4 sm:p-5 space-y-3">
+                    <!-- Javascript ile dinamik doldurulacak -->
                 </div>
             </div>
 
@@ -1059,21 +1095,55 @@
     <!-- JAVASCRIPT KODLARI -->
     <script>
         const DEFAULT_INIT_TEAM = [
-            { id: 1, name: "Ahmet Can", role: "Şube Sorumlusu", phone: "05551234567", pin: "1978", status: "aktif" }
+            { id: 1, name: "Ahmet Can", role: "Şube Sorumlusu", title: "Şube Sorumlusu", department: "Şube Operasyon", phone: "05551234567", email: "ahmetcan@cancerez.com.tr", pin: "1978", status: "aktif" }
         ];
         const DEFAULT_INIT_TASKS = [
             {
                 id: 1729000000001,
                 title: "Günlük Çerez Reyon Düzeni ve Tazelik Kontrolü",
+                action: "Sabah açılışında tüm kuruyemiş reyonlarının kontrol edilmesi ve etiketlerin düzenlenmesi.",
                 desc: "Sabah açılışında tüm kuruyemiş reyonlarının kontrol edilmesi ve etiketlerin düzenlenmesi.",
-                category: "Operasyon",
-                priority: "Yuksek",
+                department: "Şube Operasyon",
+                category: "Şube Operasyon",
+                priority: "Yüksek",
+                owner: "Ahmet Can",
                 assignee: "Ahmet Can",
+                dueDate: "2026-10-16",
                 deadline: "2026-10-16",
-                status: "beklemede",
+                status: "Devam Ediyor",
                 createdAt: "2026-10-16T08:00:00.000Z"
             }
         ];
+
+        function normalizeTask(t) {
+            if (!t) return null;
+            const owner = (t.owner || t.assignee || 'Ahmet Can').trim();
+            const action = t.action || t.desc || t.title || 'Aksiyon belirtilmedi';
+            const department = t.department || t.category || 'Şube Operasyon';
+            const dueDate = t.dueDate || t.deadline || new Date().toISOString().split('T')[0];
+            let status = t.status || 'Devam Ediyor';
+            if (status === 'beklemede') status = 'Devam Ediyor';
+            return {
+                ...t,
+                id: t.id || Date.now(),
+                title: t.title || 'Görev',
+                owner: owner,
+                assignee: owner,
+                action: action,
+                desc: action,
+                department: department,
+                category: department,
+                dueDate: dueDate,
+                deadline: dueDate,
+                status: status,
+                priority: t.priority || 'Normal'
+            };
+        }
+
+        function normalizeTasks(arr) {
+            if (!Array.isArray(arr)) return [];
+            return arr.map(normalizeTask).filter(Boolean);
+        }
 
         let team = JSON.parse(localStorage.getItem('task_team_members')) || [];
         let tasks = JSON.parse(localStorage.getItem('task_items')) || [];
@@ -1084,6 +1154,9 @@
         }
         if (!tasks || tasks.length === 0) {
             tasks = DEFAULT_INIT_TASKS;
+            localStorage.setItem('task_items', JSON.stringify(tasks));
+        } else {
+            tasks = normalizeTasks(tasks);
             localStorage.setItem('task_items', JSON.stringify(tasks));
         }
 
@@ -1156,9 +1229,10 @@
                     let changed = false;
 
                     if (Array.isArray(data.tasks)) {
-                        const serverTasksStr = JSON.stringify(data.tasks);
+                        const normalizedServerTasks = normalizeTasks(data.tasks);
+                        const serverTasksStr = JSON.stringify(normalizedServerTasks);
                         if (serverTasksStr !== JSON.stringify(tasks)) {
-                            tasks = data.tasks;
+                            tasks = normalizedServerTasks;
                             localStorage.setItem('task_items', serverTasksStr);
                             changed = true;
                         }
@@ -1507,6 +1581,7 @@
         function renderApp() {
             calculateAndRenderStatistics();
             renderReportTable();
+            renderPage1QuickTasks();
             renderDetailTableAndBoard();
             renderSmartAlertBanner();
         }
@@ -1525,7 +1600,7 @@
             const openPct = total > 0 ? Math.round((open / total) * 100) : 0;
 
             document.getElementById('badgeCompletionPct').innerText = `%${completionPct}`;
-            document.getElementById('badgeTotalTasks').innerText = total;
+            document.getElementById('badgeTotalTasks').innerText = `${total} Görev`;
 
             document.getElementById('progressPercentText').innerText = `%${completionPct} Tamamlandı`;
             document.getElementById('progressBarFill').style.width = `${completionPct}%`;
@@ -1709,13 +1784,27 @@
             }
         }
 
+        function filterAndShowTasksByPerson(personName) {
+            switchMainPage(2);
+            const sInput = document.getElementById('searchInput');
+            if (sInput) sInput.value = personName;
+            const sFilter = document.getElementById('statusFilter');
+            if (sFilter) sFilter.value = 'ALL';
+            renderApp();
+            const tableEl = document.getElementById('tableViewContainer');
+            if (tableEl) tableEl.scrollIntoView({ behavior: 'smooth' });
+        }
+
         function renderReportTable() {
             const tbody = document.getElementById('reportTableBody');
             const now = new Date();
             now.setHours(0,0,0,0);
 
             const allOwnersSet = new Set(team.map(m => m.name.trim()));
-            tasks.forEach(t => { if (t.owner) allOwnersSet.add(t.owner.trim()); });
+            tasks.forEach(t => { 
+                const o = (t.owner || t.assignee); 
+                if (o) allOwnersSet.add(o.trim()); 
+            });
             const ownerList = Array.from(allOwnersSet);
 
             if (ownerList.length === 0) {
@@ -1740,7 +1829,7 @@
                     email: ""
                 };
 
-                const personTasks = tasks.filter(t => t.owner.toLowerCase().trim() === ownerName.toLowerCase().trim());
+                const personTasks = tasks.filter(t => (t.owner || t.assignee || '').toLowerCase().trim() === ownerName.toLowerCase().trim());
                 const pTotal = personTasks.length;
                 const pCompleted = personTasks.filter(t => t.status === 'Tamamlandı').length;
                 const pOpen = personTasks.filter(t => t.status !== 'Tamamlandı').length;
@@ -1778,7 +1867,11 @@
                             </div>
                         </td>
                         <td class="py-3 px-4 text-center no-print" onclick="event.stopPropagation()">
-                            <div class="flex items-center justify-center gap-1.5">
+                            <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                                <button onclick="filterAndShowTasksByPerson('${escapeHtml(ownerName)}')" title="Bu personelin görevlerini görüntüle" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#FFF9ED] hover:bg-[#FFBF3F] text-[#824701] hover:text-[#31261D] font-bold text-xs transition-all border border-[#FFBF3F]/40 shadow-2xs cursor-pointer">
+                                    <i class="fa-solid fa-list-check text-xs"></i>
+                                    <span>Görevleri (${pTotal})</span>
+                                </button>
                                 <button onclick="openWhatsAppMember('${escapeHtml(ownerName)}')" title="WhatsApp ile Durum Özeti Gönder" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#F4F9F0] hover:bg-[#1E340C] text-[#1E340C] hover:text-white font-bold text-xs transition-all border border-[#1E340C]/20 shadow-2xs cursor-pointer">
                                     <i class="fa-brands fa-whatsapp text-sm"></i>
                                     <span>WhatsApp</span>
@@ -1790,6 +1883,76 @@
                             </div>
                         </td>
                     </tr>
+                `;
+            }).join('');
+        }
+
+        function renderPage1QuickTasks() {
+            const container = document.getElementById('page1QuickTasksContainer');
+            if (!container) return;
+
+            if (!tasks || tasks.length === 0) {
+                container.innerHTML = `
+                    <div class="py-8 text-center text-stone-400">
+                        <i class="fa-solid fa-list-check text-3xl mb-2 text-stone-300"></i>
+                        <p class="font-bold text-stone-700 text-xs">Henüz kayıtlı bir görev bulunmuyor.</p>
+                        <p class="text-[11px] text-stone-500 mt-1">Yukarıdaki <strong>"Yeni Görev Ekle"</strong> butonuna tıklayarak ilk görevinizi tanımlayabilirsiniz.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const now = new Date();
+            now.setHours(0,0,0,0);
+
+            container.innerHTML = tasks.map((task, idx) => {
+                const isOverdue = task.status !== 'Tamamlandı' && new Date(task.dueDate) < now;
+                const isCompleted = task.status === 'Tamamlandı';
+                const dateFormatted = formatTurkishDate(task.dueDate);
+
+                let badge = '';
+                if (isCompleted) {
+                    badge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#E6F3DF] text-[#1E340C] border border-[#1E340C]/20"><i class="fa-solid fa-check text-[9px]"></i> Tamamlandı</span>`;
+                } else if (isOverdue) {
+                    badge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-[#A6192E] border border-rose-200 animate-pulse"><i class="fa-solid fa-clock text-[9px]"></i> Gecikti!</span>`;
+                } else {
+                    badge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#FFF6E0] text-[#824701] border border-[#FFBF3F]/30"><i class="fa-solid fa-spinner text-[9px]"></i> Devam Ediyor</span>`;
+                }
+
+                return `
+                    <div class="p-3.5 sm:p-4 rounded-2xl border ${isOverdue ? 'border-[#A6192E]/30 bg-[#FFF8F8]' : isCompleted ? 'border-[#1E340C]/20 bg-[#F8FAF7]' : 'border-[#E8DFC8] bg-white'} shadow-2xs hover:shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="space-y-1.5 flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                ${badge}
+                                <span class="text-[10px] font-bold bg-[#FAF7F2] text-[#31261D] px-2 py-0.5 rounded border border-[#E8DFC8]">
+                                    ${escapeHtml(task.department || 'Birim')}
+                                </span>
+                                <span class="text-[11px] font-semibold text-[#824701] flex items-center gap-1">
+                                    <i class="fa-solid fa-user text-[10px]"></i> ${escapeHtml(task.owner || 'Atanmamış')}
+                                </span>
+                                <span class="text-[11px] font-medium text-stone-500">
+                                    • Termin: <strong class="${isOverdue ? 'text-[#A6192E]' : 'text-[#31261D]'}">${dateFormatted}</strong>
+                                </span>
+                            </div>
+                            <h4 class="font-bold text-[#31261D] text-xs sm:text-sm ${isCompleted ? 'line-through text-stone-400' : ''}">
+                                ${escapeHtml(task.title)}
+                            </h4>
+                            <p class="text-xs text-stone-600 line-clamp-2">
+                                <strong class="text-[#31261D]">Aksiyon:</strong> ${escapeHtml(task.action)}
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-2 self-end md:self-center shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#E8DFC8] w-full md:w-auto justify-end flex-wrap">
+                            <button onclick="editTask(${task.id})" class="px-3 py-1.5 bg-[#FAF7F2] hover:bg-[#F2ECE0] text-[#31261D] font-bold text-xs rounded-xl border border-[#E8DFC8] transition-all cursor-pointer flex items-center gap-1">
+                                <i class="fa-solid fa-pen-to-square text-[#A6192E]"></i>
+                                <span>Düzenle</span>
+                            </button>
+                            <button onclick="filterAndShowTasksByPerson('${escapeHtml(task.owner)}')" class="px-3 py-1.5 bg-[#A6192E] hover:bg-[#8C1224] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1">
+                                <span>2. Sayfada İncele</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
                 `;
             }).join('');
         }
