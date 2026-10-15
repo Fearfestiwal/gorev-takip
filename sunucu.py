@@ -78,12 +78,13 @@ class TaskServerHandler(http.server.SimpleHTTPRequestHandler):
             try:
                 posted_data = json.loads(body.decode("utf-8"))
                 current_data = load_data()
-                if "tasks" in posted_data:
-                    current_data["tasks"] = posted_data["tasks"]
-                if "team" in posted_data:
-                    current_data["team"] = posted_data["team"]
-                if "notes" in posted_data:
-                    current_data["notes"] = posted_data["notes"]
+                payload_data = posted_data.get("data", posted_data) if isinstance(posted_data, dict) else {}
+                if "tasks" in payload_data:
+                    current_data["tasks"] = payload_data["tasks"]
+                if "team" in payload_data:
+                    current_data["team"] = payload_data["team"]
+                if "notes" in payload_data:
+                    current_data["notes"] = payload_data["notes"]
                 save_data(current_data)
 
                 response = json.dumps({"status": "ok", "message": "Kaydedildi"}).encode("utf-8")

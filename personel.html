@@ -163,7 +163,15 @@
         let tasks = JSON.parse(localStorage.getItem('task_items')) || [];
         let currentSelectedUser = localStorage.getItem('task_personel_selected_user') || '';
 
-        const CLOUD_DB_URL = "https://extendsclass.com/api/json-storage/bin/cffebea";
+        const CLOUD_DB_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a13e949ddf65df";
+        let lastLocalActionTime = 0;
+
+        function isLocalEnvironment() {
+            return window.location.protocol.startsWith('http') && 
+                   (window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1' || 
+                    window.location.port === '8080');
+        }
 
         function updatePersonelServerBadge(online) {
             const badge = document.getElementById('personelServerBadge');
@@ -179,9 +187,14 @@
         }
 
         async function syncWithServer() {
+            // Son 4 saniye içinde personel bir durum değiştirdiyse sunucudan ezilmesini engelle
+            if (Date.now() - lastLocalActionTime < 4000) {
+                return;
+            }
+
             try {
                 let data = null;
-                if (window.location.protocol.startsWith('http') && window.location.hostname === 'localhost') {
+                if (isLocalEnvironment()) {
                     try {
                         const localRes = await fetch('/api/data');
                         if (localRes.ok) data = await localRes.json();
@@ -190,10 +203,17 @@
 
                 if (!data) {
                     const cloudRes = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
-                    if (cloudRes.ok) data = await cloudRes.json();
+                    if (cloudRes.ok) {
+                        const cloudJson = await cloudRes.json();
+                        data = cloudJson.data || cloudJson;
+                    }
                 }
 
                 if (data) {
+                    if (Date.now() - lastLocalActionTime < 4000) {
+                        return;
+                    }
+
                     let changed = false;
 
                     if (Array.isArray(data.tasks)) {
@@ -214,6 +234,10 @@
                         }
                     }
 
+                    if (data.notes !== undefined) {
+                        localStorage.setItem('task_management_notes', data.notes);
+                    }
+
                     if (changed) {
                         if (currentSelectedUser) {
                             renderPersonalDashboard(currentSelectedUser);
@@ -229,28 +253,34 @@
         }
 
         async function pushDataToServer() {
-            const payload = JSON.stringify({
+            const rawData = {
                 tasks: tasks,
-                team: team
+                team: team,
+                notes: localStorage.getItem('task_management_notes') || ''
+            };
+
+            const cloudPayload = JSON.stringify({
+                name: "Can Kardesler DB",
+                data: rawData
             });
 
             try {
-                await fetch(CLOUD_DB_URL, {
+                const res = await fetch(CLOUD_DB_URL, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json; charset=utf-8' },
-                    body: payload
+                    body: cloudPayload
                 });
-                updatePersonelServerBadge(true);
+                if (res.ok) updatePersonelServerBadge(true);
             } catch (err) {
                 console.warn("Buluta gönderilemedi:", err);
             }
 
-            if (window.location.protocol.startsWith('http') && window.location.hostname === 'localhost') {
+            if (isLocalEnvironment()) {
                 try {
                     await fetch('/api/data', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: payload
+                        body: JSON.stringify(rawData)
                     });
                 } catch(e) {}
             }
@@ -281,6 +311,7 @@
         });
 
         function saveTasks() {
+            lastLocalActionTime = Date.now();
             localStorage.setItem('task_items', JSON.stringify(tasks));
             pushDataToServer();
         }
@@ -446,7 +477,7 @@
         }
 
         function setTaskStatus(taskId, status) {
-            const task = tasks.find(t => t.id === taskId);
+            const task = tasks.find(t => String(t.id) === String(taskId));
             if (task) {
                 task.status = status;
                 saveTasks();

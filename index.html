@@ -855,7 +855,15 @@
         let viewMode = "table";
         let currentEmailPersonName = "";
 
-        const CLOUD_DB_URL = "https://extendsclass.com/api/json-storage/bin/cffebea";
+        const CLOUD_DB_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a13e949ddf65df";
+        let lastLocalActionTime = 0;
+
+        function isLocalEnvironment() {
+            return window.location.protocol.startsWith('http') && 
+                   (window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1' || 
+                    window.location.port === '8080');
+        }
 
         function updateServerStatusBadge(online) {
             const badge = document.getElementById('serverStatusBadge');
@@ -871,9 +879,14 @@
         }
 
         async function syncWithServer() {
+            // Son 4 saniye içinde yerel işlem yapıldıysa bulut güncellemesini bekleterek ezilmeyi önle
+            if (Date.now() - lastLocalActionTime < 4000) {
+                return;
+            }
+
             try {
                 let data = null;
-                if (window.location.protocol.startsWith('http') && window.location.hostname === 'localhost') {
+                if (isLocalEnvironment()) {
                     try {
                         const localRes = await fetch('/api/data');
                         if (localRes.ok) data = await localRes.json();
@@ -882,10 +895,17 @@
 
                 if (!data) {
                     const cloudRes = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
-                    if (cloudRes.ok) data = await cloudRes.json();
+                    if (cloudRes.ok) {
+                        const cloudJson = await cloudRes.json();
+                        data = cloudJson.data || cloudJson;
+                    }
                 }
 
                 if (data) {
+                    if (Date.now() - lastLocalActionTime < 4000) {
+                        return;
+                    }
+
                     let changed = false;
 
                     if (Array.isArray(data.tasks)) {
@@ -926,29 +946,34 @@
         }
 
         async function pushDataToServer() {
-            const payload = JSON.stringify({
+            const rawData = {
                 tasks: tasks,
                 team: team,
                 notes: document.getElementById('managementNotes')?.value || localStorage.getItem('task_management_notes') || ''
+            };
+
+            const cloudPayload = JSON.stringify({
+                name: "Can Kardesler DB",
+                data: rawData
             });
 
             try {
-                await fetch(CLOUD_DB_URL, {
+                const res = await fetch(CLOUD_DB_URL, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json; charset=utf-8' },
-                    body: payload
+                    body: cloudPayload
                 });
-                updateServerStatusBadge(true);
+                if (res.ok) updateServerStatusBadge(true);
             } catch (err) {
                 console.warn("Buluta gönderilemedi:", err);
             }
 
-            if (window.location.protocol.startsWith('http') && window.location.hostname === 'localhost') {
+            if (isLocalEnvironment()) {
                 try {
                     await fetch('/api/data', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: payload
+                        body: JSON.stringify(rawData)
                     });
                 } catch(e) {}
             }
@@ -987,12 +1012,14 @@
         });
 
         function saveData() {
+            lastLocalActionTime = Date.now();
             localStorage.setItem('task_team_members', JSON.stringify(team));
             localStorage.setItem('task_items', JSON.stringify(tasks));
             pushDataToServer();
         }
 
         function saveManagementNotes() {
+            lastLocalActionTime = Date.now();
             localStorage.setItem('task_management_notes', document.getElementById('managementNotes').value);
             pushDataToServer();
         }
@@ -1239,8 +1266,8 @@
                             </td>
                             <td class="py-3 px-3 text-center no-print">
                                 <div class="flex items-center justify-center gap-1">
-                                    <button onclick="toggleTaskStatus(${task.id})" title="Durum Değiştir" class="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors">
-                                        <i class="fa-solid fa-check"></i>
+                                    <button onclick="toggleTaskStatus(${task.id})" title="${task.status === 'Tamamlandı' ? 'Görevi Tekrar Aç' : 'Görevi Tamamlandı Yap'}" class="p-1.5 ${task.status === 'Tamamlandı' ? 'text-emerald-700 bg-emerald-50 hover:bg-amber-50 hover:text-amber-700' : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'} rounded transition-colors">
+                                        <i class="fa-solid ${task.status === 'Tamamlandı' ? 'fa-rotate-left' : 'fa-check'}"></i>
                                     </button>
                                     <button onclick="editTask(${task.id})" title="Düzenle" class="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded transition-colors">
                                         <i class="fa-solid fa-pen"></i>
@@ -1288,7 +1315,7 @@
                         </div>
                         <div class="flex items-center justify-end gap-1 mt-2 pt-1 border-t border-slate-50">
                             <button onclick="editTask(${task.id})" class="text-[10px] text-sky-600 hover:underline px-1">Düzenle</button>
-                            <button onclick="toggleTaskStatus(${task.id})" class="text-[10px] text-emerald-600 hover:underline px-1 font-medium">Durum Değiştir</button>
+                            <button onclick="toggleTaskStatus(${task.id})" class="text-[10px] text-emerald-600 hover:underline px-1 font-medium">${task.status === 'Tamamlandı' ? 'Tekrar Aç' : 'Tamamla'}</button>
                         </div>
                     </div>
                 `;
@@ -1623,16 +1650,29 @@
         function handleTeamSubmit(e) {
             e.preventDefault();
             const editIdx = parseInt(document.getElementById('editPersonIndex').value);
+            const newName = document.getElementById('personName').value.trim();
+            const oldName = (editIdx >= 0 && team[editIdx]) ? team[editIdx].name : null;
+
             const memberData = {
-                name: document.getElementById('personName').value.trim(),
+                name: newName,
                 title: document.getElementById('personTitle').value.trim(),
                 phone: document.getElementById('personPhone').value.trim(),
                 email: document.getElementById('personEmail').value.trim(),
                 department: document.getElementById('personDepartment').value.trim()
             };
 
-            if (editIdx >= 0) team[editIdx] = memberData;
-            else team.push(memberData);
+            if (editIdx >= 0) {
+                if (oldName && oldName !== newName) {
+                    tasks.forEach(t => {
+                        if (t.owner && t.owner.toLowerCase().trim() === oldName.toLowerCase().trim()) {
+                            t.owner = newName;
+                        }
+                    });
+                }
+                team[editIdx] = memberData;
+            } else {
+                team.push(memberData);
+            }
 
             saveData();
             updateTeamDatalist();
@@ -1687,7 +1727,7 @@
         }
 
         function editTask(id) {
-            const task = tasks.find(t => t.id === id);
+            const task = tasks.find(t => String(t.id) === String(id));
             if (!task) return;
 
             document.getElementById('editTaskId').value = task.id;
@@ -1739,10 +1779,10 @@
             }
 
             if (editId) {
-                const index = tasks.findIndex(t => t.id === parseInt(editId));
+                const index = tasks.findIndex(t => String(t.id) === String(editId));
                 if (index !== -1) tasks[index] = { ...tasks[index], ...taskData };
             } else {
-                const newId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+                const newId = tasks.length > 0 ? Math.max(...tasks.map(t => Number(t.id) || 0)) + 1 : 1;
                 tasks.push({ id: newId, ...taskData });
             }
 
@@ -1784,12 +1824,14 @@
         }
 
         function toggleTaskStatus(id) {
-            const task = tasks.find(t => t.id === id);
+            const task = tasks.find(t => String(t.id) === String(id));
             if (!task) return;
 
-            if (task.status === 'Açık') task.status = 'Devam Ediyor';
-            else if (task.status === 'Devam Ediyor') task.status = 'Tamamlandı';
-            else task.status = 'Açık';
+            if (task.status !== 'Tamamlandı') {
+                task.status = 'Tamamlandı';
+            } else {
+                task.status = 'Açık';
+            }
 
             saveData();
             renderApp();
@@ -1797,7 +1839,7 @@
 
         function deleteTask(id) {
             if (confirm("Bu görevi silmek istediğinize emin misiniz?")) {
-                tasks = tasks.filter(t => t.id !== id);
+                tasks = tasks.filter(t => String(t.id) !== String(id));
                 saveData();
                 renderApp();
             }
