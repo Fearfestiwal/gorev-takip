@@ -129,7 +129,7 @@ if __name__ == "__main__":
         main_ip = local_ips[0] if local_ips else "BILGISAYAR_IP_ADRESI"
 
         print("=" * 70)
-        print("  CAN KARDESLER KURU YEMIS - SIRKET ICI YEREL SUNUCU (LOCAL)")
+        print("  CAN CEREZ (1978 | Adiyla Tadiyla Can'dan) - SIRKET ICI YEREL SUNUCU")
         print("=" * 70)
         print()
         print("  [YONETICI PANELINIZ]:")
