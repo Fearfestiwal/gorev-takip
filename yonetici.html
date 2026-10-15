@@ -159,6 +159,9 @@
     <!-- ANA İÇERİK ALANI -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
 
+        <!-- AKILLI UYARI & BİLDİRİM BANDI (GECİKEN & BUGÜN BİTEN İŞLER) -->
+        <div id="smartAlertBanner" class="no-print mb-6 hidden"></div>
+
         <!-- ============================================================== -->
         <!-- 1. SAYFA: YÖNETİM & PERFORMANS RAPORU                          -->
         <!-- ============================================================== -->
@@ -346,7 +349,8 @@
                             <option value="ALL">Tüm Durumlar</option>
                             <option value="Açık">Sadece Açık Görevler</option>
                             <option value="Devam Ediyor">Devam Edenler</option>
-                            <option value="Geciken">Sadece Gecikenler ⚠️</option>
+                            <option value="Bugun">📅 Bugün Bitenler</option>
+                            <option value="Geciken">⚠️ Sadece Gecikenler</option>
                             <option value="Tamamlandı">Tamamlananlar</option>
                         </select>
                     </div>
@@ -1127,6 +1131,7 @@
             calculateAndRenderStatistics();
             renderReportTable();
             renderDetailTableAndBoard();
+            renderSmartAlertBanner();
         }
 
         function calculateAndRenderStatistics() {
@@ -1157,6 +1162,174 @@
             document.getElementById('p1OpenRatio').innerText = `İşlerin %${openPct}'si açık`;
             document.getElementById('p1Completed').innerText = completed;
             document.getElementById('p1CompletedRatio').innerText = `İşlerin %${completionPct}'si bitti`;
+        }
+
+        // ================= AKILLI UYARI & BİLDİRİM BANDI =================
+        let isAlertBannerDismissed = false;
+
+        function filterTasksByQuickType(type) {
+            switchMainPage(2);
+            const select = document.getElementById('statusFilter');
+            if (select) {
+                select.value = type;
+            }
+            renderApp();
+            const tableEl = document.getElementById('tableViewContainer');
+            if (tableEl) {
+                tableEl.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function dismissAlertBanner() {
+            isAlertBannerDismissed = true;
+            const banner = document.getElementById('smartAlertBanner');
+            if (banner) banner.classList.add('hidden');
+        }
+
+        function renderSmartAlertBanner() {
+            const banner = document.getElementById('smartAlertBanner');
+            if (!banner) return;
+
+            if (isAlertBannerDismissed) {
+                banner.classList.add('hidden');
+                return;
+            }
+
+            const now = new Date();
+            now.setHours(0,0,0,0);
+
+            const delayedTasks = [];
+            const todayTasks = [];
+
+            tasks.forEach(t => {
+                if (t.status === 'Tamamlandı') return;
+                const d = new Date(t.dueDate);
+                d.setHours(0,0,0,0);
+
+                if (d < now) {
+                    delayedTasks.push(t);
+                } else if (d.getTime() === now.getTime()) {
+                    todayTasks.push(t);
+                }
+            });
+
+            // Gecikmedeki sorumluları grupla
+            const delayedOwnersMap = {};
+            delayedTasks.forEach(t => {
+                const owner = t.owner ? t.owner.trim() : 'Atanmamış';
+                delayedOwnersMap[owner] = (delayedOwnersMap[owner] || 0) + 1;
+            });
+            const delayedOwnerNames = Object.keys(delayedOwnersMap);
+
+            if (delayedTasks.length > 0) {
+                banner.classList.remove('hidden');
+                banner.innerHTML = `
+                    <div class="bg-gradient-to-r from-stone-900 via-rose-950 to-stone-900 text-white rounded-2xl p-4 sm:p-5 shadow-xl shadow-rose-950/30 border border-rose-700/60 relative overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div class="absolute -right-10 -top-10 w-44 h-44 bg-rose-600/15 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="absolute -left-10 -bottom-10 w-44 h-44 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="flex items-start sm:items-center gap-3.5">
+                                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white flex items-center justify-center text-xl shrink-0 shadow-lg shadow-rose-600/40 border border-rose-400/40">
+                                    <i class="fa-solid fa-bell text-rose-100 animate-bounce"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="bg-rose-500/30 text-rose-200 text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-rose-400/30 flex items-center gap-1.5 shadow-xs">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping"></span>
+                                            AKILLI UYARI BANDI
+                                        </span>
+                                        <h3 class="font-extrabold text-sm sm:text-base text-white tracking-tight flex items-center gap-1.5">
+                                            <span>${delayedTasks.length} Adet Görevin Termin Süresi Gecikti!</span>
+                                        </h3>
+                                        ${todayTasks.length > 0 ? `
+                                            <span class="bg-amber-500/20 text-amber-300 text-[11px] font-bold px-2 py-0.5 rounded-full border border-amber-400/30 flex items-center gap-1">
+                                                <i class="fa-regular fa-calendar-check text-[10px]"></i> ${todayTasks.length} Görev Bugün Bitiyor
+                                            </span>
+                                        ` : ''}
+                                    </div>
+                                    <div class="text-xs text-rose-200/90 mt-1.5 flex items-center gap-1.5 flex-wrap">
+                                        <span class="font-medium text-stone-300">Gecikmedeki Personeller:</span>
+                                        ${delayedOwnerNames.map(name => `
+                                            <button onclick="openWhatsAppMember('${escapeHtml(name)}')" title="${name} kişisine WhatsApp'tan hatırlatma at" class="inline-flex items-center gap-1 font-semibold text-white bg-white/10 hover:bg-rose-600/60 px-2 py-0.5 rounded-lg text-[11px] transition-all border border-white/10 cursor-pointer active:scale-95">
+                                                <i class="fa-brands fa-whatsapp text-emerald-400"></i> ${escapeHtml(name)} <span class="bg-rose-500/40 text-rose-100 px-1 rounded text-[10px] font-bold">${delayedOwnersMap[name]}</span>
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 self-start lg:self-center shrink-0 flex-wrap">
+                                <button onclick="filterTasksByQuickType('Geciken')" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-md shadow-rose-600/30 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                                    <i class="fa-solid fa-filter text-xs"></i>
+                                    <span>Gecikenleri Listele</span>
+                                </button>
+                                ${todayTasks.length > 0 ? `
+                                    <button onclick="filterTasksByQuickType('Bugun')" class="px-3.5 py-2 bg-stone-800 hover:bg-stone-700 text-amber-300 border border-amber-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                                        <i class="fa-regular fa-calendar-check text-xs"></i>
+                                        <span>Bugünün İşleri (${todayTasks.length})</span>
+                                    </button>
+                                ` : ''}
+                                <button onclick="openBulkReminderModal()" title="Bekleyen herkese toplu bildirim gönder" class="px-3.5 py-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white rounded-xl text-xs font-bold shadow-md shadow-amber-600/20 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                                    <i class="fa-solid fa-bullhorn text-xs"></i>
+                                    <span class="hidden sm:inline">Toplu Uyar</span>
+                                </button>
+                                <button onclick="dismissAlertBanner()" title="Bu oturum için uyarıyı gizle" class="p-2 text-rose-300 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer">
+                                    <i class="fa-solid fa-xmark text-base"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (todayTasks.length > 0) {
+                banner.classList.remove('hidden');
+                banner.innerHTML = `
+                    <div class="bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 text-white rounded-2xl p-4 shadow-md border border-amber-700/50 relative overflow-hidden animate-in fade-in duration-200">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg shrink-0 border border-amber-500/30">
+                                    <i class="fa-regular fa-calendar-check"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-amber-500/30">GÜNÜ GELDİ</span>
+                                        <h4 class="font-bold text-xs sm:text-sm text-white">Bugün Hedef Terminli ${todayTasks.length} Görev Bulunuyor</h4>
+                                    </div>
+                                    <p class="text-[11px] text-stone-300 mt-0.5">Geciken herhangi bir işiniz yok. Bugün teslim edilecek ${todayTasks.length} aksiyon bekliyor.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button onclick="filterTasksByQuickType('Bugun')" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+                                    <i class="fa-solid fa-list-check"></i>
+                                    <span>Bugünün Görevlerini Gör</span>
+                                </button>
+                                <button onclick="dismissAlertBanner()" class="p-1.5 text-stone-400 hover:text-white rounded-lg cursor-pointer">
+                                    <i class="fa-solid fa-xmark text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (tasks.length > 0) {
+                banner.classList.remove('hidden');
+                banner.innerHTML = `
+                    <div class="bg-gradient-to-r from-stone-900 via-emerald-950 to-stone-900 text-white rounded-2xl p-3.5 shadow-xs border border-emerald-800/40 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs border border-emerald-500/30 shrink-0">
+                                <i class="fa-solid fa-check"></i>
+                            </span>
+                            <p class="text-xs text-stone-200">
+                                <strong class="text-emerald-400 font-bold">Harika Durum:</strong> Can Kardeşler Kuruyemiş koordinasyonunda şu an geciken görev bulunmuyor. Tüm aksiyonlar planlanan takvimde ilerliyor.
+                            </p>
+                        </div>
+                        <button onclick="dismissAlertBanner()" class="text-stone-400 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/5 cursor-pointer">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                banner.classList.add('hidden');
+            }
         }
 
         function renderReportTable() {
@@ -1252,9 +1425,14 @@
             now.setHours(0,0,0,0);
 
             return tasks.filter(item => {
-                const isDelayed = item.status !== 'Tamamlandı' && new Date(item.dueDate) < now;
+                const itemDate = new Date(item.dueDate);
+                itemDate.setHours(0,0,0,0);
+                const isDelayed = item.status !== 'Tamamlandı' && itemDate < now;
+                const isDueToday = item.status !== 'Tamamlandı' && itemDate.getTime() === now.getTime();
+
                 if (statusFilter === 'Geciken' && !isDelayed) return false;
-                if (statusFilter !== 'ALL' && statusFilter !== 'Geciken' && item.status !== statusFilter) return false;
+                if (statusFilter === 'Bugun' && !isDueToday) return false;
+                if (statusFilter !== 'ALL' && statusFilter !== 'Geciken' && statusFilter !== 'Bugun' && item.status !== statusFilter) return false;
 
                 if (monthFilter !== 'ALL') {
                     const taskMonth = new Date(item.dueDate).getMonth() + 1;

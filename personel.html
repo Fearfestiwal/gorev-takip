@@ -110,6 +110,9 @@
                 </div>
             </div>
 
+            <!-- KİŞİSEL AKILLI UYARI BANDI -->
+            <div id="personalAlertBanner" class="hidden"></div>
+
             <!-- Kişisel 4'lü KPI Kartları -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
@@ -457,6 +460,60 @@
             document.getElementById('userSuccessPct').innerText = `%${pct}`;
             document.getElementById('userFractionText').innerText = `${completed} / ${total} Bitti`;
             document.getElementById('userBadgeTaskCount').innerText = `${total} Görev`;
+
+            // Kişisel Akıllı Uyarı Bandı
+            const todayTasks = userTasks.filter(t => {
+                if (t.status === 'Tamamlandı') return false;
+                const d = new Date(t.dueDate);
+                d.setHours(0,0,0,0);
+                return d.getTime() === now.getTime();
+            });
+
+            const alertBanner = document.getElementById('personalAlertBanner');
+            if (delayed > 0) {
+                alertBanner.classList.remove('hidden');
+                alertBanner.innerHTML = `
+                    <div class="bg-gradient-to-r from-stone-900 via-rose-950 to-stone-900 text-white rounded-2xl p-4 shadow-lg shadow-rose-950/20 border border-rose-700/60 flex items-center justify-between gap-3 animate-in fade-in duration-200">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center text-lg shrink-0 shadow-md shadow-rose-600/30">
+                                <i class="fa-solid fa-triangle-exclamation animate-bounce"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-rose-500/30 text-rose-200 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-rose-400/30">DİKKAT</span>
+                                    <h4 class="font-bold text-xs sm:text-sm text-white">Teslim Tarihi Geçmiş ${delayed} Göreviniz Bulunuyor!</h4>
+                                </div>
+                                <p class="text-xs text-rose-200/90 mt-0.5">Lütfen geciken görevlerinizi öncelikli olarak tamamlayıp durumunu 'Tamamlandı' yapınız.</p>
+                            </div>
+                        </div>
+                        <button onclick="notifyManagerWhatsApp()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-xs transition-all shrink-0">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                            <span>Yöneticiye WhatsApp Bildir</span>
+                        </button>
+                    </div>
+                `;
+            } else if (todayTasks.length > 0) {
+                alertBanner.classList.remove('hidden');
+                alertBanner.innerHTML = `
+                    <div class="bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 text-white rounded-2xl p-4 shadow-md border border-amber-700/50 flex items-center justify-between gap-3 animate-in fade-in duration-200">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg shrink-0 border border-amber-500/30">
+                                <i class="fa-regular fa-calendar-check"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-amber-500/30">GÜNÜ GELDİ</span>
+                                    <h4 class="font-bold text-xs sm:text-sm text-white">Bugün Tamamlanması Gereken ${todayTasks.length} Göreviniz Var</h4>
+                                </div>
+                                <p class="text-xs text-stone-300 mt-0.5">Geciken işiniz yok, günün planlanan aksiyonlarını tamamlayabilirsiniz.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                alertBanner.classList.add('hidden');
+                alertBanner.innerHTML = '';
+            }
 
             const container = document.getElementById('userTasksContainer');
 
