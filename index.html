@@ -306,7 +306,7 @@
                                 <th class="py-3 px-3 text-center w-24 text-amber-600">Bekleyen</th>
                                 <th class="py-3 px-3 text-center w-24 text-emerald-600">Biten</th>
                                 <th class="py-3 px-4 w-48 text-center">Tamamlanma %</th>
-                                <th class="py-3 px-4 text-center w-36 no-print">İşlem</th>
+                                <th class="py-3 px-4 text-center w-48 no-print">İşlem</th>
                             </tr>
                         </thead>
                         <tbody id="reportTableBody" class="divide-y divide-slate-100"></tbody>
@@ -393,7 +393,7 @@
                                 <th class="py-3 px-3 w-44">Sorumlu Kişi</th>
                                 <th class="py-3 px-3 w-28 text-center">Termin</th>
                                 <th class="py-3 px-3 w-28 text-center">Durum</th>
-                                <th class="py-3 px-3 w-24 text-center no-print">İşlem</th>
+                                <th class="py-3 px-3 w-32 text-center no-print">İşlem</th>
                             </tr>
                         </thead>
                         <tbody id="taskTableBody" class="divide-y divide-slate-100"></tbody>
@@ -525,11 +525,15 @@
                         <span>Metni Kopyala (WhatsApp / Duyuru)</span>
                     </button>
                     
-                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
                         <button type="button" onclick="closeBulkReminderModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-medium">Kapat</button>
+                        <button type="button" onclick="shareBulkWhatsApp()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-md shadow-emerald-600/30 flex items-center gap-1.5 transition-all">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                            <span>WhatsApp ile Paylaş</span>
+                        </button>
                         <button type="button" onclick="sendBulkMailClient()" class="px-5 py-2 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white rounded-xl font-bold shadow-md shadow-rose-600/30 flex items-center gap-2 transition-all">
                             <i class="fa-solid fa-paper-plane"></i>
-                            <span>Outlook'ta Aç ve Herkese Gönder</span>
+                            <span>Outlook'ta Aç</span>
                         </button>
                     </div>
                 </div>
@@ -630,8 +634,12 @@
                         <span>Metni Kopyala</span>
                     </button>
                     
-                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-wrap">
                         <button type="button" onclick="closeEmailModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-medium">Kapat</button>
+                        <button type="button" onclick="sendWhatsAppFromModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-md shadow-emerald-600/30 flex items-center gap-1.5 transition-all">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                            <span>WhatsApp ile Gönder</span>
+                        </button>
                         <button type="button" onclick="sendMailClient()" class="px-5 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl font-semibold shadow-md shadow-sky-600/30 flex items-center gap-2 transition-all">
                             <i class="fa-solid fa-envelope"></i>
                             <span>Outlook'ta Aç</span>
@@ -1220,10 +1228,16 @@
                             </div>
                         </td>
                         <td class="py-3 px-4 text-center no-print" onclick="event.stopPropagation()">
-                            <button onclick="openEmailModal('${escapeHtml(ownerName)}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white font-medium text-xs transition-all shadow-2xs">
-                                <i class="fa-solid fa-paper-plane text-[10px]"></i>
-                                <span>Mail Gönder</span>
-                            </button>
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="openWhatsAppMember('${escapeHtml(ownerName)}')" title="WhatsApp ile Durum Özeti Gönder" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white font-medium text-xs transition-all shadow-2xs">
+                                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                                    <span>WhatsApp</span>
+                                </button>
+                                <button onclick="openEmailModal('${escapeHtml(ownerName)}')" title="Mail Gönder" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white font-medium text-xs transition-all shadow-2xs">
+                                    <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                                    <span>Mail</span>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -1310,6 +1324,9 @@
                             </td>
                             <td class="py-3 px-3 text-center no-print">
                                 <div class="flex items-center justify-center gap-1">
+                                    <button onclick="openWhatsAppTask('${task.id}')" title="Sorumluya WhatsApp ile Bildir" class="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors">
+                                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                                    </button>
                                     <button onclick="toggleTaskStatus(${task.id})" title="${task.status === 'Tamamlandı' ? 'Görevi Tekrar Aç' : 'Görevi Tamamlandı Yap'}" class="p-1.5 ${task.status === 'Tamamlandı' ? 'text-emerald-700 bg-emerald-50 hover:bg-amber-50 hover:text-amber-700' : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'} rounded transition-colors">
                                         <i class="fa-solid ${task.status === 'Tamamlandı' ? 'fa-rotate-left' : 'fa-check'}"></i>
                                     </button>
@@ -1357,9 +1374,14 @@
                             </div>
                             <span class="${isOverdue ? 'text-rose-600 font-bold' : ''}"><i class="fa-regular fa-calendar"></i> ${formatTurkishDate(task.dueDate)}</span>
                         </div>
-                        <div class="flex items-center justify-end gap-1 mt-2 pt-1 border-t border-slate-50">
-                            <button onclick="editTask(${task.id})" class="text-[10px] text-sky-600 hover:underline px-1">Düzenle</button>
-                            <button onclick="toggleTaskStatus(${task.id})" class="text-[10px] text-emerald-600 hover:underline px-1 font-medium">${task.status === 'Tamamlandı' ? 'Tekrar Aç' : 'Tamamla'}</button>
+                        <div class="flex items-center justify-between gap-1 mt-2 pt-1 border-t border-slate-50">
+                            <button onclick="openWhatsAppTask('${task.id}')" title="WhatsApp ile Hatırlat" class="text-[11px] text-emerald-600 hover:text-emerald-700 flex items-center gap-1 font-medium">
+                                <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                            </button>
+                            <div class="flex items-center gap-1">
+                                <button onclick="editTask(${task.id})" class="text-[10px] text-sky-600 hover:underline px-1">Düzenle</button>
+                                <button onclick="toggleTaskStatus(${task.id})" class="text-[10px] text-emerald-600 hover:underline px-1 font-medium">${task.status === 'Tamamlandı' ? 'Tekrar Aç' : 'Tamamla'}</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1407,10 +1429,16 @@
                             </div>
                         </div>
 
-                        <button onclick="closeQuickMailPickerModal(); openEmailModal('${escapeHtml(member.name)}')" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-600/20 flex items-center gap-1.5 transition-all shrink-0">
-                            <i class="fa-solid fa-paper-plane text-[10px]"></i>
-                            <span>Mail Gönder</span>
-                        </button>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button onclick="closeQuickMailPickerModal(); openWhatsAppMember('${escapeHtml(member.name)}')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all">
+                                <i class="fa-brands fa-whatsapp text-sm"></i>
+                                <span>WhatsApp</span>
+                            </button>
+                            <button onclick="closeQuickMailPickerModal(); openEmailModal('${escapeHtml(member.name)}')" class="px-3 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-600/20 flex items-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                                <span>Mail</span>
+                            </button>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1544,6 +1572,127 @@
             }
 
             window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+        }
+
+        // ================= WHATSAPP ENTEGRASYONU =================
+        function formatWhatsAppPhone(phone) {
+            if (!phone) return '';
+            let cleaned = phone.replace(/\D/g, '');
+            if (cleaned.startsWith('0')) {
+                cleaned = '9' + cleaned;
+            } else if (cleaned.length === 10) {
+                cleaned = '90' + cleaned;
+            }
+            return cleaned;
+        }
+
+        function sendWhatsAppMessage(formattedPhone, messageText, personName) {
+            if (!formattedPhone) {
+                const inputPhone = prompt(`${personName ? `"${personName}"` : 'Çalışan'} için rehberde kayıtlı geçerli telefon numarası bulunamadı.\n\nWhatsApp mesajı göndermek istediğiniz cep telefonu numarasını girin (Örn: 0532 123 45 67) veya WhatsApp Web/Uygulamada kişi seçmek için boş bırakıp Tamam'a basın:`);
+                if (inputPhone !== null) {
+                    formattedPhone = formatWhatsAppPhone(inputPhone);
+                } else {
+                    return; // İptal edildi
+                }
+            }
+
+            const encoded = encodeURIComponent(messageText);
+            const url = formattedPhone 
+                ? `https://wa.me/${formattedPhone}?text=${encoded}`
+                : `https://wa.me/?text=${encoded}`;
+
+            window.open(url, '_blank');
+        }
+
+        function openWhatsAppTask(taskId) {
+            const task = tasks.find(t => String(t.id) === String(taskId));
+            if (!task) return;
+
+            const ownerName = task.owner ? task.owner.trim() : '';
+            const member = team.find(m => m.name.toLowerCase().trim() === ownerName.toLowerCase().trim());
+            const phone = member ? formatWhatsAppPhone(member.phone) : '';
+
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            const isOverdue = task.status !== 'Tamamlandı' && new Date(task.dueDate) < now;
+
+            let msg = `🌰 *CAN KARDEŞLER KURUYEMİŞ*\n`;
+            msg += `*Görev & Aksiyon Hatırlatması*\n\n`;
+            if (ownerName) {
+                msg += `Sayın *${ownerName}*,\n`;
+            }
+            msg += `Üzerinizdeki görev hakkında bilgilendirme:\n\n`;
+            msg += `📋 *Görev:* ${task.title}\n`;
+            msg += `🏢 *Birim:* ${task.department || '-'}\n`;
+            msg += `📅 *Hedef Termin:* ${formatTurkishDate(task.dueDate)}${isOverdue ? ' ⚠️ *(GECİKTİ)*' : ''}\n`;
+            msg += `⏳ *Mevcut Durum:* ${task.status}\n`;
+            msg += `📝 *Aksiyon:* ${task.action || '-'}\n\n`;
+            msg += `Görev durumunuzu Personel Paneli üzerinden güncelleyebilirsiniz:\n`;
+            const personnelUrl = window.location.href.split('?')[0].replace(/yonetici\.html|index\.html|$/, 'personel.html');
+            msg += `${personnelUrl}\n\n`;
+            msg += `İyi çalışmalar dileriz.`;
+
+            sendWhatsAppMessage(phone, msg, ownerName);
+        }
+
+        function openWhatsAppMember(ownerName) {
+            const member = team.find(m => m.name.toLowerCase().trim() === ownerName.toLowerCase().trim());
+            const phone = member ? formatWhatsAppPhone(member.phone) : '';
+
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            const pTasks = tasks.filter(t => t.owner.toLowerCase().trim() === ownerName.toLowerCase().trim());
+            const openTasks = pTasks.filter(t => t.status !== 'Tamamlandı');
+            const delayedTasks = pTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now);
+            const completedTasks = pTasks.filter(t => t.status === 'Tamamlandı');
+
+            let msg = `🌰 *CAN KARDEŞLER KURUYEMİŞ*\n`;
+            msg += `*Görev & Performans Durum Özeti*\n\n`;
+            msg += `Sayın *${ownerName}*,\n`;
+            msg += `Koordinasyon Takip Sistemindeki güncel görev durumunuz:\n\n`;
+            msg += `📊 *Özet:* ${pTasks.length} Toplam | ⏳ ${openTasks.length} Bekleyen | ⚠️ ${delayedTasks.length} Geciken | ✅ ${completedTasks.length} Tamamlanan\n`;
+            msg += `--------------------------------------------------\n\n`;
+
+            if (delayedTasks.length > 0) {
+                msg += `⚠️ *GECİKEN GÖREVLERİNİZ:*\n`;
+                delayedTasks.forEach((t, i) => {
+                    msg += `${i + 1}. ${t.title} (Termin: ${formatTurkishDate(t.dueDate)})\n   • Aksiyon: ${t.action}\n`;
+                });
+                msg += `\n`;
+            }
+
+            if (openTasks.length > 0) {
+                msg += `⏳ *BEKLEYEN / DEVAM EDEN GÖREVLERİNİZ:*\n`;
+                openTasks.forEach((t, i) => {
+                    msg += `${i + 1}. [${t.status}] ${t.title} (Termin: ${formatTurkishDate(t.dueDate)})\n   • Aksiyon: ${t.action}\n`;
+                });
+                msg += `\n`;
+            }
+
+            if (openTasks.length === 0 && delayedTasks.length === 0) {
+                msg += `🎉 Tebrikler! Bekleyen veya geciken herhangi bir açık göreviniz bulunmuyor.\n\n`;
+            }
+
+            msg += `Görevlerinizi güncel tutmak için Personel Paneli:\n`;
+            const personnelUrl = window.location.href.split('?')[0].replace(/yonetici\.html|index\.html|$/, 'personel.html');
+            msg += `${personnelUrl}\n\n`;
+            msg += `İyi çalışmalar dileriz.`;
+
+            sendWhatsAppMessage(phone, msg, ownerName);
+        }
+
+        function sendWhatsAppFromModal() {
+            const member = team.find(m => m.name.toLowerCase().trim() === currentEmailPersonName.toLowerCase().trim());
+            const phone = member ? formatWhatsAppPhone(member.phone) : '';
+            const previewText = document.getElementById('emailBodyPreview').value;
+            sendWhatsAppMessage(phone, previewText, currentEmailPersonName);
+        }
+
+        function shareBulkWhatsApp() {
+            const rawText = document.getElementById('bulkBodyPreview').value;
+            const msg = `🌰 *CAN KARDEŞLER KURUYEMİŞ*\n*Koordinasyon Toplantısı - Toplu Aksiyon Hatırlatması*\n\n` + rawText;
+            const encoded = encodeURIComponent(msg);
+            window.open(`https://wa.me/?text=${encoded}`, '_blank');
         }
 
         // ================= TOPLU HATIRLATMA MAİLİ MANTIĞI =================
@@ -1681,6 +1830,7 @@
                                 ${memberTaskCount} Görev
                             </span>
                             <div class="flex items-center gap-1 mt-2">
+                                <button onclick="openWhatsAppMember('${escapeHtml(member.name)}')" title="WhatsApp Mesajı Gönder" class="p-1 text-slate-400 hover:text-emerald-600 rounded"><i class="fa-brands fa-whatsapp text-sm"></i></button>
                                 <button onclick="openEmailModal('${escapeHtml(member.name)}')" title="Mail Gönder" class="p-1 text-slate-400 hover:text-emerald-600 rounded"><i class="fa-solid fa-envelope text-[11px]"></i></button>
                                 <button onclick="editTeamMember(${idx})" class="p-1 text-slate-400 hover:text-sky-600 rounded"><i class="fa-solid fa-pen text-[11px]"></i></button>
                                 <button onclick="deleteTeamMember(${idx})" class="p-1 text-slate-400 hover:text-rose-600 rounded"><i class="fa-regular fa-trash-can text-[11px]"></i></button>
