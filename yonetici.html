@@ -582,7 +582,7 @@
         </footer>
 
     <!-- TOPLU HATIRLATMA MAİLİ MODALI -->
-    <div id="bulkReminderModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto no-print">
+    <div id="bulkReminderModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
         <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
             <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
                 <div class="flex items-center gap-3">
@@ -664,7 +664,7 @@
     </div>
 
     <!-- HIZLI MAİL SEÇİM MODALI -->
-    <div id="quickMailPickerModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto no-print">
+    <div id="quickMailPickerModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
         <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
             <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
                 <div>
@@ -701,7 +701,7 @@
     </div>
 
     <!-- MAİL GÖNDERME MODALI -->
-    <div id="emailModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto no-print">
+    <div id="emailModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
         <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
             <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
                 <div>
@@ -773,7 +773,7 @@
     </div>
 
     <!-- EKİP REHBERİ MODALI -->
-    <div id="teamModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto no-print">
+    <div id="teamModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
         <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
             <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
                 <div>
@@ -846,7 +846,7 @@
     </div>
 
     <!-- GÖREV EKLE / DÜZENLE MODALI -->
-    <div id="taskModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto no-print">
+    <div id="taskModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
         <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
             <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
                 <h3 id="modalTitle" class="font-bold text-sm sm:text-base flex items-center gap-2">
@@ -933,7 +933,7 @@
     </div>
 
     <!-- AYARLAR & YEDEKLEME MODALI -->
-    <div id="settingsModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 no-print">
+    <div id="settingsModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 no-print" style="display: none;">
         <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-[#E8DFC8]">
             <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
                 <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
@@ -1219,6 +1219,8 @@
                     });
                 } catch(e) {}
             }
+        }
+
         // ================= YÖNETİCİ KİLİT & ŞİFRE SİSTEMİ =================
         function checkAdminAuth() {
             const isRemembered = localStorage.getItem('cancerez_remember_admin') === 'true' || localStorage.getItem('cancerez_active_role') === 'admin';
@@ -1975,11 +1977,19 @@
                 `;
             }).join('');
 
-            document.getElementById('quickMailPickerModal').classList.remove('hidden');
+            const qm = document.getElementById('quickMailPickerModal');
+            if (qm) {
+                qm.style.setProperty('display', 'flex', 'important');
+                qm.classList.remove('hidden');
+            }
         }
 
         function closeQuickMailPickerModal() {
-            document.getElementById('quickMailPickerModal').classList.add('hidden');
+            const qm = document.getElementById('quickMailPickerModal');
+            if (qm) {
+                qm.style.setProperty('display', 'none', 'important');
+                qm.classList.add('hidden');
+            }
         }
 
         function openEmailModal(personName) {
@@ -2009,11 +2019,19 @@
             document.getElementById('chkIncludeCompleted').checked = false;
 
             updateEmailPreview();
-            document.getElementById('emailModal').classList.remove('hidden');
+            const em = document.getElementById('emailModal');
+            if (em) {
+                em.style.setProperty('display', 'flex', 'important');
+                em.classList.remove('hidden');
+            }
         }
 
         function closeEmailModal() {
-            document.getElementById('emailModal').classList.add('hidden');
+            const em = document.getElementById('emailModal');
+            if (em) {
+                em.style.setProperty('display', 'none', 'important');
+                em.classList.add('hidden');
+            }
         }
 
         function updateEmailPreview() {
@@ -2303,11 +2321,19 @@
             body += `CAN ÇEREZ (1978) • Koordinasyon & Yönetim Kurulu`;
 
             document.getElementById('bulkBodyPreview').value = body;
-            document.getElementById('bulkReminderModal').classList.remove('hidden');
+            const bm = document.getElementById('bulkReminderModal');
+            if (bm) {
+                bm.style.setProperty('display', 'flex', 'important');
+                bm.classList.remove('hidden');
+            }
         }
 
         function closeBulkReminderModal() {
-            document.getElementById('bulkReminderModal').classList.add('hidden');
+            const bm = document.getElementById('bulkReminderModal');
+            if (bm) {
+                bm.style.setProperty('display', 'none', 'important');
+                bm.classList.add('hidden');
+            }
         }
 
         function copyBulkEmailText() {
@@ -2334,11 +2360,19 @@
         function openTeamModal() {
             resetTeamForm();
             renderTeamCards();
-            document.getElementById('teamModal').classList.remove('hidden');
+            const tm = document.getElementById('teamModal');
+            if (tm) {
+                tm.style.setProperty('display', 'flex', 'important');
+                tm.classList.remove('hidden');
+            }
         }
 
         function closeTeamModal() {
-            document.getElementById('teamModal').classList.add('hidden');
+            const tm = document.getElementById('teamModal');
+            if (tm) {
+                tm.style.setProperty('display', 'none', 'important');
+                tm.classList.add('hidden');
+            }
         }
 
         function renderTeamCards() {
@@ -2457,7 +2491,7 @@
         function openNewTaskModal() {
             document.getElementById('taskForm').reset();
             document.getElementById('editTaskId').value = '';
-            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus text-sky-400"></i> Yeni Görev / Aksiyon Girişi';
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus text-[#FFBF3F]"></i> Yeni Görev / Aksiyon Girişi';
             
             const d = new Date();
             d.setDate(d.getDate() + 7);
@@ -2465,7 +2499,11 @@
             const chk = document.getElementById('taskSendEmailNotification');
             if (chk) chk.checked = true;
             
-            document.getElementById('taskModal').classList.remove('hidden');
+            const tm = document.getElementById('taskModal');
+            if (tm) {
+                tm.style.setProperty('display', 'flex', 'important');
+                tm.classList.remove('hidden');
+            }
         }
 
         function editTask(id) {
@@ -2484,12 +2522,20 @@
             const chk = document.getElementById('taskSendEmailNotification');
             if (chk) chk.checked = false; // Düzenleme yaparken varsayılan kapalı
 
-            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-sky-400"></i> Görevi Düzenle #' + task.id;
-            document.getElementById('taskModal').classList.remove('hidden');
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-[#FFBF3F]"></i> Görevi Düzenle #' + task.id;
+            const tm = document.getElementById('taskModal');
+            if (tm) {
+                tm.style.setProperty('display', 'flex', 'important');
+                tm.classList.remove('hidden');
+            }
         }
 
         function closeTaskModal() {
-            document.getElementById('taskModal').classList.add('hidden');
+            const tm = document.getElementById('taskModal');
+            if (tm) {
+                tm.style.setProperty('display', 'none', 'important');
+                tm.classList.add('hidden');
+            }
         }
 
         function handleTaskSubmit(e) {
@@ -2587,10 +2633,18 @@
 
         // ================= YEDEKLEME =================
         function openSettingsModal() {
-            document.getElementById('settingsModal').classList.remove('hidden');
+            const sm = document.getElementById('settingsModal');
+            if (sm) {
+                sm.style.setProperty('display', 'flex', 'important');
+                sm.classList.remove('hidden');
+            }
         }
         function closeSettingsModal() {
-            document.getElementById('settingsModal').classList.add('hidden');
+            const sm = document.getElementById('settingsModal');
+            if (sm) {
+                sm.style.setProperty('display', 'none', 'important');
+                sm.classList.add('hidden');
+            }
         }
 
         function exportBackup() {
