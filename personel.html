@@ -35,7 +35,7 @@
                                 <span class="font-medium text-amber-400 text-xs sm:text-sm tracking-normal uppercase">Kuruyemiş</span>
                             </h1>
                             <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold border border-amber-400/30">Çalışan Ekranı</span>
-                            <span id="personelServerBadge" class="hidden text-[10px] px-2 py-0.5 rounded font-semibold flex items-center gap-1"></span>
+                            <button id="personelServerBadge" onclick="syncWithServer(true)" title="Bulut / Yerel veriyi yenilemek için tıklayın" class="hidden text-[10px] px-2 py-0.5 rounded font-semibold flex items-center gap-1 cursor-pointer hover:opacity-90 transition-opacity"></button>
                         </div>
                         <p class="text-[11px] text-stone-400">Kişisel Görev & Aksiyon Takip Ekranı</p>
                     </div>
@@ -188,9 +188,9 @@
             }
         }
 
-        async function syncWithServer() {
-            // Son 5 saniye içinde personel bir durum değiştirdiyse veya gönderme sürüyorsa ezilmeyi engelle
-            if (pushInProgress || (Date.now() - lastLocalActionTime < 5000)) {
+        async function syncWithServer(isManual = false) {
+            // Son 5 saniye içinde personel bir durum değiştirdiyse veya gönderme sürüyorsa ezilmeyi engelle (manuel yenilemede pas geç)
+            if (!isManual && (pushInProgress || (Date.now() - lastLocalActionTime < 5000))) {
                 return;
             }
 
@@ -204,15 +204,25 @@
                 }
 
                 if (!data) {
-                    const cloudRes = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
-                    if (cloudRes.ok) {
-                        const cloudJson = await cloudRes.json();
-                        data = cloudJson.data || cloudJson;
-                    }
+                    try {
+                        const cloudRes = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
+                        if (cloudRes.ok) {
+                            const cloudJson = await cloudRes.json();
+                            data = cloudJson.data || cloudJson;
+                        }
+                    } catch(e) {}
+                }
+
+                // Buluta ulaşılamadıysa ve yerel hafıza henüz boşsa github'daki veriler.json dosyasını çek
+                if (!data && tasks.length === 0 && team.length === 0) {
+                    try {
+                        const repoRes = await fetch('./veriler.json', { cache: 'no-store' });
+                        if (repoRes.ok) data = await repoRes.json();
+                    } catch(e) {}
                 }
 
                 if (data) {
-                    if (pushInProgress || (Date.now() - lastLocalActionTime < 5000)) {
+                    if (!isManual && (pushInProgress || (Date.now() - lastLocalActionTime < 5000))) {
                         return;
                     }
 
@@ -249,9 +259,14 @@
                         }
                     }
                     updatePersonelServerBadge(true);
+                    if (isManual) alert("Görevler başarıyla eşitlendi!");
+                } else {
+                    updatePersonelServerBadge(false);
+                    if (isManual) alert("Sunucu ile iletişim kurulamadı. Görevleriniz yerel hafızanızda güvenle tutulmaktadır.");
                 }
             } catch (err) {
                 updatePersonelServerBadge(false);
+                if (isManual) alert("Eşitleme sırasında hata oluştu. Yerel verileriniz korunmaktadır.");
             }
         }
 
@@ -305,9 +320,19 @@
             }
             updatePersonelServerBadge(true);
 
-            // 7/24 Bulut Senkronizasyonunu başlat (her 3 saniyede bir yöneticiden gelen yeni görevleri çek)
+            // Otomatik Senkronizasyon:
+            // Şirket içi yerel sunucuda (sunucu.py) kotasızdır, her 3 saniyede bir kontrol eder.
+            // Bulut bağlantısında (GitHub Pages) ise kota tasarrufu için her 60 saniyede bir veya sayfaya odaklanıldığında çeker.
             syncWithServer();
-            setInterval(syncWithServer, 3000);
+            if (isLocalEnvironment()) {
+                setInterval(syncWithServer, 3000);
+            } else {
+                setInterval(syncWithServer, 60000);
+                window.addEventListener('focus', () => syncWithServer());
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible') syncWithServer();
+                });
+            }
         });
 
         // Yönetici sekmesinde bir görev eklendiğinde veya değiştiğinde anında güncelle
