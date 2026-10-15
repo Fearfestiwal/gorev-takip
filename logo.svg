@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 130" width="100%" height="100%">
+  <defs>
+    <filter id="canShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <linearGradient id="canGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE885"/>
+      <stop offset="50%" stop-color="#FFBF3F"/>
+      <stop offset="100%" stop-color="#DDA022"/>
+    </linearGradient>
+    <linearGradient id="canRedGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B81D33"/>
+      <stop offset="50%" stop-color="#A6192E"/>
+      <stop offset="100%" stop-color="#801020"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Kalkan / Dalga Arkalık (Can Çerez Marka Formu) -->
+  <path d="M 40 40 
+           C 120 18, 240 48, 410 24 
+           C 422 23, 428 32, 422 48 
+           C 410 88, 380 120, 270 124 
+           C 140 126, 45 106, 28 72 
+           C 20 54, 25 43, 40 40 Z" 
+        fill="url(#canRedGrad)" 
+        stroke="url(#canGoldGrad)" 
+        stroke-width="5" 
+        stroke-linejoin="round"
+        filter="url(#canShadow)"/>
+
+  <!-- 1978 Retro Mührü -->
+  <g transform="translate(48, 42)">
+    <text x="0" y="32" font-family="'DM Serif Display', Georgia, serif" font-weight="900" font-size="34" fill="url(#canGoldGrad)" letter-spacing="-1">1978</text>
+    <text x="0" y="44" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="6.8" fill="#FFF3D4" letter-spacing="1.2">ADIYLA TADIYLA CAN'DAN</text>
+    <!-- Sol ve alt cetvel çizgileri -->
+    <path d="M 0 49 L 92 49" stroke="url(#canGoldGrad)" stroke-width="1.2"/>
+    <path d="M 0 49 L 0 62" stroke="url(#canGoldGrad)" stroke-width="1.2"/>
+  </g>
+
+  <!-- CAN Tipografisi (Karakteristik Yüksek Kontrastlı Usta Gövde) -->
+  <g transform="translate(160, 40)">
+    <text x="0" y="62" font-family="'Playfair Display', 'Times New Roman', serif" font-weight="900" font-size="78" fill="#FFFFFF" letter-spacing="3" filter="url(#canShadow)">CAN</text>
+  </g>
+
+  <!-- ÇEREZ Yazısı & Kavis -->
+  <g transform="translate(332, 48)">
+    <text x="0" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="22" fill="#FFFFFF" letter-spacing="3">ÇEREZ</text>
+    <path d="M 2 46 Q 32 54 62 46" stroke="url(#canGoldGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>

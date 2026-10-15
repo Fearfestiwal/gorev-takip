@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#4A3B2D"/>
+      <stop offset="60%" stop-color="#31261D"/>
+      <stop offset="100%" stop-color="#1F1711"/>
+    </radialGradient>
+    <linearGradient id="shieldRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B81D33"/>
+      <stop offset="60%" stop-color="#A6192E"/>
+      <stop offset="100%" stop-color="#7A101F"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE885"/>
+      <stop offset="50%" stop-color="#FFBF3F"/>
+      <stop offset="100%" stop-color="#DDA022"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Arka Plan (Antika Siyahı / Kadim Zemin) -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)"/>
+  <rect width="504" height="504" x="4" y="4" rx="106" fill="none" stroke="url(#goldGrad)" stroke-width="3" opacity="0.4"/>
+
+  <!-- Dikey Çekirdek / Kalkan Formu (Page 18-21 Dikey Kullanım) -->
+  <g transform="translate(66, 40)" filter="url(#shadow)">
+    <!-- Çekirdek Formu Kontur -->
+    <path d="M 60 70 
+             C 180 50, 310 100, 320 280 
+             C 325 350, 240 400, 190 400 
+             C 100 400, 60 330, 60 250 
+             Z" 
+          fill="url(#shieldRed)" 
+          stroke="url(#goldGrad)" 
+          stroke-width="8" 
+          stroke-linejoin="round"/>
+
+    <!-- 1978 Retro Damgası -->
+    <text x="145" y="165" font-family="'DM Serif Display', Georgia, serif" font-weight="900" font-size="54" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="-1">1978</text>
+    <text x="145" y="185" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="10.5" fill="#FFE5A3" text-anchor="middle" letter-spacing="1.5">ADIYLA TADIYLA CAN'DAN</text>
+
+    <!-- CAN Yazısı -->
+    <text x="145" y="295" font-family="'Playfair Display', 'Times New Roman', serif" font-weight="900" font-size="112" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">CAN</text>
+
+    <!-- ÇEREZ Yazısı -->
+    <text x="145" y="348" font-family="'Plus Jakarta Sans', sans-serif" font-weight="900" font-size="34" fill="#FFFFFF" text-anchor="middle" letter-spacing="5">ÇEREZ</text>
+    <path d="M 95 362 Q 145 374 195 362" stroke="url(#goldGrad)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>
