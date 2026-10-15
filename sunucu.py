@@ -19,24 +19,8 @@ if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
 PORT = 8080
 DATA_FILE = "veriler.json"
 
-DEFAULT_TEAM = [
-    { "name": "Hikmet CAN", "title": "Şirket Yöneticisi / Ortak", "phone": "0532 111 22 33", "department": "Yönetim & Mağazalar", "email": "hikmet@cankardesler.com" },
-    { "name": "Veli CAN", "title": "Satış & Pazarlama Sorumlusu", "phone": "0533 222 33 44", "department": "Satış - Pazarlama", "email": "veli@cankardesler.com" },
-    { "name": "Umut CAN", "title": "Operasyon & İl Müdürü", "phone": "0535 333 44 55", "department": "Operasyon & Yönetim", "email": "umut@cankardesler.com" },
-    { "name": "Mustafa CAN", "title": "Fabrika & Üretim Müdürü", "phone": "0536 444 55 66", "department": "Fabrika", "email": "mustafa@cankardesler.com" },
-    { "name": "Fahri CAN", "title": "Mağaza Koordinatörü", "phone": "0530 555 66 77", "department": "Mağazalar", "email": "fahri@cankardesler.com" },
-    { "name": "Fırat", "title": "Tedarik & Envanter Sorumlusu", "phone": "0542 666 77 88", "department": "Tedarik & Ambalaj", "email": "firat@cankardesler.com" }
-]
-
-DEFAULT_TASKS = [
-    { "id": 1, "title": "3. Mağaza açılması", "department": "Hikmet CAN", "action": "Fahri Can ile görüşme yapılacak", "owner": "Hikmet CAN", "dueDate": "2026-09-29", "status": "Açık", "priority": "Yüksek" },
-    { "id": 2, "title": "Alışveriş sipariş listesi hazırlanacak", "department": "Satış-Pazarlama", "action": "7 gün içinde liste hazırlanacak", "owner": "Veli CAN", "dueDate": "2026-09-28", "status": "Açık", "priority": "Normal" },
-    { "id": 3, "title": "Bellidede şirketi yönetici atanması", "department": "Umut CAN", "action": "Eylül ayında görüşmeler yapılacak", "owner": "Umut CAN", "dueDate": "2026-10-01", "status": "Açık", "priority": "Yüksek" },
-    { "id": 4, "title": "İl Müdürü alımı", "department": "Umut CAN", "action": "İş görüşmesi yapılacak", "owner": "Umut CAN", "dueDate": "2026-10-01", "status": "Açık", "priority": "Kritik" },
-    { "id": 5, "title": "Tedarik & Envanter Ambalaj listesi", "department": "Fırat - Umut - Mustafa", "action": "Reçeteler yapılacak, talep listesi çıkarılacak", "owner": "Umut CAN", "dueDate": "2026-09-29", "status": "Açık", "priority": "Normal" },
-    { "id": 6, "title": "Reçetelerin oluşumu", "department": "Fabrika", "action": "Ürün başlıkları belirlenip içerik çıkarılacak", "owner": "Mustafa CAN", "dueDate": "2026-09-29", "status": "Açık", "priority": "Yüksek" },
-    { "id": 7, "title": "Fabrika ruhsat işleri", "department": "Mustafa CAN", "action": "Resmi belgeler hazırlanacak", "owner": "Mustafa CAN", "dueDate": "2026-09-29", "status": "Tamamlandı", "priority": "Kritik" }
-]
+DEFAULT_TEAM = []
+DEFAULT_TASKS = []
 
 def load_data():
     if os.path.exists(DATA_FILE):
@@ -48,7 +32,7 @@ def load_data():
     return {
         "team": DEFAULT_TEAM,
         "tasks": DEFAULT_TASKS,
-        "notes": "Ford Transit - 35 CUZ 038\nToplantı kararları haftalık takip edilecek."
+        "notes": ""
     }
 
 def save_data(data):

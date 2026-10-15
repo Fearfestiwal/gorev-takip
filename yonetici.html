@@ -835,9 +835,9 @@
                 </div>
 
                 <div class="pt-2 border-t border-stone-200">
-                    <button onclick="resetToSampleData()" class="w-full py-2 px-4 text-rose-600 hover:bg-rose-50 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors">
-                        <i class="fa-solid fa-rotate-left"></i>
-                        Örnek Verileri Tekrar Yükle
+                    <button onclick="clearAllSystemData()" class="w-full py-2 px-4 text-rose-600 hover:bg-rose-50 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors">
+                        <i class="fa-solid fa-trash-can"></i>
+                        Tüm Verileri Sıfırla (Temiz Sayfa Aç)
                     </button>
                 </div>
             </div>
@@ -846,27 +846,11 @@
 
     <!-- JAVASCRIPT KODLARI -->
     <script>
-        const INITIAL_TEAM = [
-            { name: "Hikmet CAN", title: "Şirket Yöneticisi / Ortak", phone: "0532 111 22 33", department: "Yönetim & Mağazalar", email: "hikmet@cankardesler.com" },
-            { name: "Veli CAN", title: "Satış & Pazarlama Sorumlusu", phone: "0533 222 33 44", department: "Satış - Pazarlama", email: "veli@cankardesler.com" },
-            { name: "Umut CAN", title: "Operasyon & İl Müdürü", phone: "0535 333 44 55", department: "Operasyon & Yönetim", email: "umut@cankardesler.com" },
-            { name: "Mustafa CAN", title: "Fabrika & Üretim Müdürü", phone: "0536 444 55 66", department: "Fabrika", email: "mustafa@cankardesler.com" },
-            { name: "Fahri CAN", title: "Mağaza Koordinatörü", phone: "0530 555 66 77", department: "Mağazalar", email: "fahri@cankardesler.com" },
-            { name: "Fırat", title: "Tedarik & Envanter Sorumlusu", phone: "0542 666 77 88", department: "Tedarik & Ambalaj", email: "firat@cankardesler.com" }
-        ];
+        const INITIAL_TEAM = [];
+        const INITIAL_TASKS = [];
 
-        const INITIAL_TASKS = [
-            { id: 1, title: "3. Mağaza açılması", department: "Hikmet CAN", action: "Fahri Can ile görüşme yapılacak", owner: "Hikmet CAN", dueDate: "2026-09-29", status: "Açık", priority: "Yüksek" },
-            { id: 2, title: "Alışveriş sipariş listesi hazırlanacak", department: "Satış-Pazarlama", action: "7 gün içinde liste hazırlanacak", owner: "Veli CAN", dueDate: "2026-09-28", status: "Açık", priority: "Normal" },
-            { id: 3, title: "Bellidede şirketi yönetici atanması", department: "Umut CAN", action: "Eylül ayında görüşmeler yapılacak", owner: "Umut CAN", dueDate: "2026-10-01", status: "Açık", priority: "Yüksek" },
-            { id: 4, title: "İl Müdürü alımı", department: "Umut CAN", action: "İş görüşmesi yapılacak", owner: "Umut CAN", dueDate: "2026-10-01", status: "Açık", priority: "Kritik" },
-            { id: 5, title: "Tedarik & Envanter Ambalaj listesi", department: "Fırat - Umut - Mustafa", action: "Reçeteler yapılacak, talep listesi çıkarılacak", owner: "Umut CAN", dueDate: "2026-09-29", status: "Açık", priority: "Normal" },
-            { id: 6, title: "Reçetelerin oluşumu", department: "Fabrika", action: "Ürün başlıkları belirlenip içerik çıkarılacak", owner: "Mustafa CAN", dueDate: "2026-09-29", status: "Açık", priority: "Yüksek" },
-            { id: 7, title: "Fabrika ruhsat işleri", department: "Mustafa CAN", action: "Resmi belgeler hazırlanacak", owner: "Mustafa CAN", dueDate: "2026-09-29", status: "Tamamlandı", priority: "Kritik" }
-        ];
-
-        let team = JSON.parse(localStorage.getItem('task_team_members')) || INITIAL_TEAM;
-        let tasks = JSON.parse(localStorage.getItem('task_items')) || INITIAL_TASKS;
+        let team = JSON.parse(localStorage.getItem('task_team_members')) || [];
+        let tasks = JSON.parse(localStorage.getItem('task_items')) || [];
         let activePage = 1;
         let viewMode = "table";
         let currentEmailPersonName = "";
@@ -904,7 +888,7 @@
                 if (data) {
                     let changed = false;
 
-                    if (Array.isArray(data.tasks) && data.tasks.length > 0) {
+                    if (Array.isArray(data.tasks)) {
                         const serverTasksStr = JSON.stringify(data.tasks);
                         if (serverTasksStr !== JSON.stringify(tasks)) {
                             tasks = data.tasks;
@@ -913,7 +897,7 @@
                         }
                     }
 
-                    if (Array.isArray(data.team) && data.team.length > 0) {
+                    if (Array.isArray(data.team)) {
                         const serverTeamStr = JSON.stringify(data.team);
                         if (serverTeamStr !== JSON.stringify(team)) {
                             team = data.team;
@@ -975,7 +959,7 @@
             if (savedNotes !== null) {
                 document.getElementById('managementNotes').value = savedNotes;
             } else {
-                document.getElementById('managementNotes').value = "Ford Transit - 35 CUZ 038\nToplantı kararları haftalık takip edilecek.";
+                document.getElementById('managementNotes').value = "";
             }
 
             const todayStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -1104,6 +1088,19 @@
             const allOwnersSet = new Set(team.map(m => m.name.trim()));
             tasks.forEach(t => { if (t.owner) allOwnersSet.add(t.owner.trim()); });
             const ownerList = Array.from(allOwnersSet);
+
+            if (ownerList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="py-12 text-center text-stone-400">
+                            <i class="fa-solid fa-users text-4xl mb-3 text-stone-300 block"></i>
+                            <p class="font-semibold text-stone-700 text-sm">Henüz kayıtlı ekip üyesi veya görev bulunmuyor.</p>
+                            <p class="text-xs text-stone-500 mt-1">Üst menüdeki <strong>"Ekip"</strong> butonuna tıklayarak çalışanlarınızı ekleyebilir veya <strong>"Yeni Görev"</strong> ile ilk görevi tanımlayabilirsiniz.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
 
             tbody.innerHTML = ownerList.map((ownerName, idx) => {
                 const member = team.find(m => m.name.toLowerCase().trim() === ownerName.toLowerCase().trim()) || {
@@ -1885,14 +1882,20 @@
             reader.readAsText(file);
         }
 
-        function resetToSampleData() {
-            if (confirm("Örnek verilere sıfırlamak istiyor musunuz?")) {
-                team = [...INITIAL_TEAM];
-                tasks = [...INITIAL_TASKS];
+        function clearAllSystemData() {
+            if (confirm("DİKKAT: Sistemdeki tüm görevleri, ekipleri ve notları tamamen silip boş şablon olarak başlatmak istediğinize emin misiniz?")) {
+                team = [];
+                tasks = [];
+                localStorage.setItem('task_team_members', '[]');
+                localStorage.setItem('task_items', '[]');
+                localStorage.setItem('task_management_notes', '');
+                const noteInput = document.getElementById('managementNotes');
+                if (noteInput) noteInput.value = '';
                 saveData();
                 updateTeamDatalist();
                 renderApp();
                 closeSettingsModal();
+                alert("Sistem tamamen sıfırlandı!");
             }
         }
 

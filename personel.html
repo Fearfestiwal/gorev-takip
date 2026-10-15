@@ -156,27 +156,11 @@
 
     <!-- JAVASCRIPT KODLARI -->
     <script>
-        const INITIAL_TEAM = [
-            { name: "Hikmet CAN", title: "Şirket Yöneticisi / Ortak", phone: "0532 111 22 33", department: "Yönetim & Mağazalar", email: "hikmet@cankardesler.com" },
-            { name: "Veli CAN", title: "Satış & Pazarlama Sorumlusu", phone: "0533 222 33 44", department: "Satış - Pazarlama", email: "veli@cankardesler.com" },
-            { name: "Umut CAN", title: "Operasyon & İl Müdürü", phone: "0535 333 44 55", department: "Operasyon & Yönetim", email: "umut@cankardesler.com" },
-            { name: "Mustafa CAN", title: "Fabrika & Üretim Müdürü", phone: "0536 444 55 66", department: "Fabrika", email: "mustafa@cankardesler.com" },
-            { name: "Fahri CAN", title: "Mağaza Koordinatörü", phone: "0530 555 66 77", department: "Mağazalar", email: "fahri@cankardesler.com" },
-            { name: "Fırat", title: "Tedarik & Envanter Sorumlusu", phone: "0542 666 77 88", department: "Tedarik & Ambalaj", email: "firat@cankardesler.com" }
-        ];
+        const INITIAL_TEAM = [];
+        const INITIAL_TASKS = [];
 
-        const INITIAL_TASKS = [
-            { id: 1, title: "3. Mağaza açılması", department: "Hikmet CAN", action: "Fahri Can ile görüşme yapılacak", owner: "Hikmet CAN", dueDate: "2026-09-29", status: "Açık", priority: "Yüksek" },
-            { id: 2, title: "Alışveriş sipariş listesi hazırlanacak", department: "Satış-Pazarlama", action: "7 gün içinde liste hazırlanacak", owner: "Veli CAN", dueDate: "2026-09-28", status: "Açık", priority: "Normal" },
-            { id: 3, title: "Bellidede şirketi yönetici atanması", department: "Umut CAN", action: "Eylül ayında görüşmeler yapılacak", owner: "Umut CAN", dueDate: "2026-10-01", status: "Açık", priority: "Yüksek" },
-            { id: 4, title: "İl Müdürü alımı", department: "Umut CAN", action: "İş görüşmesi yapılacak", owner: "Umut CAN", dueDate: "2026-10-01", status: "Açık", priority: "Kritik" },
-            { id: 5, title: "Tedarik & Envanter Ambalaj listesi", department: "Fırat - Umut - Mustafa", action: "Reçeteler yapılacak, talep listesi çıkarılacak", owner: "Umut CAN", dueDate: "2026-09-29", status: "Açık", priority: "Normal" },
-            { id: 6, title: "Reçetelerin oluşumu", department: "Fabrika", action: "Ürün başlıkları belirlenip içerik çıkarılacak", owner: "Mustafa CAN", dueDate: "2026-09-29", status: "Açık", priority: "Yüksek" },
-            { id: 7, title: "Fabrika ruhsat işleri", department: "Mustafa CAN", action: "Resmi belgeler hazırlanacak", owner: "Mustafa CAN", dueDate: "2026-09-29", status: "Tamamlandı", priority: "Kritik" }
-        ];
-
-        let team = JSON.parse(localStorage.getItem('task_team_members')) || INITIAL_TEAM;
-        let tasks = JSON.parse(localStorage.getItem('task_items')) || INITIAL_TASKS;
+        let team = JSON.parse(localStorage.getItem('task_team_members')) || [];
+        let tasks = JSON.parse(localStorage.getItem('task_items')) || [];
         let currentSelectedUser = localStorage.getItem('task_personel_selected_user') || '';
 
         const CLOUD_DB_URL = "https://extendsclass.com/api/json-storage/bin/cffebea";
@@ -212,7 +196,7 @@
                 if (data) {
                     let changed = false;
 
-                    if (Array.isArray(data.tasks) && data.tasks.length > 0) {
+                    if (Array.isArray(data.tasks)) {
                         const serverTasksStr = JSON.stringify(data.tasks);
                         if (serverTasksStr !== JSON.stringify(tasks)) {
                             tasks = data.tasks;
@@ -221,7 +205,7 @@
                         }
                     }
 
-                    if (Array.isArray(data.team) && data.team.length > 0) {
+                    if (Array.isArray(data.team)) {
                         const serverTeamStr = JSON.stringify(data.team);
                         if (serverTeamStr !== JSON.stringify(team)) {
                             team = data.team;
@@ -310,14 +294,8 @@
             document.getElementById('personalDashboardScreen').classList.add('hidden');
             document.getElementById('headerUserActions').classList.add('hidden');
 
-            if (!team || team.length === 0) {
-                team = [...INITIAL_TEAM];
-                localStorage.setItem('task_team_members', JSON.stringify(team));
-            }
-            if (!tasks || tasks.length === 0) {
-                tasks = [...INITIAL_TASKS];
-                localStorage.setItem('task_items', JSON.stringify(tasks));
-            }
+            if (!team) team = [];
+            if (!tasks) tasks = [];
 
             const list = document.getElementById('selectionCardsList');
             const now = new Date();
@@ -325,12 +303,16 @@
 
             if (team.length === 0) {
                 list.innerHTML = `
-                    <div class="p-6 text-center text-slate-500 space-y-3">
-                        <i class="fa-solid fa-users text-3xl text-slate-300"></i>
-                        <p class="text-xs">Personel listesi yükleniyor...</p>
-                        <button onclick="restoreDefaultTeam()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition-all shadow-md">
-                            Ekip Listesini Yükle
-                        </button>
+                    <div class="p-8 text-center text-stone-500 space-y-3">
+                        <i class="fa-solid fa-users text-4xl text-stone-300"></i>
+                        <p class="text-sm font-semibold text-stone-700">Henüz Kayıtlı Personel Bulunmuyor</p>
+                        <p class="text-xs text-stone-400 max-w-sm mx-auto">
+                            Lütfen önce Yönetici Paneline giderek <strong>"Ekip"</strong> menüsünden çalışanlarınızı ekleyin.
+                        </p>
+                        <a href="yonetici.html" class="inline-flex items-center gap-2 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white rounded-xl text-xs font-bold transition-all shadow-md mt-2">
+                            <i class="fa-solid fa-crown text-amber-400"></i>
+                            Yönetici Paneline Git
+                        </a>
                     </div>
                 `;
                 return;
@@ -366,12 +348,7 @@
             }).join('');
         }
 
-        function restoreDefaultTeam() {
-            team = [...INITIAL_TEAM];
-            tasks = [...INITIAL_TASKS];
-            saveTasks();
-            showUserSelectionScreen();
-        }
+
 
         function selectPerson(name) {
             currentSelectedUser = name;
