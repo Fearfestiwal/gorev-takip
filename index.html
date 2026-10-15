@@ -560,6 +560,13 @@
                     }
                 }
             } catch(e) {}
+
+            if (teamMembers && teamMembers.length > 0) {
+                localStorage.setItem('task_team_members', JSON.stringify(teamMembers));
+            } else {
+                const localTeam = JSON.parse(localStorage.getItem('task_team_members') || '[]');
+                if (localTeam.length > 0) teamMembers = localTeam;
+            }
         }
 
         function populateStaffSelect() {
