@@ -174,12 +174,23 @@
                         </p>
                     </div>
 
-                    <!-- BENİ HATIRLA ONAY KUTUSU -->
-                    <div class="flex items-center justify-between pt-1">
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" id="adminRememberMe" checked class="w-4 h-4 rounded text-[#A6192E] focus:ring-[#A6192E] border-[#E8DFC8] cursor-pointer">
-                            <span class="text-xs font-bold text-[#31261D]">Beni Hatırla (Bu cihazda açık tut)</span>
-                        </label>
+                    <!-- BENİ HATIRLA MODERN TOGGLE BUTONU -->
+                    <div onclick="toggleRememberMe('admin')" class="flex items-center justify-between p-3 rounded-2xl bg-[#FAF7F2] border border-[#E8DFC8] hover:border-[#FFBF3F] cursor-pointer transition-all select-none active:scale-[0.99]">
+                        <div class="flex items-center gap-2.5">
+                            <div id="adminRememberIcon" class="w-8 h-8 rounded-xl bg-[#1E340C] text-[#FFBF3F] flex items-center justify-center text-xs shadow-xs">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-black text-[#31261D] block">Beni Hatırla</span>
+                                <span id="adminRememberSubtext" class="text-[10px] text-[#5C4A3C] font-semibold">Bu cihazda oturumu sürekli açık tut</span>
+                            </div>
+                        </div>
+                        <div id="adminRememberSwitch" class="w-11 h-6 bg-[#1E340C] rounded-full p-0.5 transition-colors duration-200 ease-in-out flex items-center">
+                            <div id="adminRememberKnob" class="w-5 h-5 bg-white rounded-full shadow-md transform translate-x-5 transition-transform duration-200 ease-in-out flex items-center justify-center text-[9px] text-[#1E340C] font-black">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                        </div>
+                        <input type="hidden" id="adminRememberMe" value="true">
                     </div>
 
                     <div id="adminLoginError" class="hidden text-xs text-[#A6192E] font-bold bg-rose-50 border border-rose-200 p-3 rounded-xl">
@@ -304,14 +315,30 @@
                                class="w-full px-4 py-3 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-base font-mono text-center tracking-widest font-black focus:outline-none focus:ring-2 focus:ring-[#FFBF3F]">
                     </div>
 
-                    <div class="flex items-center justify-between pt-1">
-                        <label class="flex items-center gap-2 cursor-pointer select-none">
-                            <input type="checkbox" id="staffRememberMe" checked class="w-4 h-4 rounded text-[#1E340C] focus:ring-[#1E340C] border-[#E8DFC8] cursor-pointer">
-                            <span class="text-xs font-bold text-[#31261D]">Beni Hatırla (Bu cihazı adıma zimmetle)</span>
-                        </label>
-                        <button type="button" onclick="openStaffForgotPin()" class="text-[11px] text-[#A6192E] font-bold hover:underline cursor-pointer flex items-center gap-1">
-                            <i class="fa-solid fa-circle-question"></i> Şifremi Unuttum
-                        </button>
+                    <!-- BENİ HATIRLA MODERN TOGGLE BUTONU -->
+                    <div class="space-y-2 pt-1">
+                        <div onclick="toggleRememberMe('staff')" class="flex items-center justify-between p-3 rounded-2xl bg-[#FAF7F2] border border-[#E8DFC8] hover:border-[#FFBF3F] cursor-pointer transition-all select-none active:scale-[0.99]">
+                            <div class="flex items-center gap-2.5">
+                                <div id="staffRememberIcon" class="w-8 h-8 rounded-xl bg-[#1E340C] text-[#FFBF3F] flex items-center justify-center text-xs shadow-xs">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                                <div>
+                                    <span class="text-xs font-black text-[#31261D] block">Beni Hatırla</span>
+                                    <span id="staffRememberSubtext" class="text-[10px] text-[#5C4A3C] font-semibold">Bu cihazı adıma zimmetle (Doğrudan aç)</span>
+                                </div>
+                            </div>
+                            <div id="staffRememberSwitch" class="w-11 h-6 bg-[#1E340C] rounded-full p-0.5 transition-colors duration-200 ease-in-out flex items-center">
+                                <div id="staffRememberKnob" class="w-5 h-5 bg-white rounded-full shadow-md transform translate-x-5 transition-transform duration-200 ease-in-out flex items-center justify-center text-[9px] text-[#1E340C] font-black">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
+                            </div>
+                            <input type="hidden" id="staffRememberMe" value="true">
+                        </div>
+                        <div class="text-right">
+                            <button type="button" onclick="openStaffForgotPin()" class="text-[11px] text-[#A6192E] font-bold hover:underline cursor-pointer inline-flex items-center gap-1">
+                                <i class="fa-solid fa-circle-question"></i> Şifremi Unuttum
+                            </button>
+                        </div>
                     </div>
 
                     <div id="staffLoginError" class="hidden text-xs text-[#A6192E] font-bold bg-rose-50 border border-rose-200 p-3 rounded-xl">
@@ -503,6 +530,57 @@
             }
         }
 
+        // ================= BENİ HATIRLA TOGGLE MANTIĞI =================
+        function toggleRememberMe(role) {
+            if (role === 'admin') {
+                const inp = document.getElementById('adminRememberMe');
+                const icon = document.getElementById('adminRememberIcon');
+                const subtext = document.getElementById('adminRememberSubtext');
+                const sw = document.getElementById('adminRememberSwitch');
+                const knob = document.getElementById('adminRememberKnob');
+                const isChecked = inp.value === 'true';
+                const newVal = !isChecked;
+                inp.value = newVal ? 'true' : 'false';
+
+                if (newVal) {
+                    sw.className = "w-11 h-6 bg-[#1E340C] rounded-full p-0.5 transition-colors duration-200 ease-in-out flex items-center";
+                    knob.className = "w-5 h-5 bg-white rounded-full shadow-md transform translate-x-5 transition-transform duration-200 ease-in-out flex items-center justify-center text-[9px] text-[#1E340C] font-black";
+                    knob.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    icon.className = "w-8 h-8 rounded-xl bg-[#1E340C] text-[#FFBF3F] flex items-center justify-center text-xs shadow-xs";
+                    subtext.innerText = "Bu cihazda oturumu sürekli açık tut";
+                } else {
+                    sw.className = "w-11 h-6 bg-stone-300 rounded-full p-0.5 transition-colors duration-200 ease-in-out flex items-center";
+                    knob.className = "w-5 h-5 bg-white rounded-full shadow-md transform translate-x-0 transition-transform duration-200 ease-in-out flex items-center justify-center text-[9px] text-stone-400 font-black";
+                    knob.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                    icon.className = "w-8 h-8 rounded-xl bg-stone-200 text-stone-500 flex items-center justify-center text-xs shadow-xs";
+                    subtext.innerText = "Her açılışta şifre sorulsun";
+                }
+            } else if (role === 'staff') {
+                const inp = document.getElementById('staffRememberMe');
+                const icon = document.getElementById('staffRememberIcon');
+                const subtext = document.getElementById('staffRememberSubtext');
+                const sw = document.getElementById('staffRememberSwitch');
+                const knob = document.getElementById('staffRememberKnob');
+                const isChecked = inp.value === 'true';
+                const newVal = !isChecked;
+                inp.value = newVal ? 'true' : 'false';
+
+                if (newVal) {
+                    sw.className = "w-11 h-6 bg-[#1E340C] rounded-full p-0.5 transition-colors duration-200 ease-in-out flex items-center";
+                    knob.className = "w-5 h-5 bg-white rounded-full shadow-md transform translate-x-5 transition-transform duration-200 ease-in-out flex items-center justify-center text-[9px] text-[#1E340C] font-black";
+                    knob.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    icon.className = "w-8 h-8 rounded-xl bg-[#1E340C] text-[#FFBF3F] flex items-center justify-center text-xs shadow-xs";
+                    subtext.innerText = "Bu cihazı adıma zimmetle (Doğrudan aç)";
+                } else {
+                    sw.className = "w-11 h-6 bg-stone-300 rounded-full p-0.5 transition-colors duration-200 ease-in-out flex items-center";
+                    knob.className = "w-5 h-5 bg-white rounded-full shadow-md transform translate-x-0 transition-transform duration-200 ease-in-out flex items-center justify-center text-[9px] text-stone-400 font-black";
+                    knob.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                    icon.className = "w-8 h-8 rounded-xl bg-stone-200 text-stone-500 flex items-center justify-center text-xs shadow-xs";
+                    subtext.innerText = "Her açılışta PIN sorulsun";
+                }
+            }
+        }
+
         // ================= YÖNETİCİ GİRİŞİ =================
         function quickAdmin1978() {
             const passInp = document.getElementById('adminLoginPassword');
@@ -516,7 +594,8 @@
             const passInp = document.getElementById('adminLoginPassword');
             const email = (emailInp ? emailInp.value : '').trim();
             const password = (passInp ? passInp.value : '').trim();
-            const rememberMe = document.getElementById('adminRememberMe') ? document.getElementById('adminRememberMe').checked : true;
+            const remEl = document.getElementById('adminRememberMe');
+            const rememberMe = remEl ? (remEl.value === 'true' || remEl.checked === true) : true;
 
             const savedAccount = JSON.parse(localStorage.getItem('cancerez_admin_account') || 'null');
             const currentPass = localStorage.getItem('cancerez_admin_password') || '1978';
@@ -627,7 +706,8 @@
             e.preventDefault();
             const selectedName = document.getElementById('staffSelectUser').value;
             const enteredPin = document.getElementById('staffInputPin').value.trim();
-            const rememberMe = document.getElementById('staffRememberMe').checked;
+            const remEl = document.getElementById('staffRememberMe');
+            const rememberMe = remEl ? (remEl.value === 'true' || remEl.checked === true) : true;
 
             if (!selectedName) {
                 alert("Lütfen personel adınızı seçiniz.");
@@ -879,7 +959,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=14')
+                navigator.serviceWorker.register('sw.js?v=15')
                     .then(reg => {
                         reg.update();
                     })

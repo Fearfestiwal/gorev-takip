@@ -257,6 +257,25 @@
                         <i class="fa-solid fa-triangle-exclamation mr-1 text-[#FFBF3F]"></i> Hatalı PIN kodu!
                     </div>
 
+                    <!-- BENİ HATIRLA TOGGLE (PERSONEL GİRİŞ) -->
+                    <div onclick="togglePinRemember()" class="flex items-center justify-between p-2.5 rounded-xl bg-[#1C140E] border border-[#FFBF3F]/30 hover:border-[#FFBF3F] cursor-pointer select-none transition-all active:scale-[0.99]">
+                        <div class="flex items-center gap-2.5 text-left">
+                            <div id="pinRememberIcon" class="w-7 h-7 rounded-lg bg-[#1E340C] text-[#FFBF3F] flex items-center justify-center text-xs shadow-xs">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-white block">Beni Hatırla</span>
+                                <span id="pinRememberSubtext" class="text-[10px] text-stone-300">Bu cihazda tekrar PIN sorma</span>
+                            </div>
+                        </div>
+                        <div id="pinRememberSwitch" class="w-10 h-5.5 bg-[#1E340C] rounded-full p-0.5 transition-colors flex items-center">
+                            <div id="pinRememberKnob" class="w-4.5 h-4.5 bg-white rounded-full shadow-sm transform translate-x-4.5 transition-transform flex items-center justify-center text-[8px] text-[#1E340C] font-black">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                        </div>
+                        <input type="hidden" id="pinRememberMe" value="true">
+                    </div>
+
                     <div class="flex items-center justify-between text-[11px] pt-1">
                         <button type="button" onclick="openStaffForgotPinFromModal()" class="text-[#FFBF3F] hover:underline flex items-center gap-1 cursor-pointer">
                             <i class="fa-solid fa-circle-question"></i> Şifremi Unuttum
@@ -951,6 +970,31 @@
             pendingPinPerson = null;
         }
 
+        function togglePinRemember() {
+            const inp = document.getElementById('pinRememberMe');
+            const icon = document.getElementById('pinRememberIcon');
+            const subtext = document.getElementById('pinRememberSubtext');
+            const sw = document.getElementById('pinRememberSwitch');
+            const knob = document.getElementById('pinRememberKnob');
+            const isChecked = inp.value === 'true';
+            const newVal = !isChecked;
+            inp.value = newVal ? 'true' : 'false';
+
+            if (newVal) {
+                sw.className = "w-10 h-5.5 bg-[#1E340C] rounded-full p-0.5 transition-colors flex items-center";
+                knob.className = "w-4.5 h-4.5 bg-white rounded-full shadow-sm transform translate-x-4.5 transition-transform flex items-center justify-center text-[8px] text-[#1E340C] font-black";
+                knob.innerHTML = '<i class="fa-solid fa-check"></i>';
+                icon.className = "w-7 h-7 rounded-lg bg-[#1E340C] text-[#FFBF3F] flex items-center justify-center text-xs shadow-xs";
+                subtext.innerText = "Bu cihazda tekrar PIN sorma";
+            } else {
+                sw.className = "w-10 h-5.5 bg-stone-600 rounded-full p-0.5 transition-colors flex items-center";
+                knob.className = "w-4.5 h-4.5 bg-white rounded-full shadow-sm transform translate-x-0 transition-transform flex items-center justify-center text-[8px] text-stone-600 font-black";
+                knob.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                icon.className = "w-7 h-7 rounded-lg bg-stone-700 text-stone-400 flex items-center justify-center text-xs shadow-xs";
+                subtext.innerText = "Her açılışta PIN sorulsun";
+            }
+        }
+
         function handlePinSubmit(e) {
             e.preventDefault();
             if (!pendingPinPerson) return;
@@ -960,11 +1004,20 @@
 
             // Doğru PIN, varsayılan 1978 veya acil durum 'cankardesler'
             if (entered === correctPin || entered === '1978' || entered === 'cankardesler') {
+                const remEl = document.getElementById('pinRememberMe');
+                const rememberMe = remEl ? (remEl.value === 'true') : true;
+
                 sessionStorage.setItem('cancerez_staff_auth_user', pendingPinPerson);
-                localStorage.setItem('cancerez_remember_staff_user', pendingPinPerson);
-                localStorage.setItem('cancerez_active_role', 'staff');
-                currentSelectedUser = pendingPinPerson;
-                localStorage.setItem('task_personel_selected_user', pendingPinPerson);
+                if (rememberMe) {
+                    localStorage.setItem('cancerez_remember_staff_user', pendingPinPerson);
+                    localStorage.setItem('cancerez_active_role', 'staff');
+                    localStorage.setItem('task_personel_selected_user', pendingPinPerson);
+                } else {
+                    localStorage.removeItem('cancerez_remember_staff_user');
+                    localStorage.setItem('cancerez_active_role', 'staff');
+                    localStorage.setItem('task_personel_selected_user', pendingPinPerson);
+                }
+
                 closeUserPinModal();
                 renderPersonalDashboard(pendingPinPerson);
             } else {
@@ -1659,7 +1712,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=14').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=15').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);

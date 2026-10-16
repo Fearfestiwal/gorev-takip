@@ -148,6 +148,25 @@
                         <i class="fa-solid fa-triangle-exclamation mr-1 text-[#FFBF3F]"></i> Hatalı şifre! Lütfen tekrar deneyiniz.
                     </div>
 
+                    <!-- BENİ HATIRLA TOGGLE (YÖNETİCİ GİRİŞİ) -->
+                    <div onclick="toggleAdminOverlayRemember()" class="flex items-center justify-between p-2.5 rounded-xl bg-[#1C140E] border border-[#FFBF3F]/30 hover:border-[#FFBF3F] cursor-pointer select-none transition-all active:scale-[0.99]">
+                        <div class="flex items-center gap-2.5 text-left">
+                            <div id="adminOverlayRememberIcon" class="w-7 h-7 rounded-lg bg-[#1E340C] text-[#FFBF3F] flex items-center justify-center text-xs shadow-xs">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-white block">Beni Hatırla</span>
+                                <span id="adminOverlayRememberSubtext" class="text-[10px] text-stone-300">Bu cihazda oturumu sürekli açık tut</span>
+                            </div>
+                        </div>
+                        <div id="adminOverlayRememberSwitch" class="w-10 h-5.5 bg-[#1E340C] rounded-full p-0.5 transition-colors flex items-center">
+                            <div id="adminOverlayRememberKnob" class="w-4.5 h-4.5 bg-white rounded-full shadow-sm transform translate-x-4.5 transition-transform flex items-center justify-center text-[8px] text-[#1E340C] font-black">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                        </div>
+                        <input type="hidden" id="adminOverlayRememberMe" value="true">
+                    </div>
+
                     <button type="submit" class="w-full py-3 bg-gradient-to-r from-[#A6192E] to-[#8C1224] hover:from-[#B81D33] hover:to-[#A6192E] text-white font-extrabold rounded-2xl shadow-lg shadow-[#A6192E]/30 border border-[#FFBF3F]/40 transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer text-sm">
                         <i class="fa-solid fa-unlock-keyhole text-[#FFBF3F]"></i>
                         Giriş Yap
@@ -1561,6 +1580,31 @@
             }
         }
 
+        function toggleAdminOverlayRemember() {
+            const inp = document.getElementById('adminOverlayRememberMe');
+            const icon = document.getElementById('adminOverlayRememberIcon');
+            const subtext = document.getElementById('adminOverlayRememberSubtext');
+            const sw = document.getElementById('adminOverlayRememberSwitch');
+            const knob = document.getElementById('adminOverlayRememberKnob');
+            const isChecked = inp.value === 'true';
+            const newVal = !isChecked;
+            inp.value = newVal ? 'true' : 'false';
+
+            if (newVal) {
+                sw.className = "w-10 h-5.5 bg-[#1E340C] rounded-full p-0.5 transition-colors flex items-center";
+                knob.className = "w-4.5 h-4.5 bg-white rounded-full shadow-sm transform translate-x-4.5 transition-transform flex items-center justify-center text-[8px] text-[#1E340C] font-black";
+                knob.innerHTML = '<i class="fa-solid fa-check"></i>';
+                icon.className = "w-7 h-7 rounded-lg bg-[#1E340C] text-[#FFBF3F] flex items-center justify-center text-xs shadow-xs";
+                subtext.innerText = "Bu cihazda oturumu sürekli açık tut";
+            } else {
+                sw.className = "w-10 h-5.5 bg-stone-600 rounded-full p-0.5 transition-colors flex items-center";
+                knob.className = "w-4.5 h-4.5 bg-white rounded-full shadow-sm transform translate-x-0 transition-transform flex items-center justify-center text-[8px] text-stone-600 font-black";
+                knob.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                icon.className = "w-7 h-7 rounded-lg bg-stone-700 text-stone-400 flex items-center justify-center text-xs shadow-xs";
+                subtext.innerText = "Her açılışta şifre sorulsun";
+            }
+        }
+
         function handleAdminLogin(e) {
             if (e) e.preventDefault();
             const input = document.getElementById('adminPassInput');
@@ -1570,9 +1614,18 @@
             // '1978', kullanıcının belirlediği şifre veya 'cankardesler' (kurtarma anahtarı)
             // Ya da varsayılan şifre 1978 iken doğrudan Giriş Yap butonuna basılması
             if (entered === actualPass || entered === '1978' || entered === 'cankardesler' || (!entered && actualPass === '1978')) {
+                const remEl = document.getElementById('adminOverlayRememberMe');
+                const rememberMe = remEl ? (remEl.value === 'true') : true;
+
                 sessionStorage.setItem('cancerez_admin_auth', 'true');
-                localStorage.setItem('cancerez_remember_admin', 'true');
-                localStorage.setItem('cancerez_active_role', 'admin');
+                if (rememberMe) {
+                    localStorage.setItem('cancerez_remember_admin', 'true');
+                    localStorage.setItem('cancerez_active_role', 'admin');
+                } else {
+                    localStorage.removeItem('cancerez_remember_admin');
+                    sessionStorage.setItem('cancerez_active_role', 'admin');
+                }
+
                 const overlay = document.getElementById('adminAuthOverlay');
                 if (overlay) {
                     overlay.style.setProperty('display', 'none', 'important');
@@ -3439,7 +3492,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=14')
+                navigator.serviceWorker.register('sw.js?v=15')
                     .then(reg => {
                         console.log('CAN ÇEREZ SW Aktif:', reg.scope);
                         reg.update();
