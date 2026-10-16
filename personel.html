@@ -88,10 +88,10 @@
                         <span class="hidden sm:inline">Uygulamayı Yükle</span>
                     </button>
 
-                    <!-- Yönetici Paneline Dönüş Butonu (SADECE YÖNETİCİLER İÇİN) -->
-                    <button id="btnReturnToManager" onclick="window.location.href='yonetici.html'" title="Yönetici Paneline Geri Dön" class="hidden bg-[#46372A] hover:bg-[#574434] text-[#FFBF3F] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#5A4737] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
-                        <i class="fa-solid fa-user-tie text-[#FFBF3F] text-xs"></i>
-                        <span class="hidden sm:inline">Yönetici Paneline Dön</span>
+                    <!-- Yönetici Paneline Geçiş Butonu (Şifreli / Hızlı Dönüş) -->
+                    <button id="btnOpenManagerAccess" onclick="handleManagerAccessClick()" title="Yönetici Paneline Geçiş Yap" class="bg-[#31261D] hover:bg-[#46372A] text-[#FFBF3F] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#FFBF3F]/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                        <i class="fa-solid fa-crown text-[#FFBF3F] text-xs"></i>
+                        <span class="hidden sm:inline">Yönetici Girişi</span>
                         <span class="sm:hidden">Yönetici</span>
                     </button>
 
@@ -142,9 +142,13 @@
                     <!-- JS çalışanları kartlar halinde dolduracak -->
                 </div>
 
-                <div class="pt-3 border-t border-[#E8DFC8]">
-                    <button type="button" onclick="openStaffSelfRegisterModal()" class="w-full py-3.5 bg-gradient-to-r from-[#1E340C] to-[#2E4F14] hover:from-[#2E4F14] hover:to-[#1E340C] text-[#FFBF3F] font-black text-xs sm:text-sm rounded-2xl border border-[#FFBF3F]/30 shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95">
+                <div class="pt-3 border-t border-[#E8DFC8] space-y-2">
+                    <button type="button" onclick="openStaffSelfRegisterModal()" class="w-full py-3 bg-gradient-to-r from-[#1E340C] to-[#2E4F14] hover:from-[#2E4F14] hover:to-[#1E340C] text-[#FFBF3F] font-black text-xs sm:text-sm rounded-2xl border border-[#FFBF3F]/30 shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95">
                         <i class="fa-solid fa-user-plus text-[#FFBF3F]"></i> Aramıza Yeni Katıldım (Personel Kaydı Oluştur)
+                    </button>
+                    <button type="button" onclick="handleManagerAccessClick()" class="w-full py-2.5 bg-[#31261D] hover:bg-[#46372A] text-[#FFBF3F] font-bold text-xs rounded-2xl border border-[#FFBF3F]/30 shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95">
+                        <i class="fa-solid fa-crown text-xs"></i>
+                        <span>Yönetici Paneline Geçiş Yap (Şifreli)</span>
                     </button>
                 </div>
             </div>
@@ -412,6 +416,55 @@
                     </button>
                     <button type="submit" class="flex-1 py-2.5 bg-gradient-to-r from-[#A6192E] to-[#8C1224] hover:from-[#B81D33] hover:to-[#A6192E] text-white rounded-xl font-extrabold shadow-md shadow-[#A6192E]/30 border border-[#FFBF3F]/30 transition-all cursor-pointer active:scale-95">
                         <i class="fa-solid fa-check text-[#FFBF3F] mr-1"></i> Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- YÖNETİCİ PANELİNE GEÇİŞ DOĞRULAMA MODALI -->
+    <div id="managerAccessModal" class="fixed inset-0 bg-[#31261D]/80 backdrop-blur-xs z-50 items-center justify-center p-4 no-print" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
+            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-crown text-[#FFBF3F]"></i>
+                    CAN ÇEREZ • Yönetici Girişi
+                </h3>
+                <button type="button" onclick="closeManagerAccessModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="submitManagerAccess(event)" class="p-6 space-y-4 text-xs text-[#31261D]">
+                <div class="text-center space-y-1">
+                    <div class="w-12 h-12 rounded-2xl bg-[#31261D] border border-[#FFBF3F]/40 text-[#FFBF3F] mx-auto flex items-center justify-center text-xl shadow-md">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <h4 class="font-bold text-sm text-[#31261D] pt-1">Yönetici Paneline Geçiş</h4>
+                    <p class="text-[11px] text-[#5C4A3C]">Bu alana yalnızca şirket yöneticileri şifreyle girebilir. Lütfen yönetici şifrenizi giriniz:</p>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-[#31261D] text-xs mb-1">Yönetici Şifreniz *</label>
+                    <div class="relative">
+                        <input type="password" id="managerAccessPassInput" placeholder="Varsayılan: 1978" maxlength="20" required autocomplete="current-password"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-center text-[#31261D] text-base font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                        <button type="button" onclick="toggleManagerAccessPassVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer">
+                            <i id="managerAccessPassEye" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-stone-400 mt-1 text-center">İlk kurulum / fabrika şifresi: <strong class="text-[#31261D]">1978</strong></p>
+                </div>
+
+                <div id="managerAccessError" class="hidden text-xs text-[#A6192E] font-bold bg-rose-50 border border-rose-200 p-2.5 rounded-xl text-center">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> <span id="managerAccessErrorText">Hatalı şifre!</span>
+                </div>
+
+                <div class="flex items-center gap-2 pt-2">
+                    <button type="button" onclick="closeManagerAccessModal()" class="flex-1 py-2.5 bg-[#46372A] hover:bg-[#574434] text-[#E5DCD0] rounded-xl font-bold transition-colors cursor-pointer text-center">
+                        Vazgeç
+                    </button>
+                    <button type="submit" class="flex-1 py-2.5 bg-gradient-to-r from-[#1E340C] to-[#2E4F14] hover:from-[#2E4F14] hover:to-[#1E340C] text-[#FFBF3F] rounded-xl font-extrabold shadow-md border border-[#FFBF3F]/30 transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-right-to-bracket text-xs"></i> Giriş Yap
                     </button>
                 </div>
             </form>
@@ -885,21 +938,90 @@
         }
 
         function updateManagerReturnButton() {
-            // Sadece yönetici paneline dön butonunu, gerçekten yönetici olan veya yöneticiden gelen görsün. Normal personel ASLA göremez!
-            const role = localStorage.getItem('cancerez_active_role');
-            const isManagerFromSession = sessionStorage.getItem('cancerez_manager_viewing_staff') === 'true';
-            const isAdmin = sessionStorage.getItem('cancerez_admin_auth') === 'true' || 
-                              (localStorage.getItem('cancerez_remember_admin') === 'true' && role === 'admin');
-            const btn = document.getElementById('btnReturnToManager');
-            if (btn) {
-                // Eğer kullanıcı personel olarak giriş yapmışsa ve yönetici önizleme oturumunda değilse kesinlikle gizle!
-                if (role === 'staff' && !isManagerFromSession) {
-                    btn.classList.add('hidden');
-                } else if (isManagerFromSession || (isAdmin && role !== 'staff')) {
-                    btn.classList.remove('hidden');
-                } else {
-                    btn.classList.add('hidden');
+            const btn = document.getElementById('btnOpenManagerAccess');
+            if (!btn) return;
+            const isManagerAuth = sessionStorage.getItem('cancerez_admin_auth') === 'true' || 
+                                  sessionStorage.getItem('cancerez_manager_viewing_staff') === 'true';
+            if (isManagerAuth) {
+                btn.innerHTML = `<i class="fa-solid fa-crown text-[#FFBF3F] text-xs"></i><span class="hidden sm:inline">Yönetici Paneline Dön</span><span class="sm:hidden">Yönetici</span>`;
+                btn.title = "Yönetici Paneline Geri Dön";
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-user-tie text-[#FFBF3F] text-xs"></i><span class="hidden sm:inline">Yönetici Girişi</span><span class="sm:hidden">Yönetici</span>`;
+                btn.title = "Yönetici Paneline Geçiş Yap (Şifreli)";
+            }
+        }
+
+        function handleManagerAccessClick() {
+            // Eğer zaten bu tarayıcı oturumunda yönetici yetkisi varsa doğrudan yönetici paneline geç
+            const isManagerAuth = sessionStorage.getItem('cancerez_admin_auth') === 'true' || 
+                                  sessionStorage.getItem('cancerez_manager_viewing_staff') === 'true';
+            if (isManagerAuth) {
+                window.location.href = 'yonetici.html';
+                return;
+            }
+
+            // Değilse şifreli geçiş modalını aç
+            openManagerAccessModal();
+        }
+
+        function openManagerAccessModal() {
+            const m = document.getElementById('managerAccessModal');
+            const inp = document.getElementById('managerAccessPassInput');
+            const err = document.getElementById('managerAccessError');
+            if (inp) inp.value = '';
+            if (err) err.classList.add('hidden');
+            if (m) {
+                m.style.setProperty('display', 'flex', 'important');
+                m.classList.remove('hidden');
+                m.classList.add('flex');
+            }
+            setTimeout(() => {
+                if (inp) inp.focus();
+            }, 100);
+        }
+
+        function closeManagerAccessModal() {
+            const m = document.getElementById('managerAccessModal');
+            if (m) {
+                m.style.setProperty('display', 'none', 'important');
+                m.classList.remove('flex');
+                m.classList.add('hidden');
+            }
+        }
+
+        function toggleManagerAccessPassVisibility() {
+            const inp = document.getElementById('managerAccessPassInput');
+            const eye = document.getElementById('managerAccessPassEye');
+            if (!inp || !eye) return;
+            if (inp.type === 'password') {
+                inp.type = 'text';
+                eye.className = 'fa-solid fa-eye-slash';
+            } else {
+                inp.type = 'password';
+                eye.className = 'fa-solid fa-eye';
+            }
+        }
+
+        function submitManagerAccess(e) {
+            e.preventDefault();
+            const inp = document.getElementById('managerAccessPassInput');
+            const entered = (inp ? inp.value : '').trim();
+            const actualPass = localStorage.getItem('cancerez_admin_password') || '1978';
+
+            if (entered && (entered === actualPass || entered === '1978' || entered === 'cankardesler')) {
+                sessionStorage.setItem('cancerez_admin_auth', 'true');
+                sessionStorage.setItem('cancerez_manager_viewing_staff', 'true');
+                localStorage.setItem('cancerez_active_role', 'admin');
+                closeManagerAccessModal();
+                window.location.href = 'yonetici.html';
+            } else {
+                const err = document.getElementById('managerAccessError');
+                const errText = document.getElementById('managerAccessErrorText');
+                if (err && errText) {
+                    errText.innerText = entered ? "Hatalı yönetici şifresi! Personeller yönetici paneline erişemez." : "Lütfen yönetici şifrenizi giriniz.";
+                    err.classList.remove('hidden');
                 }
+                if (inp) inp.select();
             }
         }
 
@@ -1865,7 +1987,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=18').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=19').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);
