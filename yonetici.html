@@ -104,19 +104,14 @@
     <!-- YÖNETİCİ GİRİŞ / KİLİT EKRANI (ŞİFRESİZ GİRİLEMEZ) -->
     <div id="adminAuthOverlay" class="fixed inset-0 bg-[#241A13]/95 backdrop-blur-md z-[9999] items-center justify-center p-4" style="display: flex;">
         <script>
-            // Kullanıcı zaten giriş yapmışsa overlay'i ilk andan görünmez yap
+            // Kullanıcı bu oturumda henüz şifre girmemişse kilit ekranı açık kalmalı ve şifre istemelidir
             (function() {
                 try {
                     var role = localStorage.getItem('cancerez_active_role');
-                    // EĞER KULLANICI 'staff' ROLÜNDEYSE, ASLA OTOMATİK GİRİŞ YAPILAMAZ!
-                    if (role === 'staff') {
+                    if (role === 'staff' || sessionStorage.getItem('cancerez_admin_auth') !== 'true') {
                         return;
                     }
-                    var isAuth = sessionStorage.getItem('cancerez_admin_auth') === 'true' || 
-                                 (localStorage.getItem('cancerez_remember_admin') === 'true' && role === 'admin');
-                    if (isAuth) {
-                        document.getElementById('adminAuthOverlay').style.setProperty('display', 'none', 'important');
-                    }
+                    document.getElementById('adminAuthOverlay').style.setProperty('display', 'none', 'important');
                 } catch(e) {}
             })();
         </script>
@@ -178,7 +173,7 @@
                 </form>
 
                 <div class="pt-3 border-t border-[#46372A] flex items-center justify-between text-[11px] text-[#A69788]">
-                    <button type="button" onclick="window.location.href='personel.html'" class="text-[#FFBF3F] hover:underline flex items-center gap-1 font-semibold cursor-pointer">
+                    <button type="button" onclick="goToPersonnelScreen()" class="text-[#FFBF3F] hover:underline flex items-center gap-1 font-semibold cursor-pointer">
                         <i class="fa-solid fa-users"></i> Personel Ekranına Git
                     </button>
                     <span>İlk Giriş Şifresi: <strong class="text-white">1978</strong></span>
@@ -1618,12 +1613,10 @@
         function checkAdminAuth() {
             const role = localStorage.getItem('cancerez_active_role');
             const isStaff = role === 'staff';
-            // Eğer personel rolü aktifse, admin auth session/remember kesinlikle bloklanır
-            const isRemembered = !isStaff && (localStorage.getItem('cancerez_remember_admin') === 'true' || role === 'admin');
-            const isAuth = !isStaff && (sessionStorage.getItem('cancerez_admin_auth') === 'true' || isRemembered);
+            // Yönetici paneline girişte yetki kontrolü: Bu oturumda şifre doğrulanmamışsa şifre ekranı açık kalmalıdır
+            const isAuth = !isStaff && sessionStorage.getItem('cancerez_admin_auth') === 'true';
             const overlay = document.getElementById('adminAuthOverlay');
             if (isAuth) {
-                sessionStorage.setItem('cancerez_admin_auth', 'true');
                 if (overlay) {
                     overlay.style.setProperty('display', 'none', 'important');
                     overlay.classList.remove('flex');
@@ -1714,9 +1707,10 @@
         }
 
         function goToPersonnelScreen() {
-            // Yönetici personel ekranına geçtiğinde bu oturumda yönetici olduğunu işaretle
-            sessionStorage.setItem('cancerez_manager_viewing_staff', 'true');
-            sessionStorage.setItem('cancerez_admin_auth', 'true');
+            // Personel ekranına geçerken yönetici oturumunu sıfırla, böylece geri dönmek için her seferinde tekrar şifre istesin!
+            sessionStorage.removeItem('cancerez_admin_auth');
+            sessionStorage.removeItem('cancerez_manager_viewing_staff');
+            localStorage.setItem('cancerez_active_role', 'staff');
             window.location.href = 'personel.html';
         }
 
@@ -3576,7 +3570,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=19')
+                navigator.serviceWorker.register('sw.js?v=20')
                     .then(reg => {
                         console.log('CAN ÇEREZ SW Aktif:', reg.scope);
                         reg.update();

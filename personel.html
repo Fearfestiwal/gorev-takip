@@ -940,27 +940,12 @@
         function updateManagerReturnButton() {
             const btn = document.getElementById('btnOpenManagerAccess');
             if (!btn) return;
-            const isManagerAuth = sessionStorage.getItem('cancerez_admin_auth') === 'true' || 
-                                  sessionStorage.getItem('cancerez_manager_viewing_staff') === 'true';
-            if (isManagerAuth) {
-                btn.innerHTML = `<i class="fa-solid fa-crown text-[#FFBF3F] text-xs"></i><span class="hidden sm:inline">Yönetici Paneline Dön</span><span class="sm:hidden">Yönetici</span>`;
-                btn.title = "Yönetici Paneline Geri Dön";
-            } else {
-                btn.innerHTML = `<i class="fa-solid fa-user-tie text-[#FFBF3F] text-xs"></i><span class="hidden sm:inline">Yönetici Girişi</span><span class="sm:hidden">Yönetici</span>`;
-                btn.title = "Yönetici Paneline Geçiş Yap (Şifreli)";
-            }
+            btn.innerHTML = `<i class="fa-solid fa-crown text-[#FFBF3F] text-xs"></i><span class="hidden sm:inline">Yönetici Girişi</span><span class="sm:hidden">Yönetici</span>`;
+            btn.title = "Yönetici Paneline Geçiş Yap (Şifreli)";
         }
 
         function handleManagerAccessClick() {
-            // Eğer zaten bu tarayıcı oturumunda yönetici yetkisi varsa doğrudan yönetici paneline geç
-            const isManagerAuth = sessionStorage.getItem('cancerez_admin_auth') === 'true' || 
-                                  sessionStorage.getItem('cancerez_manager_viewing_staff') === 'true';
-            if (isManagerAuth) {
-                window.location.href = 'yonetici.html';
-                return;
-            }
-
-            // Değilse şifreli geçiş modalını aç
+            // Yönetici paneline geçiş için HER ZAMAN şifre sorulmalıdır (güvenlik gereği otomatik atlama engellendi)
             openManagerAccessModal();
         }
 
@@ -1987,7 +1972,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=19').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=20').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);
