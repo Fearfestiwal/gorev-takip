@@ -155,79 +155,87 @@
         </div>
 
         <!-- 2. ÇALIŞANIN KENDİ GÖREV ALANI (KİŞİ SEÇİLDİĞİNDE GÖRÜNÜR) -->
-        <div id="personalDashboardScreen" class="hidden space-y-6">
+        <div id="personalDashboardScreen" class="hidden space-y-4">
 
-            <!-- CAN ÇEREZ Karşılama Kartı -->
-            <div class="bg-[#31261D] rounded-3xl p-6 sm:p-7 text-white shadow-xl shadow-[#31261D]/20 border border-[#FFBF3F]/30 relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-                <div class="absolute -right-16 -top-16 w-56 h-56 bg-[#A6192E]/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -left-16 -bottom-16 w-56 h-56 bg-[#FFBF3F]/15 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div class="relative z-10 flex items-center gap-4">
-                    <div id="userAvatarBig" class="w-14 h-14 rounded-2xl bg-[#A6192E] border border-[#FFBF3F]/40 flex items-center justify-center text-[#FFBF3F] font-black text-xl shadow-lg shadow-[#A6192E]/30 shrink-0">
-                        HC
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] bg-[#A6192E] text-white px-2 py-0.5 rounded font-black border border-[#FFBF3F]/40">CAN ÇEREZ PERSONEL</span>
-                            <span id="userRoleText" class="text-[11px] text-[#E5DCD0] font-semibold">Şirket Yöneticisi</span>
+            <!-- KİŞİ ÖZET & İLERLEME KARTI (SADE & MODERN) -->
+            <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E8DFC8] shadow-xs space-y-3.5">
+                <div class="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+                    <!-- Kişi Bilgisi -->
+                    <div class="flex items-center gap-3">
+                        <div id="userAvatarBig" class="w-11 h-11 rounded-xl bg-[#31261D] border border-[#FFBF3F]/40 flex items-center justify-center text-[#FFBF3F] font-black text-base shadow-xs shrink-0">
+                            HC
                         </div>
-                        <h2 id="userNameText" class="text-xl sm:text-2xl font-black mt-1 text-white tracking-tight">Hikmet CAN</h2>
-                        <p class="text-xs text-[#E5DCD0] mt-0.5">Üzerinizdeki güncel görevleri aşağıdan takip edebilir ve bitirdiklerinizi işaretleyebilirsiniz.</p>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 id="userNameText" class="text-base sm:text-lg font-bold text-[#31261D] tracking-tight">Hikmet CAN</h2>
+                                <span id="userRoleText" class="text-[11px] font-semibold text-[#824701] bg-[#FAF7F2] border border-[#E8DFC8] px-2 py-0.5 rounded-md">Personel</span>
+                            </div>
+                            <p class="text-[11px] text-[#5C4A3C]">Kişisel Görev ve Aksiyon Takip Paneli</p>
+                        </div>
+                    </div>
+
+                    <!-- İlerleme Özeti -->
+                    <div class="flex items-center gap-3 sm:text-right w-full sm:w-auto justify-between sm:justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-[#E8DFC8]/60">
+                        <div class="space-y-0.5">
+                            <div class="flex items-center sm:justify-end gap-1.5">
+                                <span class="text-[11px] text-[#5C4A3C] font-medium">Başarı:</span>
+                                <span id="userSuccessPct" class="text-sm font-black text-[#1E340C] font-mono">%0</span>
+                            </div>
+                            <span id="userFractionText" class="text-[11px] text-stone-500 block">0 / 0 Bitti</span>
+                        </div>
+                        <div class="w-24 sm:w-28 h-2 bg-[#FAF7F2] rounded-full overflow-hidden border border-[#E8DFC8]/70">
+                            <div id="userProgressFill" class="h-full bg-gradient-to-r from-[#1E340C] to-[#2E4F14] rounded-full transition-all duration-300" style="width: 0%;"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Kişisel Tamamlanma Rozeti -->
-                <div class="relative z-10 bg-[#241A13] rounded-2xl p-4 border border-[#FFBF3F]/30 text-center min-w-[130px] self-start sm:self-center shadow-lg">
-                    <span class="text-[10px] text-[#E5DCD0] uppercase font-bold tracking-wider">Başarı Oranınız</span>
-                    <div id="userSuccessPct" class="text-3xl font-black text-[#FFBF3F] font-serif my-0.5">%0</div>
-                    <span id="userFractionText" class="text-[10px] text-[#E5DCD0] font-semibold">0 / 0 Bitti</span>
+                <!-- 4'lü Kompakt Metrik Şeridi -->
+                <div class="grid grid-cols-4 gap-2 pt-2 border-t border-[#E8DFC8]/70 text-center text-xs">
+                    <div class="p-2 rounded-xl bg-[#FAF7F2] border border-[#E8DFC8]/50">
+                        <span class="text-[10px] text-[#5C4A3C] font-semibold block uppercase">Toplam</span>
+                        <span id="statUserTotal" class="text-base sm:text-lg font-bold text-[#31261D]">0</span>
+                    </div>
+                    <div class="p-2 rounded-xl bg-[#FFFDF7] border border-[#FFBF3F]/30">
+                        <span class="text-[10px] text-[#824701] font-semibold block uppercase">Bekleyen</span>
+                        <span id="statUserOpen" class="text-base sm:text-lg font-bold text-[#824701]">0</span>
+                    </div>
+                    <div class="p-2 rounded-xl bg-rose-50/50 border border-rose-200/60">
+                        <span class="text-[10px] text-[#A6192E] font-semibold block uppercase">Geciken</span>
+                        <span id="statUserDelayed" class="text-base sm:text-lg font-bold text-[#A6192E]">0</span>
+                    </div>
+                    <div class="p-2 rounded-xl bg-[#F4F9F0] border border-[#1E340C]/20">
+                        <span class="text-[10px] text-[#1E340C] font-semibold block uppercase">Biten</span>
+                        <span id="statUserCompleted" class="text-base sm:text-lg font-bold text-[#1E340C]">0</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- KİŞİSEL AKILLI UYARI BANDI -->
+            <!-- KİŞİSEL AKILLI UYARI BANDI (SADE) -->
             <div id="personalAlertBanner" class="hidden"></div>
 
-            <!-- Kişisel 4'lü KPI Kartları -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                <div class="bg-white rounded-2xl p-4 shadow-2xs border border-[#E8DFC8]">
-                    <span class="text-xs font-bold text-[#5C4A3C] uppercase tracking-wider">Toplam Görevim</span>
-                    <h3 id="statUserTotal" class="text-2xl sm:text-3xl font-black text-[#31261D] mt-1">0</h3>
-                </div>
-                <div class="bg-white rounded-2xl p-4 shadow-2xs border border-rose-200 bg-rose-50/30">
-                    <span class="text-xs font-bold text-[#A6192E] uppercase tracking-wider flex items-center gap-1">
-                        <i class="fa-solid fa-triangle-exclamation"></i> Geciken İşler
-                    </span>
-                    <h3 id="statUserDelayed" class="text-2xl sm:text-3xl font-black text-[#A6192E] mt-1">0</h3>
-                </div>
-                <div class="bg-white rounded-2xl p-4 shadow-2xs border border-[#FFBF3F]/40 bg-[#FFFDF7]">
-                    <span class="text-xs font-bold text-[#824701] uppercase tracking-wider flex items-center gap-1">
-                        <i class="fa-solid fa-hourglass-half"></i> Bekleyen / Açık
-                    </span>
-                    <h3 id="statUserOpen" class="text-2xl sm:text-3xl font-black text-[#824701] mt-1">0</h3>
-                </div>
-                <div class="bg-white rounded-2xl p-4 shadow-2xs border border-[#1E340C]/30 bg-[#F4F9F0]">
-                    <span class="text-xs font-bold text-[#1E340C] uppercase tracking-wider flex items-center gap-1">
-                        <i class="fa-solid fa-circle-check"></i> Tamamladıklarım
-                    </span>
-                    <h3 id="statUserCompleted" class="text-2xl sm:text-3xl font-black text-[#1E340C] mt-1">0</h3>
-                </div>
-            </div>
-
-            <!-- Sadece Bu Çalışana Ait Görev Listesi -->
-            <div class="bg-white rounded-3xl shadow-sm border border-[#E8DFC8] overflow-hidden">
-                <div class="px-6 py-4 bg-[#FAF7F2] border-b border-[#E8DFC8] flex items-center justify-between">
-                    <div>
-                        <h3 class="font-bold text-[#31261D] text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-[#A6192E]"></i>
-                            Size Atanmış Görevler & Aksiyon Listesi
-                        </h3>
-                        <p class="text-xs text-[#5C4A3C] mt-0.5">İşinizi bitirdiğinizde "Tamamla" butonuna basmanız yeterlidir; yöneticiniz anında görecektir.</p>
+            <!-- GÖREV LİSTESİ KARTI -->
+            <div class="bg-white rounded-2xl border border-[#E8DFC8] shadow-xs overflow-hidden">
+                <!-- Filtre & Başlık Barı -->
+                <div class="px-4 py-3 bg-[#FAF7F2] border-b border-[#E8DFC8] flex items-center justify-between gap-2 flex-wrap">
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="setTaskFilter('all')" id="filterTabAll" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-[#31261D] text-white transition-all cursor-pointer shadow-2xs">
+                            Tümü (<span id="userBadgeTaskCount">0</span>)
+                        </button>
+                        <button type="button" onclick="setTaskFilter('open')" id="filterTabOpen" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer">
+                            Bekleyenler
+                        </button>
+                        <button type="button" onclick="setTaskFilter('completed')" id="filterTabCompleted" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer">
+                            Tamamlananlar
+                        </button>
                     </div>
-                    <span id="userBadgeTaskCount" class="text-xs font-black bg-[#FFBF3F] text-[#31261D] px-3 py-1 rounded-full border border-[#FFBF3F]/40 shadow-2xs">0 Görev</span>
+                    <div class="text-[11px] text-[#5C4A3C] hidden sm:block">
+                        <i class="fa-solid fa-circle-info text-stone-400"></i> Bitirdiğiniz işin kutucuğuna tıklayınız.
+                    </div>
                 </div>
 
-                <div id="userTasksContainer" class="p-4 sm:p-6 space-y-3">
-                    <!-- JS dinamik kartları basacak -->
+                <!-- Görev Kartları Konteyneri -->
+                <div id="userTasksContainer" class="p-3 sm:p-4 space-y-2.5">
+                    <!-- JS dinamik sade kartları basacak -->
                 </div>
             </div>
 
@@ -1427,7 +1435,30 @@
             }
         }
 
-        // 2. KİŞİSEL PANEL RENDER
+        let currentTaskFilter = 'all';
+
+        function setTaskFilter(filter) {
+            currentTaskFilter = filter;
+            const tabAll = document.getElementById('filterTabAll');
+            const tabOpen = document.getElementById('filterTabOpen');
+            const tabComp = document.getElementById('filterTabCompleted');
+
+            if (tabAll) tabAll.className = filter === 'all' 
+                ? "px-2.5 py-1 text-xs font-bold rounded-lg bg-[#31261D] text-white transition-all cursor-pointer shadow-2xs" 
+                : "px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer";
+
+            if (tabOpen) tabOpen.className = filter === 'open' 
+                ? "px-2.5 py-1 text-xs font-bold rounded-lg bg-[#824701] text-white transition-all cursor-pointer shadow-2xs" 
+                : "px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer";
+
+            if (tabComp) tabComp.className = filter === 'completed' 
+                ? "px-2.5 py-1 text-xs font-bold rounded-lg bg-[#1E340C] text-white transition-all cursor-pointer shadow-2xs" 
+                : "px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer";
+
+            if (currentSelectedUser) renderPersonalDashboard(currentSelectedUser);
+        }
+
+        // 2. KİŞİSEL PANEL RENDER (SADE & ZARİF)
         function renderPersonalDashboard(name) {
             if (!name) return;
             currentSelectedUser = name;
@@ -1460,9 +1491,13 @@
 
             document.getElementById('userSuccessPct').innerText = `%${pct}`;
             document.getElementById('userFractionText').innerText = `${completed} / ${total} Bitti`;
-            document.getElementById('userBadgeTaskCount').innerText = `${total} Görev`;
+            const badgeCount = document.getElementById('userBadgeTaskCount');
+            if (badgeCount) badgeCount.innerText = `${total}`;
 
-            // Kişisel Akıllı Uyarı Bandı
+            const fill = document.getElementById('userProgressFill');
+            if (fill) fill.style.width = pct + '%';
+
+            // Kişisel Akıllı Uyarı Bandı (Sadeleştirilmiş)
             const todayTasks = userTasks.filter(t => {
                 if (t.status === 'Tamamlandı') return false;
                 const d = new Date(t.dueDate);
@@ -1474,41 +1509,22 @@
             if (delayed > 0) {
                 alertBanner.classList.remove('hidden');
                 alertBanner.innerHTML = `
-                    <div class="bg-gradient-to-r from-[#31261D] via-[#A6192E] to-[#31261D] text-white rounded-2xl p-4 shadow-lg shadow-[#A6192E]/20 border border-[#A6192E]/60 flex items-center justify-between gap-3 animate-in fade-in duration-200">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-[#A6192E] text-white flex items-center justify-center text-lg shrink-0 shadow-md shadow-[#A6192E]/40 border border-[#FFBF3F]/30">
-                                <i class="fa-solid fa-triangle-exclamation animate-bounce"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-[#A6192E]/40 text-[#FFBF3F] text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-[#FFBF3F]/30">DİKKAT</span>
-                                    <h4 class="font-bold text-xs sm:text-sm text-white">Teslim Tarihi Geçmiş ${delayed} Göreviniz Bulunuyor!</h4>
-                                </div>
-                                <p class="text-xs text-rose-100/90 mt-0.5">Lütfen geciken görevlerinizi öncelikli olarak tamamlayıp durumunu 'Tamamlandı' yapınız.</p>
-                            </div>
+                    <div class="p-3 bg-rose-50 border border-rose-200/80 rounded-xl flex items-center justify-between gap-3 text-xs text-[#A6192E]">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-sm shrink-0 text-[#A6192E]"></i>
+                            <span>Teslim tarihi geçmiş <strong>${delayed} adet</strong> göreviniz bulunuyor.</span>
                         </div>
-                        <button onclick="notifyManagerWhatsApp()" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1E340C] hover:bg-[#2b4b12] text-white text-xs font-bold rounded-xl shadow-xs transition-all shrink-0 border border-[#FFBF3F]/30">
-                            <i class="fa-brands fa-whatsapp text-sm"></i>
-                            <span>Yöneticiye WhatsApp Bildir</span>
+                        <button onclick="notifyManagerWhatsApp()" class="text-[11px] font-bold bg-[#A6192E] text-white px-2.5 py-1 rounded-lg hover:bg-[#8C1224] transition-colors shrink-0 cursor-pointer">
+                            Yöneticiye WhatsApp Bildir
                         </button>
                     </div>
                 `;
             } else if (todayTasks.length > 0) {
                 alertBanner.classList.remove('hidden');
                 alertBanner.innerHTML = `
-                    <div class="bg-gradient-to-r from-[#31261D] via-[#433427] to-[#31261D] text-white rounded-2xl p-4 shadow-md border border-[#FFBF3F]/40 flex items-center justify-between gap-3 animate-in fade-in duration-200">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-[#FFBF3F]/20 text-[#FFBF3F] flex items-center justify-center text-lg shrink-0 border border-[#FFBF3F]/30">
-                                <i class="fa-regular fa-calendar-check"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-[#FFBF3F]/20 text-[#FFBF3F] text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border border-[#FFBF3F]/30">GÜNÜ GELDİ</span>
-                                    <h4 class="font-bold text-xs sm:text-sm text-white">Bugün Tamamlanması Gereken ${todayTasks.length} Göreviniz Var</h4>
-                                </div>
-                                <p class="text-xs text-stone-300 mt-0.5">Geciken işiniz yok, günün planlanan aksiyonlarını tamamlayabilirsiniz.</p>
-                            </div>
-                        </div>
+                    <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl flex items-center gap-2 text-xs text-amber-900">
+                        <i class="fa-regular fa-calendar-check text-sm shrink-0 text-amber-700"></i>
+                        <span>Bugün tamamlanması hedeflenen <strong>${todayTasks.length} adet</strong> göreviniz var.</span>
                     </div>
                 `;
             } else {
@@ -1518,66 +1534,72 @@
 
             const container = document.getElementById('userTasksContainer');
 
-            if (userTasks.length === 0) {
+            let displayedTasks = userTasks;
+            if (currentTaskFilter === 'open') {
+                displayedTasks = userTasks.filter(t => t.status !== 'Tamamlandı');
+            } else if (currentTaskFilter === 'completed') {
+                displayedTasks = userTasks.filter(t => t.status === 'Tamamlandı');
+            }
+
+            if (displayedTasks.length === 0) {
+                const emptyMsg = currentTaskFilter === 'open' 
+                    ? 'Bekleyen herhangi bir göreviniz bulunmuyor 🎉' 
+                    : currentTaskFilter === 'completed' 
+                    ? 'Henüz tamamlanan bir görev bulunmuyor.' 
+                    : 'Üzerinizde kayıtlı herhangi bir görev bulunmuyor.';
                 container.innerHTML = `
-                    <div class="py-12 text-center text-stone-400">
-                        <i class="fa-solid fa-circle-check text-4xl text-[#1E340C] mb-2"></i>
-                        <p class="font-bold text-[#31261D] text-sm">Üzerinizde bekleyen herhangi bir görev bulunmuyor.</p>
-                        <p class="text-xs text-stone-500 mt-1">Tüm işlerinizi tamamladınız, tebrikler!</p>
+                    <div class="py-8 text-center text-stone-400">
+                        <i class="fa-solid fa-circle-check text-3xl text-[#1E340C] mb-2"></i>
+                        <p class="font-bold text-[#31261D] text-xs sm:text-sm">${emptyMsg}</p>
                     </div>
                 `;
                 return;
             }
 
-            container.innerHTML = userTasks.map(task => {
+            container.innerHTML = displayedTasks.map(task => {
                 const isOverdue = task.status !== 'Tamamlandı' && new Date(task.dueDate) < now;
                 const isCompleted = task.status === 'Tamamlandı';
 
                 return `
-                    <div class="p-4 sm:p-5 rounded-2xl border ${isOverdue ? 'border-[#A6192E]/40 bg-[#FFF5F6]' : isCompleted ? 'border-[#1E340C]/30 bg-[#F4F8F1]' : 'border-[#E8DFC8] bg-white'} shadow-2xs hover:shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="space-y-1.5 flex-1 min-w-0">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                ${getBranchBadgeHtml(task.branch)}
-                                ${getRecurrenceBadgeHtml(task.recurrence)}
-                                <span class="text-[10px] font-semibold bg-[#FAF7F2] text-[#31261D] px-2 py-0.5 rounded border border-[#E8DFC8]">
-                                    ${escapeHtml(task.department)}
-                                </span>
-                                ${isOverdue ? '<span class="text-[10px] font-bold bg-[#A6192E]/10 text-[#A6192E] px-2.5 py-0.5 rounded-full border border-[#A6192E]/30 animate-pulse"><i class="fa-solid fa-clock mr-1"></i> GECİKTİ</span>' : ''}
-                                ${isCompleted ? '<span class="text-[10px] font-bold bg-[#1E340C]/10 text-[#1E340C] px-2.5 py-0.5 rounded-full border border-[#1E340C]/30"><i class="fa-solid fa-check mr-1"></i> TAMAMLANDI</span>' : ''}
-                                <span class="text-[11px] font-medium text-stone-500">
-                                    Hedef Termin: <strong class="${isOverdue ? 'text-[#A6192E]' : 'text-[#31261D]'}">${formatTurkishDate(task.dueDate)}</strong>
-                                </span>
+                    <div class="p-3 sm:p-3.5 rounded-xl border ${isOverdue ? 'border-rose-300 bg-rose-50/20' : isCompleted ? 'border-stone-200 bg-stone-50/40' : 'border-[#E8DFC8] bg-white hover:border-[#824701]/30'} transition-all flex items-start justify-between gap-3 shadow-2xs">
+                        <!-- Sol: Tek tıkla Tamamlama / Geri Alma Butonu (Modern Checkbox) -->
+                        <button onclick="${isCompleted ? `setTaskStatus(${task.id}, 'Açık')` : `setTaskStatus(${task.id}, 'Tamamlandı')`}" 
+                                title="${isCompleted ? 'Görevi Tekrar Aç' : 'Görevi Tamamlandı Olarak İşaretle'}" 
+                                class="w-6 h-6 mt-0.5 rounded-lg flex items-center justify-center shrink-0 transition-transform active:scale-90 cursor-pointer ${isCompleted ? 'bg-[#1E340C] text-white shadow-2xs' : 'border-2 border-stone-300 hover:border-[#1E340C] text-transparent hover:text-stone-300'}">
+                            <i class="fa-solid fa-check text-xs"></i>
+                        </button>
+
+                        <!-- Orta: Başlık, Açıklama, Tek Satır Metadata -->
+                        <div class="flex-1 min-w-0 space-y-1">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <h4 class="font-bold text-xs sm:text-sm text-[#31261D] ${isCompleted ? 'line-through text-stone-400 font-normal' : ''}">
+                                    ${escapeHtml(task.title)}
+                                </h4>
+                                ${isOverdue ? '<span class="text-[9px] font-black bg-rose-100 text-[#A6192E] border border-rose-200 px-1.5 py-0.5 rounded-md">GECİKTİ</span>' : ''}
+                                ${isCompleted ? '<span class="text-[9px] font-black bg-emerald-100 text-[#1E340C] border border-emerald-200 px-1.5 py-0.5 rounded-md">TAMAMLANDI</span>' : ''}
+                                ${task.recurrence && task.recurrence !== 'none' ? `<span class="text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded-md"><i class="fa-solid fa-arrows-rotate text-[8px]"></i> Rutin</span>` : ''}
                             </div>
-                            <h4 class="font-bold text-[#31261D] text-sm sm:text-base ${isCompleted ? 'line-through text-stone-400' : ''}">
-                                ${escapeHtml(task.title)}
-                            </h4>
-                            <p class="text-xs text-stone-600 leading-relaxed">
-                                <strong class="text-[#31261D]">Aksiyon Planı:</strong> ${escapeHtml(task.action)}
-                            </p>
+
+                            ${task.action ? `<p class="text-xs text-stone-600 line-clamp-2 leading-relaxed ${isCompleted ? 'text-stone-400' : ''}">${escapeHtml(task.action)}</p>` : ''}
+
+                            <div class="flex items-center gap-2 text-[10px] text-stone-500 pt-0.5 flex-wrap">
+                                <span class="inline-flex items-center gap-1 ${isOverdue ? 'text-[#A6192E] font-bold' : ''}">
+                                    <i class="fa-regular fa-calendar text-[10px]"></i> Termin: ${formatTurkishDate(task.dueDate)}
+                                </span>
+                                ${task.branch ? `<span>•</span><span><i class="fa-solid fa-location-dot text-[9px] text-[#A6192E]"></i> ${escapeHtml(task.branch)}</span>` : ''}
+                                ${task.department ? `<span>•</span><span>${escapeHtml(task.department)}</span>` : ''}
+                            </div>
                         </div>
 
-                        <!-- Butonlar (Durum güncelleme & Yorumlar & WhatsApp bildirim) -->
-                        <div class="flex items-center gap-2 self-end md:self-center shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#E8DFC8] w-full md:w-auto justify-end flex-wrap">
-                            <button onclick="openTaskCommentsModal(${task.id})" class="px-3 py-2 rounded-xl border border-blue-200 bg-blue-50/70 hover:bg-blue-100 text-blue-900 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
-                                <i class="fa-regular fa-comment-dots text-blue-700"></i>
-                                <span>Notlar (${(task.comments && task.comments.length) || 0})</span>
+                        <!-- Sağ: Kompakt Aksiyon Butonları -->
+                        <div class="flex items-center gap-1.5 shrink-0 pt-0.5">
+                            <button onclick="openTaskCommentsModal(${task.id})" title="Görev Notları & Mesajlar" class="h-7 px-2 rounded-lg border border-[#E8DFC8] bg-white hover:bg-blue-50 hover:border-blue-200 text-stone-600 hover:text-blue-700 flex items-center gap-1 transition-colors cursor-pointer text-xs">
+                                <i class="fa-regular fa-comment-dots text-xs"></i>
+                                <span class="text-[11px] font-semibold">${(task.comments && task.comments.length) || 0}</span>
                             </button>
-                            <button onclick="notifyTaskWhatsApp(${task.id})" title="Bu görevin durumunu WhatsApp'tan yöneticiye bildir" class="px-3 py-2 rounded-xl border border-[#1E340C]/30 bg-[#F4F8F1] hover:bg-[#E7F0E1] text-[#1E340C] text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
-                                <i class="fa-brands fa-whatsapp text-sm"></i>
-                                <span class="hidden sm:inline">WhatsApp</span>
+                            <button onclick="notifyTaskWhatsApp(${task.id})" title="Bu görevin durumunu WhatsApp ile yöneticiye ilet" class="w-7 h-7 rounded-lg border border-[#E8DFC8] bg-white hover:bg-[#F4F8F1] hover:border-[#1E340C]/30 text-stone-600 hover:text-[#1E340C] flex items-center justify-center transition-colors cursor-pointer">
+                                <i class="fa-brands fa-whatsapp text-xs"></i>
                             </button>
-                            ${task.status === 'Tamamlandı' ? `
-                                <button onclick="setTaskStatus(${task.id}, 'Açık')" class="px-3.5 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] text-xs font-semibold hover:bg-[#F2ECE0] transition-colors flex items-center gap-1.5 cursor-pointer">
-                                    <i class="fa-solid fa-rotate-left"></i> Tekrar Aç
-                                </button>
-                            ` : `
-                                <button onclick="setTaskStatus(${task.id}, 'Devam Ediyor')" class="px-3.5 py-2 rounded-xl border border-[#FFBF3F]/50 bg-[#FFF9ED] text-[#824701] text-xs font-semibold hover:bg-[#FFF3D6] transition-colors flex items-center gap-1.5 cursor-pointer ${task.status === 'Devam Ediyor' ? 'ring-2 ring-[#FFBF3F]' : ''}">
-                                    <i class="fa-solid fa-spinner"></i> Devam Ediyor
-                                </button>
-                                <button onclick="setTaskStatus(${task.id}, 'Tamamlandı')" class="px-4 py-2 rounded-xl bg-[#1E340C] hover:bg-[#2c4c11] text-white text-xs font-bold shadow-md shadow-[#1E340C]/25 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                                    <i class="fa-solid fa-check"></i> Tamamla
-                                </button>
-                            `}
                         </div>
                     </div>
                 `;
@@ -1972,7 +1994,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=20').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=21').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);
