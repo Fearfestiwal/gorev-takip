@@ -1415,6 +1415,59 @@
             }
         }
 
+        function getDeletedMemberNames() {
+            try {
+                return JSON.parse(localStorage.getItem('task_deleted_member_names') || '[]');
+            } catch(e) {
+                return [];
+            }
+        }
+
+        // AKILLI BİRLEŞTİRME (Smart Merge):
+        // Sunucudan gelen liste, yerelde kayıt edilmiş personelleri ASLA silemez!
+        function mergeTeamMembers(localList, serverList) {
+            if (!Array.isArray(localList)) localList = [];
+            if (!Array.isArray(serverList)) serverList = [];
+            const deletedNames = getDeletedMemberNames();
+            const map = new Map();
+
+            // 1. Önce sunucudaki personelleri ekle (silinmemiş olanlar)
+            serverList.forEach(m => {
+                if (m && m.name) {
+                    const key = m.name.toLowerCase().trim();
+                    if (!deletedNames.includes(key)) {
+                        map.set(key, { ...m });
+                    }
+                }
+            });
+
+            // 2. Ardından yerel personelleri ekle / birleştir (yerel personeller daima korunur)
+            localList.forEach(m => {
+                if (m && m.name) {
+                    const key = m.name.toLowerCase().trim();
+                    if (!deletedNames.includes(key)) {
+                        if (map.has(key)) {
+                            const existing = map.get(key);
+                            map.set(key, {
+                                ...existing,
+                                ...m,
+                                pin: m.pin || existing.pin || '1978',
+                                phone: m.phone || existing.phone || '',
+                                email: m.email || existing.email || '',
+                                title: m.title || existing.title || m.role || existing.role || 'Personel',
+                                role: m.role || existing.role || m.title || existing.title || 'Personel',
+                                status: m.status || existing.status || 'aktif'
+                            });
+                        } else {
+                            map.set(key, { ...m });
+                        }
+                    }
+                }
+            });
+
+            return Array.from(map.values());
+        }
+
         async function syncWithServer(isManual = false) {
             // Son 6 saniye içinde yerel işlem yapıldıysa veya buluta veri gönderme işlemi devam ediyorsa ezilmeyi önle (manuel yenilemede pas geç)
             if (!isManual && (pushInProgress || isRecentLocalAction(6000))) {
@@ -1473,12 +1526,19 @@
                     }
 
                     if (Array.isArray(data.team)) {
-                        const serverTeamStr = JSON.stringify(data.team);
-                        if (serverTeamStr !== JSON.stringify(team)) {
-                            team = data.team;
-                            localStorage.setItem('task_team_members', serverTeamStr);
+                        // Akıllı Birleştirme: Server'dan gelen liste yereldeki personelleri ASLA silemez!
+                        const mergedTeam = mergeTeamMembers(team, data.team);
+                        const mergedStr = JSON.stringify(mergedTeam);
+                        if (mergedStr !== JSON.stringify(team)) {
+                            team = mergedTeam;
+                            localStorage.setItem('task_team_members', mergedStr);
                             updateTeamDatalist();
+                            renderTeamCards();
                             changed = true;
+                        }
+                        // Yerelde olup sunucuda henüz bulunmayan üyeler varsa, bulutu da güncelle
+                        if (data.team.length < team.length) {
+                            pushDataToServer();
                         }
                     }
 
@@ -2951,6 +3011,10 @@
             const newName = document.getElementById('personName').value.trim();
             const oldName = (editIdx >= 0 && team[editIdx]) ? team[editIdx].name : null;
 
+            // Silinenler listesinde bu isim varsa kaldır
+            let deletedNames = getDeletedMemberNames().filter(n => n !== newName.toLowerCase().trim());
+            localStorage.setItem('task_deleted_member_names', JSON.stringify(deletedNames));
+
             const memberData = {
                 name: newName,
                 title: document.getElementById('personTitle').value.trim(),
@@ -3003,7 +3067,14 @@
         }
 
         function deleteTeamMember(idx) {
-            if (confirm(`${team[idx].name} kişisini rehberden silmek istediğinize emin misiniz?`)) {
+            const memberToDelete = team[idx];
+            if (!memberToDelete) return;
+            if (confirm(`${memberToDelete.name} kişisini rehberden silmek istediğinize emin misiniz?`)) {
+                const deletedNames = getDeletedMemberNames();
+                if (memberToDelete.name && !deletedNames.includes(memberToDelete.name.toLowerCase().trim())) {
+                    deletedNames.push(memberToDelete.name.toLowerCase().trim());
+                    localStorage.setItem('task_deleted_member_names', JSON.stringify(deletedNames));
+                }
                 team.splice(idx, 1);
                 saveData();
                 updateTeamDatalist();
@@ -3505,7 +3576,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=16')
+                navigator.serviceWorker.register('sw.js?v=17')
                     .then(reg => {
                         console.log('CAN ÇEREZ SW Aktif:', reg.scope);
                         reg.update();

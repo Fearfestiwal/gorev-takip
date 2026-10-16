@@ -687,6 +687,59 @@
             }
         }
 
+        function getDeletedMemberNames() {
+            try {
+                return JSON.parse(localStorage.getItem('task_deleted_member_names') || '[]');
+            } catch(e) {
+                return [];
+            }
+        }
+
+        // AKILLI BİRLEŞTİRME (Smart Merge):
+        // Sunucudan gelen liste, yerelde kayıt edilmiş personelleri ASLA silemez!
+        function mergeTeamMembers(localList, serverList) {
+            if (!Array.isArray(localList)) localList = [];
+            if (!Array.isArray(serverList)) serverList = [];
+            const deletedNames = getDeletedMemberNames();
+            const map = new Map();
+
+            // 1. Önce sunucudaki personelleri ekle (silinmemiş olanlar)
+            serverList.forEach(m => {
+                if (m && m.name) {
+                    const key = m.name.toLowerCase().trim();
+                    if (!deletedNames.includes(key)) {
+                        map.set(key, { ...m });
+                    }
+                }
+            });
+
+            // 2. Ardından yerel personelleri ekle / birleştir (yerel personeller daima korunur)
+            localList.forEach(m => {
+                if (m && m.name) {
+                    const key = m.name.toLowerCase().trim();
+                    if (!deletedNames.includes(key)) {
+                        if (map.has(key)) {
+                            const existing = map.get(key);
+                            map.set(key, {
+                                ...existing,
+                                ...m,
+                                pin: m.pin || existing.pin || '1978',
+                                phone: m.phone || existing.phone || '',
+                                email: m.email || existing.email || '',
+                                title: m.title || existing.title || m.role || existing.role || 'Personel',
+                                role: m.role || existing.role || m.title || existing.title || 'Personel',
+                                status: m.status || existing.status || 'aktif'
+                            });
+                        } else {
+                            map.set(key, { ...m });
+                        }
+                    }
+                }
+            });
+
+            return Array.from(map.values());
+        }
+
         async function syncWithServer(isManual = false) {
             // Son 6 saniye içinde personel bir durum değiştirdiyse veya gönderme sürüyorsa ezilmeyi engelle (manuel yenilemede pas geç)
             if (!isManual && (pushInProgress || isRecentLocalAction(6000))) {
@@ -744,12 +797,19 @@
                     }
 
                     if (Array.isArray(data.team)) {
-                        if (data.team.length > 0) lastKnownTeam = data.team;
-                        const serverTeamStr = JSON.stringify(data.team);
-                        if (serverTeamStr !== JSON.stringify(team)) {
-                            team = data.team;
-                            localStorage.setItem('task_team_members', serverTeamStr);
+                        // Akıllı Birleştirme: Server'dan gelen liste yereldeki personelleri ASLA silemez!
+                        const mergedTeam = mergeTeamMembers(team, data.team);
+                        const mergedStr = JSON.stringify(mergedTeam);
+                        if (mergedStr !== JSON.stringify(team)) {
+                            team = mergedTeam;
+                            localStorage.setItem('task_team_members', mergedStr);
                             changed = true;
+                        }
+                        if (team.length > 0) lastKnownTeam = team;
+
+                        // Yerelde olup sunucuda henüz bulunmayan üyeler varsa, bulutu da güncelle
+                        if (data.team.length < team.length) {
+                            pushDataToServer();
                         }
                     }
 
@@ -902,6 +962,14 @@
             document.getElementById('userSelectionScreen').classList.remove('hidden');
             document.getElementById('personalDashboardScreen').classList.add('hidden');
             document.getElementById('headerUserActions').classList.add('hidden');
+
+            // Ekip listesini daima localStorage'dan en güncel haliyle çek
+            try {
+                const storedTeam = JSON.parse(localStorage.getItem('task_team_members') || '[]');
+                if (Array.isArray(storedTeam) && storedTeam.length > 0) {
+                    team = storedTeam;
+                }
+            } catch(e) {}
 
             if (!team || !Array.isArray(team) || team.length === 0) team = DEFAULT_INIT_TEAM;
             if (!tasks) tasks = [];
@@ -1133,10 +1201,15 @@
                 createdAt: new Date().toISOString()
             };
 
+            // Silinenler listesinde bu isim varsa kaldır
+            let deletedNames = getDeletedMemberNames().filter(n => n !== name.toLowerCase().trim());
+            localStorage.setItem('task_deleted_member_names', JSON.stringify(deletedNames));
+
             team.push(newMember);
             lastKnownTeam = team;
             localStorage.setItem('task_team_members', JSON.stringify(team));
-            pushDataToServer();
+            setLocalActionTimestamp();
+            await pushDataToServer();
 
             closeStaffSelfRegisterModal();
 
@@ -1229,7 +1302,7 @@
         }
 
         function logoutStaffUser() {
-            if (confirm("Güvenli çıkış yapıp ana portala dönmek istiyor musunuz?")) {
+            if (confirm("Kişisel oturumunuz kapatılsın ve profil seçim ekranına dönülsün mü?")) {
                 sessionStorage.removeItem('cancerez_staff_auth_user');
                 sessionStorage.removeItem('cancerez_manager_viewing_staff');
                 sessionStorage.removeItem('cancerez_admin_auth');
@@ -1238,7 +1311,8 @@
                 localStorage.removeItem('cancerez_active_role');
                 currentSelectedUser = '';
                 localStorage.removeItem('task_personel_selected_user');
-                window.location.href = 'index.html?logout=true';
+                updateManagerReturnButton();
+                showUserSelectionScreen();
             }
         }
 
@@ -1746,7 +1820,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=16').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=17').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);

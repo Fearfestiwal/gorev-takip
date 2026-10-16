@@ -448,8 +448,9 @@
 
         // Sayfa yüklendiğinde ekip üyelerini çek ve personel listesini doldur
         window.addEventListener('DOMContentLoaded', async () => {
+            populateStaffSelect(); // Yerel hafızadaki personelleri anında göster (kullanıcı beklemesin)
             await fetchTeamMembers();
-            populateStaffSelect();
+            populateStaffSelect(); // Sunucudan gelen akıllı birleştirilmiş listeyle güncelle
 
             // Kayıtlı bir yönetici e-postası varsa input'a hazır getir
             const savedAccount = JSON.parse(localStorage.getItem('cancerez_admin_account') || 'null');
@@ -477,6 +478,7 @@
                 btnAdmin.className = "py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#FAF7F2] cursor-pointer";
                 staffCard.classList.remove('hidden');
                 adminCard.classList.add('hidden');
+                populateStaffSelect(); // Personel sekmesine geçildiğinde listeyi tazele
             }
         }
 
@@ -801,6 +803,11 @@
                 createdAt: new Date().toISOString()
             };
 
+            // Silinenler listesinde bu isim varsa kaldır
+            let deletedNames = getDeletedMemberNames().filter(n => n !== name.toLowerCase().trim());
+            localStorage.setItem('task_deleted_member_names', JSON.stringify(deletedNames));
+            localStorage.setItem('cancerez_last_local_action', String(Date.now()));
+
             teamMembers.push(newMember);
             localStorage.setItem('task_team_members', JSON.stringify(teamMembers));
             populateStaffSelect();
@@ -848,21 +855,81 @@
             }
         }
 
+        function getDeletedMemberNames() {
+            try {
+                return JSON.parse(localStorage.getItem('task_deleted_member_names') || '[]');
+            } catch(e) {
+                return [];
+            }
+        }
+
+        // AKILLI BİRLEŞTİRME (Smart Merge):
+        // Sunucudan gelen liste, yerelde kayıt edilmiş personelleri ASLA silemez!
+        function mergeTeamMembers(localList, serverList) {
+            if (!Array.isArray(localList)) localList = [];
+            if (!Array.isArray(serverList)) serverList = [];
+            const deletedNames = getDeletedMemberNames();
+            const map = new Map();
+
+            // 1. Önce sunucudaki personelleri ekle (silinmemiş olanlar)
+            serverList.forEach(m => {
+                if (m && m.name) {
+                    const key = m.name.toLowerCase().trim();
+                    if (!deletedNames.includes(key)) {
+                        map.set(key, { ...m });
+                    }
+                }
+            });
+
+            // 2. Ardından yerel personelleri ekle / birleştir (yerel personeller daima korunur)
+            localList.forEach(m => {
+                if (m && m.name) {
+                    const key = m.name.toLowerCase().trim();
+                    if (!deletedNames.includes(key)) {
+                        if (map.has(key)) {
+                            const existing = map.get(key);
+                            map.set(key, {
+                                ...existing,
+                                ...m,
+                                pin: m.pin || existing.pin || '1978',
+                                phone: m.phone || existing.phone || '',
+                                email: m.email || existing.email || '',
+                                title: m.title || existing.title || m.role || existing.role || 'Personel',
+                                role: m.role || existing.role || m.title || existing.title || 'Personel',
+                                status: m.status || existing.status || 'aktif'
+                            });
+                        } else {
+                            map.set(key, { ...m });
+                        }
+                    }
+                }
+            });
+
+            return Array.from(map.values());
+        }
+
         // Ekip Üyelerini Doldur
         async function fetchTeamMembers() {
+            const localTeam = JSON.parse(localStorage.getItem('task_team_members') || '[]');
+            let serverTeam = [];
+
             try {
                 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.port === '8080') {
                     const res = await fetch('/api/data');
                     if (res.ok) {
                         const d = await res.json();
-                        if (Array.isArray(d.team)) teamMembers = d.team;
+                        if (Array.isArray(d.team)) serverTeam = d.team;
                     }
                 } else {
-                    const res = await fetch(CLOUD_DB_URL, { cache: 'no-store' });
+                    const cacheBuster = (CLOUD_DB_URL.includes('?') ? '&' : '?') + '_ts=' + Date.now();
+                    const res = await fetch(CLOUD_DB_URL + cacheBuster, { 
+                        cache: 'no-store',
+                        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+                    });
                     if (res.ok) {
                         const d = await res.json();
                         const p = (d && d.data && (d.data.tasks || d.data.team)) ? d.data : d;
-                        if (Array.isArray(p.team)) teamMembers = p.team;
+                        if (Array.isArray(p.team)) serverTeam = p.team;
                         if (p.adminPassword) {
                             localStorage.setItem('cancerez_admin_password', p.adminPassword);
                         }
@@ -870,11 +937,14 @@
                 }
             } catch(e) {}
 
-            if (teamMembers && teamMembers.length > 0) {
-                localStorage.setItem('task_team_members', JSON.stringify(teamMembers));
-            } else {
-                const localTeam = JSON.parse(localStorage.getItem('task_team_members') || '[]');
-                if (localTeam.length > 0) teamMembers = localTeam;
+            // Akıllı Birleştirme: Yerel personelleri ASLA ezme!
+            const merged = mergeTeamMembers(localTeam, serverTeam);
+            teamMembers = merged.length > 0 ? merged : DEFAULT_INIT_TEAM;
+            localStorage.setItem('task_team_members', JSON.stringify(teamMembers));
+
+            // Eğer yerelde sunucuda henüz bulunmayan yeni personeller varsa, bulutu da anında güncelle
+            if (serverTeam.length > 0 && merged.length > serverTeam.length) {
+                pushTeamToCloud(teamMembers);
             }
         }
 
@@ -969,7 +1039,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=16')
+                navigator.serviceWorker.register('sw.js?v=17')
                     .then(reg => {
                         reg.update();
                     })
