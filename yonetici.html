@@ -12,6 +12,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Can Çerez">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <!-- Google Fonts: Plus Jakarta Sans (Proxima Nova Wide hissi) & Playfair Display & DM Serif (Zanaatkar Ustalık) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1354,6 +1357,11 @@
         } else {
             team = [];
             localStorage.setItem('task_team_members', '[]');
+        }
+
+        if (!team || !Array.isArray(team) || team.length === 0) {
+            team = DEFAULT_INIT_TEAM;
+            localStorage.setItem('task_team_members', JSON.stringify(team));
         }
 
         let activePage = 1;
@@ -3398,9 +3406,19 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('CAN ÇEREZ SW Aktif:', reg.scope))
+                navigator.serviceWorker.register('sw.js?v=13')
+                    .then(reg => {
+                        console.log('CAN ÇEREZ SW Aktif:', reg.scope);
+                        reg.update();
+                    })
                     .catch(err => console.log('CAN ÇEREZ SW Hatası:', err));
+            });
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
             });
         }
     </script>

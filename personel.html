@@ -11,6 +11,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CAN ÇEREZ">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="apple-touch-icon" href="icon-192.svg">
@@ -626,6 +629,11 @@
             localStorage.setItem('task_team_members', '[]');
         }
 
+        if (!team || !Array.isArray(team) || team.length === 0) {
+            team = DEFAULT_INIT_TEAM;
+            localStorage.setItem('task_team_members', JSON.stringify(team));
+        }
+
         let currentSelectedUser = localStorage.getItem('task_personel_selected_user') || '';
 
         const CLOUD_DB_URL = localStorage.getItem('cancerez_cloud_db_url') || "https://extendsclass.com/api/json-storage/bin/aecadfa";
@@ -849,7 +857,7 @@
             document.getElementById('personalDashboardScreen').classList.add('hidden');
             document.getElementById('headerUserActions').classList.add('hidden');
 
-            if (!team) team = [];
+            if (!team || !Array.isArray(team) || team.length === 0) team = DEFAULT_INIT_TEAM;
             if (!tasks) tasks = [];
 
             const list = document.getElementById('selectionCardsList');
@@ -961,19 +969,28 @@
 
         // ================= YENİ PERSONEL KENDİ KENDİNE KAYIT =================
         function openStaffSelfRegisterModal() {
-            document.getElementById('selfRegError').classList.add('hidden');
-            document.getElementById('selfRegName').value = '';
-            document.getElementById('selfRegPhone').value = '';
-            document.getElementById('selfRegEmail').value = '';
-            document.getElementById('selfRegPin').value = '';
-            document.getElementById('selfRegPinConfirm').value = '';
+            const errBox = document.getElementById('selfRegError');
+            if (errBox) errBox.classList.add('hidden');
+            const fields = ['selfRegName', 'selfRegPhone', 'selfRegEmail', 'selfRegPin', 'selfRegPinConfirm'];
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if (el) el.value = '';
+            });
             const m = document.getElementById('staffSelfRegisterModal');
-            m.style.setProperty('display', 'flex', 'important');
+            if (m) {
+                m.style.setProperty('display', 'flex', 'important');
+                m.classList.remove('hidden');
+                m.classList.add('flex');
+            }
         }
 
         function closeStaffSelfRegisterModal() {
             const m = document.getElementById('staffSelfRegisterModal');
-            m.style.setProperty('display', 'none', 'important');
+            if (m) {
+                m.style.setProperty('display', 'none', 'important');
+                m.classList.remove('flex');
+                m.classList.add('hidden');
+            }
         }
 
         async function handleSelfRegisterSubmit(e) {
@@ -1602,9 +1619,18 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => {
+                navigator.serviceWorker.register('sw.js?v=13').then(reg => {
+                    reg.update();
+                }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);
                 });
+            });
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
             });
         }
     </script>
