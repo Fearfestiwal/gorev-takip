@@ -844,9 +844,42 @@
             }
         }
 
+        // ================= PWA İÇİNDE KALMA & YENİ SEKME ENGELLEYİCİ =================
+        // Mobil cihazlarda (iOS Safari PWA / Android Chrome PWA) harici tarayıcıya veya yeni sekmeye fırlamayı engeller
+        (function initPwaStayInApp() {
+            document.addEventListener('click', function(e) {
+                let el = e.target;
+                while (el && el.tagName !== 'A') {
+                    el = el.parentElement;
+                }
+                if (!el || el.tagName !== 'A') return;
+
+                const href = el.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+                // Harici iletişim kanalları hariç (WhatsApp, Telefon, Mail)
+                if (href.startsWith('tel:') || href.startsWith('mailto:') || href.includes('wa.me') || href.includes('mail.google.com')) {
+                    return;
+                }
+
+                // Kendi iç sayfalarımız (personel.html, yonetici.html, index.html vb.)
+                const isInternalPage = href.includes('personel.html') || 
+                                       href.includes('yonetici.html') || 
+                                       href.includes('index.html') || 
+                                       href.startsWith('./') || 
+                                       (!href.startsWith('http://') && !href.startsWith('https://'));
+
+                if (isInternalPage) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = href;
+                }
+            }, true);
+        })();
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=13')
+                navigator.serviceWorker.register('sw.js?v=14')
                     .then(reg => {
                         reg.update();
                     })

@@ -88,6 +88,13 @@
                         <span class="hidden sm:inline">Uygulamayı Yükle</span>
                     </button>
 
+                    <!-- Yönetici Paneline Geçiş Butonu (Uygulama İçi) -->
+                    <button onclick="window.location.href='yonetici.html'" title="Yönetici Paneline Geç" class="bg-[#46372A] hover:bg-[#574434] text-[#FFBF3F] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#5A4737] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                        <i class="fa-solid fa-user-tie text-[#FFBF3F] text-xs"></i>
+                        <span class="hidden sm:inline">Yönetici Paneli</span>
+                        <span class="sm:hidden">Yönetici</span>
+                    </button>
+
                     <div id="headerUserActions" class="hidden flex items-center gap-2">
                         <button onclick="openStaffChangePinModal()" title="Kişisel Giriş PIN Kodunuzu Değiştirin" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#46372A] hover:bg-[#574434] text-[#FFBF3F] text-xs font-bold border border-[#5A4737] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
                             <i class="fa-solid fa-key text-xs"></i>
@@ -1617,9 +1624,42 @@
             deferredPrompt = null;
         });
 
+        // ================= PWA İÇİNDE KALMA & YENİ SEKME ENGELLEYİCİ =================
+        // Mobil cihazlarda (iOS Safari PWA / Android Chrome PWA) harici tarayıcıya veya yeni sekmeye fırlamayı engeller
+        (function initPwaStayInApp() {
+            document.addEventListener('click', function(e) {
+                let el = e.target;
+                while (el && el.tagName !== 'A') {
+                    el = el.parentElement;
+                }
+                if (!el || el.tagName !== 'A') return;
+
+                const href = el.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+                // Harici iletişim kanalları hariç (WhatsApp, Telefon, Mail)
+                if (href.startsWith('tel:') || href.startsWith('mailto:') || href.includes('wa.me') || href.includes('mail.google.com')) {
+                    return;
+                }
+
+                // Kendi iç sayfalarımız (personel.html, yonetici.html, index.html vb.)
+                const isInternalPage = href.includes('personel.html') || 
+                                       href.includes('yonetici.html') || 
+                                       href.includes('index.html') || 
+                                       href.startsWith('./') || 
+                                       (!href.startsWith('http://') && !href.startsWith('https://'));
+
+                if (isInternalPage) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = href;
+                }
+            }, true);
+        })();
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=13').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=14').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);

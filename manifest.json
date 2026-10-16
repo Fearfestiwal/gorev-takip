@@ -3,10 +3,14 @@
   "short_name": "Can Çerez",
   "description": "1978 | Adıyla Tadıyla Can'dan - Koordinasyon ve Görev Takip Portalı",
   "start_url": "./index.html",
+  "scope": "./",
+  "id": "cancerez-gorev-takip-pwa",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
   "background_color": "#31261D",
   "theme_color": "#A6192E",
+  "categories": ["business", "productivity"],
   "icons": [
     {
       "src": "./favicon.svg",
