@@ -1993,8 +1993,9 @@
         })();
 
         if ('serviceWorker' in navigator) {
+            const hadController = !!navigator.serviceWorker.controller;
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=21').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=22').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);
@@ -2002,7 +2003,7 @@
             });
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
+                if (hadController && !refreshing) {
                     refreshing = true;
                     window.location.reload();
                 }
