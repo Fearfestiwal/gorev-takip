@@ -1024,6 +1024,7 @@
         let pendingPinPerson = null;
 
         function selectPerson(name) {
+            if (!name) return;
             // Eğer bu kullanıcı için zaten oturum açılmışsa doğrudan dashboard'a geç
             const currentAuth = sessionStorage.getItem('cancerez_staff_auth_user');
             if (currentAuth && currentAuth.toLowerCase().trim() === name.toLowerCase().trim()) {
@@ -1034,7 +1035,7 @@
 
             // Değilse PIN doğrulama modalını aç
             pendingPinPerson = name;
-            const member = team.find(m => m.name.toLowerCase().trim() === name.toLowerCase().trim());
+            const member = team.find(m => m && m.name && m.name.toLowerCase().trim() === name.toLowerCase().trim());
             document.getElementById('modalPinUserName').innerText = name;
             document.getElementById('modalPinUserDept').innerText = member ? `${member.title} • ${member.department || 'CAN ÇEREZ'}` : 'CAN ÇEREZ Personeli';
             document.getElementById('modalPinAvatar').innerText = getInitials(name);
@@ -1052,9 +1053,11 @@
 
         function closeUserPinModal() {
             const modal = document.getElementById('userPinModal');
-            modal.style.setProperty('display', 'none', 'important');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
+            if (modal) {
+                modal.style.setProperty('display', 'none', 'important');
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
             pendingPinPerson = null;
         }
 
@@ -1086,8 +1089,9 @@
         function handlePinSubmit(e) {
             e.preventDefault();
             if (!pendingPinPerson) return;
+            const personName = pendingPinPerson;
             const entered = document.getElementById('staffPinInput').value.trim();
-            const member = team.find(m => m.name.toLowerCase().trim() === pendingPinPerson.toLowerCase().trim());
+            const member = team.find(m => m && m.name && m.name.toLowerCase().trim() === personName.toLowerCase().trim());
             const correctPin = (member && member.pin) ? member.pin : '1978';
 
             // Doğru PIN, varsayılan 1978 veya acil durum 'cankardesler'
@@ -1100,20 +1104,20 @@
                 sessionStorage.removeItem('cancerez_admin_auth');
                 localStorage.removeItem('cancerez_remember_admin');
 
-                sessionStorage.setItem('cancerez_staff_auth_user', pendingPinPerson);
+                sessionStorage.setItem('cancerez_staff_auth_user', personName);
                 if (rememberMe) {
-                    localStorage.setItem('cancerez_remember_staff_user', pendingPinPerson);
+                    localStorage.setItem('cancerez_remember_staff_user', personName);
                     localStorage.setItem('cancerez_active_role', 'staff');
-                    localStorage.setItem('task_personel_selected_user', pendingPinPerson);
+                    localStorage.setItem('task_personel_selected_user', personName);
                 } else {
                     localStorage.removeItem('cancerez_remember_staff_user');
                     localStorage.setItem('cancerez_active_role', 'staff');
-                    localStorage.setItem('task_personel_selected_user', pendingPinPerson);
+                    localStorage.setItem('task_personel_selected_user', personName);
                 }
 
                 updateManagerReturnButton();
                 closeUserPinModal();
-                renderPersonalDashboard(pendingPinPerson);
+                renderPersonalDashboard(personName);
             } else {
                 const err = document.getElementById('staffPinError');
                 if (err) err.classList.remove('hidden');
@@ -1318,11 +1322,15 @@
 
         // 2. KİŞİSEL PANEL RENDER
         function renderPersonalDashboard(name) {
+            if (!name) return;
+            currentSelectedUser = name;
+            localStorage.setItem('task_personel_selected_user', name);
+
             document.getElementById('userSelectionScreen').classList.add('hidden');
             document.getElementById('personalDashboardScreen').classList.remove('hidden');
             document.getElementById('headerUserActions').classList.remove('hidden');
 
-            const member = team.find(m => m.name.toLowerCase().trim() === name.toLowerCase().trim()) || { name: name, title: "Personel" };
+            const member = team.find(m => m && m.name && m.name.toLowerCase().trim() === name.toLowerCase().trim()) || { name: name, title: "Personel" };
 
             document.getElementById('userAvatarBig').innerText = getInitials(member.name);
             document.getElementById('userNameText').innerText = member.name;
@@ -1713,18 +1721,55 @@
             window.open(url, '_blank');
         }
 
+        function getManagerEmailAddress() {
+            try {
+                const adminAcc = JSON.parse(localStorage.getItem('cancerez_admin_account') || 'null');
+                if (adminAcc && adminAcc.email) return adminAcc.email.trim();
+            } catch(e) {}
+            const custom = localStorage.getItem('task_manager_email');
+            if (custom) return custom.trim();
+            return 'yonetim@cancerez.com.tr';
+        }
+
         function notifyManagerMail() {
+            if (!currentSelectedUser) return;
             const userTasks = tasks.filter(t => (t.owner || t.assignee || '').toLowerCase().trim() === currentSelectedUser.toLowerCase().trim());
-            const completed = userTasks.filter(t => t.status === 'Tamamlandı').length;
             const total = userTasks.length;
+            const completed = userTasks.filter(t => t.status === 'Tamamlandı').length;
+            const openTasks = userTasks.filter(t => t.status !== 'Tamamlandı');
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            const delayed = userTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now).length;
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-            const subject = `[Bilgilendirme] ${currentSelectedUser} - Görev Durum Güncellemesi`;
-            let body = `Sayın Yönetici,\n\n`;
-            body += `${currentSelectedUser} olarak üzerimdeki görevlerin son durumunu bildirmek isterim:\n`;
-            body += `Toplam ${total} görevimden ${completed} tanesi tamamlanmıştır.\n\n`;
-            body += `Detaylı listeyi sistemden inceleyebilirsiniz.\nİyi çalışmalar dilerim.`;
+            const recipient = getManagerEmailAddress();
+            const subject = `[CAN ÇEREZ] Görev Durum Bildirimi - ${currentSelectedUser}`;
 
-            const encodedTo = encodeURIComponent('yonetim@cancerez.com.tr');
+            let body = `CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)\n`;
+            body += `Can Kardeşler Kuruyemiş Grubu - Personel Görev Raporu\n\n`;
+            body += `Sayın Yöneticim,\n\n`;
+            body += `Ben ${currentSelectedUser}, üzerimdeki görevlerin son durumunu bilgilerinize sunarım:\n\n`;
+            body += `📊 Genel Durum: Toplam ${total} görev / ${completed} tamamlandı (%${pct} Başarı)\n`;
+            if (delayed > 0) {
+                body += `⚠️ Geciken Görev: ${delayed} adet\n`;
+            }
+            body += `⏳ Bekleyen / Açık Görev: ${openTasks.length} adet\n\n`;
+
+            if (openTasks.length > 0) {
+                body += `📌 Devam Eden / Açık Görevlerim:\n`;
+                openTasks.forEach((t, i) => {
+                    body += `${i + 1}. [${t.status}] ${t.title} (Termin: ${formatTurkishDate(t.dueDate)})\n`;
+                });
+                body += `\n`;
+            } else {
+                body += `🎉 Üzerimdeki tüm görevler başarıyla tamamlanmıştır.\n\n`;
+            }
+
+            const portalUrl = window.location.href.split('?')[0].replace(/personel\.html|$/, 'yonetici.html');
+            body += `Yönetici Paneli: ${portalUrl}\n\n`;
+            body += `İyi çalışmalar dilerim.\n${currentSelectedUser}`;
+
+            const encodedTo = encodeURIComponent(recipient);
             const encodedSu = encodeURIComponent(subject);
             const encodedBody = encodeURIComponent(body);
             const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSu}&body=${encodedBody}`;
@@ -1820,7 +1865,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=17').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=18').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);
