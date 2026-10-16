@@ -609,12 +609,12 @@
 
             if (isValid) {
                 sessionStorage.setItem('cancerez_admin_auth', 'true');
+                sessionStorage.removeItem('cancerez_manager_viewing_staff');
+                localStorage.setItem('cancerez_active_role', 'admin');
                 if (rememberMe) {
                     localStorage.setItem('cancerez_remember_admin', 'true');
-                    localStorage.setItem('cancerez_active_role', 'admin');
                 } else {
                     localStorage.removeItem('cancerez_remember_admin');
-                    sessionStorage.setItem('cancerez_active_role', 'admin');
                 }
 
                 window.location.href = 'yonetici.html';
@@ -696,6 +696,7 @@
             localStorage.setItem('cancerez_remember_admin', 'true');
             localStorage.setItem('cancerez_active_role', 'admin');
             sessionStorage.setItem('cancerez_admin_auth', 'true');
+            sessionStorage.removeItem('cancerez_manager_viewing_staff');
 
             alert(`Tebrikler Sayın ${name}!\n\n${email} adresiniz başarıyla doğrulandı ve yönetici şifreniz kaydedildi. Yönetici Paneline yönlendiriliyorsunuz...`);
             window.location.href = 'yonetici.html';
@@ -718,14 +719,18 @@
             const correctPin = (member && member.pin) ? String(member.pin).trim() : '1978';
 
             if (enteredPin === correctPin || enteredPin === '1978' || enteredPin === 'cankardesler') {
+                // Personel giriş yaptığı için yöneticiye ait tüm geçiş yetkilerini kesin olarak sıfırla!
+                sessionStorage.removeItem('cancerez_manager_viewing_staff');
+                sessionStorage.removeItem('cancerez_admin_auth');
+                localStorage.removeItem('cancerez_remember_admin');
+
                 sessionStorage.setItem('cancerez_staff_auth_user', selectedName);
+                localStorage.setItem('cancerez_active_role', 'staff');
                 if (rememberMe) {
                     localStorage.setItem('cancerez_remember_staff_user', selectedName);
-                    localStorage.setItem('cancerez_active_role', 'staff');
                     localStorage.setItem('task_personel_selected_user', selectedName);
                 } else {
                     localStorage.removeItem('cancerez_remember_staff_user');
-                    sessionStorage.setItem('cancerez_active_role', 'staff');
                     localStorage.setItem('task_personel_selected_user', selectedName);
                 }
 
@@ -803,6 +808,11 @@
             try {
                 await pushTeamToCloud(teamMembers);
             } catch(err) {}
+
+            // Personel kaydolduğu için yönetici yetkilerini sıfırla
+            sessionStorage.removeItem('cancerez_manager_viewing_staff');
+            sessionStorage.removeItem('cancerez_admin_auth');
+            localStorage.removeItem('cancerez_remember_admin');
 
             sessionStorage.setItem('cancerez_staff_auth_user', name);
             localStorage.setItem('cancerez_remember_staff_user', name);
@@ -959,7 +969,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=15')
+                navigator.serviceWorker.register('sw.js?v=16')
                     .then(reg => {
                         reg.update();
                     })

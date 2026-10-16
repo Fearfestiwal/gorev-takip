@@ -88,10 +88,10 @@
                         <span class="hidden sm:inline">Uygulamayı Yükle</span>
                     </button>
 
-                    <!-- Yönetici Paneline Geçiş Butonu (Uygulama İçi) -->
-                    <button onclick="window.location.href='yonetici.html'" title="Yönetici Paneline Geç" class="bg-[#46372A] hover:bg-[#574434] text-[#FFBF3F] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#5A4737] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                    <!-- Yönetici Paneline Dönüş Butonu (SADECE YÖNETİCİLER İÇİN) -->
+                    <button id="btnReturnToManager" onclick="window.location.href='yonetici.html'" title="Yönetici Paneline Geri Dön" class="hidden bg-[#46372A] hover:bg-[#574434] text-[#FFBF3F] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#5A4737] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
                         <i class="fa-solid fa-user-tie text-[#FFBF3F] text-xs"></i>
-                        <span class="hidden sm:inline">Yönetici Paneli</span>
+                        <span class="hidden sm:inline">Yönetici Paneline Dön</span>
                         <span class="sm:hidden">Yönetici</span>
                     </button>
 
@@ -824,7 +824,27 @@
             }
         }
 
+        function updateManagerReturnButton() {
+            // Sadece yönetici paneline dön butonunu, gerçekten yönetici olan veya yöneticiden gelen görsün. Normal personel ASLA göremez!
+            const role = localStorage.getItem('cancerez_active_role');
+            const isManagerFromSession = sessionStorage.getItem('cancerez_manager_viewing_staff') === 'true';
+            const isAdmin = sessionStorage.getItem('cancerez_admin_auth') === 'true' || 
+                              (localStorage.getItem('cancerez_remember_admin') === 'true' && role === 'admin');
+            const btn = document.getElementById('btnReturnToManager');
+            if (btn) {
+                // Eğer kullanıcı personel olarak giriş yapmışsa ve yönetici önizleme oturumunda değilse kesinlikle gizle!
+                if (role === 'staff' && !isManagerFromSession) {
+                    btn.classList.add('hidden');
+                } else if (isManagerFromSession || (isAdmin && role !== 'staff')) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
+            updateManagerReturnButton();
             const rememberedStaff = localStorage.getItem('cancerez_remember_staff_user');
             const authUser = sessionStorage.getItem('cancerez_staff_auth_user') || rememberedStaff;
             if (authUser) {
@@ -1007,6 +1027,11 @@
                 const remEl = document.getElementById('pinRememberMe');
                 const rememberMe = remEl ? (remEl.value === 'true') : true;
 
+                // Personel giriş yaptığı için yöneticiye ait tüm geçiş yetkilerini kesin olarak sıfırla!
+                sessionStorage.removeItem('cancerez_manager_viewing_staff');
+                sessionStorage.removeItem('cancerez_admin_auth');
+                localStorage.removeItem('cancerez_remember_admin');
+
                 sessionStorage.setItem('cancerez_staff_auth_user', pendingPinPerson);
                 if (rememberMe) {
                     localStorage.setItem('cancerez_remember_staff_user', pendingPinPerson);
@@ -1018,6 +1043,7 @@
                     localStorage.setItem('task_personel_selected_user', pendingPinPerson);
                 }
 
+                updateManagerReturnButton();
                 closeUserPinModal();
                 renderPersonalDashboard(pendingPinPerson);
             } else {
@@ -1114,13 +1140,18 @@
 
             closeStaffSelfRegisterModal();
 
-            // Oturumu açıp hemen dashboard'a yönlendir
+            // Oturumu açıp hemen dashboard'a yönlendir (yönetici izinlerini sıfırla)
+            sessionStorage.removeItem('cancerez_manager_viewing_staff');
+            sessionStorage.removeItem('cancerez_admin_auth');
+            localStorage.removeItem('cancerez_remember_admin');
+
             sessionStorage.setItem('cancerez_staff_auth_user', name);
             localStorage.setItem('cancerez_remember_staff_user', name);
             localStorage.setItem('cancerez_active_role', 'staff');
             currentSelectedUser = name;
             localStorage.setItem('task_personel_selected_user', name);
 
+            updateManagerReturnButton();
             alert(`Hoş geldiniz ${name}! Personel kaydınız başarıyla oluşturuldu.`);
             renderPersonalDashboard(name);
         }
@@ -1200,6 +1231,9 @@
         function logoutStaffUser() {
             if (confirm("Güvenli çıkış yapıp ana portala dönmek istiyor musunuz?")) {
                 sessionStorage.removeItem('cancerez_staff_auth_user');
+                sessionStorage.removeItem('cancerez_manager_viewing_staff');
+                sessionStorage.removeItem('cancerez_admin_auth');
+                localStorage.removeItem('cancerez_remember_admin');
                 localStorage.removeItem('cancerez_remember_staff_user');
                 localStorage.removeItem('cancerez_active_role');
                 currentSelectedUser = '';
@@ -1712,7 +1746,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=15').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=16').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);
