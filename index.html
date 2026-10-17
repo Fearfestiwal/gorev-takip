@@ -26,6 +26,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Supabase 7/24 Bulut Veritabanı SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         body {
@@ -37,9 +39,29 @@
         }
     </style>
 
-    <!-- OTOMATİK OTURUM KONTROLÜ (BENİ HATIRLA) -->
+    <!-- OTOMATİK OTURUM KONTROLÜ (BENİ HATIRLA) & BULUT KURULUM HASH -->
     <script>
         (function() {
+            if (window.location.hash && window.location.hash.includes('cloud_setup=')) {
+                try {
+                    const match = window.location.hash.match(/cloud_setup=([^&]+)/);
+                    if (match && match[1]) {
+                        const jsonStr = decodeURIComponent(escape(atob(match[1])));
+                        const parsed = JSON.parse(jsonStr);
+                        if (parsed.url && parsed.key) {
+                            localStorage.setItem('cancerez_supabase_url', parsed.url);
+                            localStorage.setItem('cancerez_supabase_key', parsed.key);
+                            console.log("Supabase bulut yapılandırması link üzerinden otomatik yüklendi!");
+                        }
+                    }
+                } catch(e) {
+                    console.warn("Cloud setup hash hatası:", e);
+                }
+                try {
+                    history.replaceState(null, document.title, window.location.pathname + window.location.search);
+                } catch(e) {}
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const forceLogout = urlParams.get('logout') === 'true';
             if (forceLogout) {
@@ -436,6 +458,22 @@
     <!-- JAVASCRIPT: PORTAL & GİRİŞ MANTIĞI -->
     <script>
         const CLOUD_DB_URL = localStorage.getItem('cancerez_cloud_db_url') || "https://extendsclass.com/api/json-storage/bin/aecadfa";
+
+        // Supabase 7/24 Bulut Entegrasyonu
+        let supabaseClient = null;
+        function initSupabase() {
+            const url = (localStorage.getItem('cancerez_supabase_url') || '').trim();
+            const key = (localStorage.getItem('cancerez_supabase_key') || '').trim();
+            if (window.supabase && url && key) {
+                try {
+                    supabaseClient = window.supabase.createClient(url, key, { auth: { persistSession: false } });
+                } catch(e) {
+                    supabaseClient = null;
+                }
+            }
+        }
+        initSupabase();
+
         const DEFAULT_INIT_TEAM = [
             { id: 1, name: "Ahmet Can", role: "Şube Sorumlusu", phone: "05551234567", pin: "1978", status: "aktif" }
         ];
@@ -831,6 +869,24 @@
         }
 
         async function pushTeamToCloud(newTeam) {
+            if (supabaseClient) {
+                try {
+                    const teamRows = newTeam.map((m, idx) => ({
+                        id: Number(m.id || (idx + 1)),
+                        name: m.name,
+                        title: m.title || m.role || 'Personel',
+                        department: m.department || 'Şube Operasyon',
+                        phone: m.phone || '',
+                        email: m.email || '',
+                        pin: m.pin || '1978',
+                        status: m.status || 'aktif'
+                    }));
+                    await supabaseClient.from('cancerez_team').upsert(teamRows, { onConflict: 'id' });
+                } catch(e) {
+                    console.warn("Supabase push team:", e);
+                }
+            }
+
             const rawData = {
                 tasks: JSON.parse(localStorage.getItem('task_items') || '[]'),
                 team: newTeam,
@@ -913,29 +969,47 @@
             const localTeam = JSON.parse(localStorage.getItem('task_team_members') || '[]');
             let serverTeam = [];
 
-            try {
-                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.port === '8080') {
-                    const res = await fetch('/api/data');
-                    if (res.ok) {
-                        const d = await res.json();
-                        if (Array.isArray(d.team)) serverTeam = d.team;
+            if (supabaseClient) {
+                try {
+                    const { data: sTeam } = await supabaseClient.from('cancerez_team').select('*');
+                    if (Array.isArray(sTeam) && sTeam.length > 0) {
+                        serverTeam = sTeam;
                     }
-                } else {
-                    const cacheBuster = (CLOUD_DB_URL.includes('?') ? '&' : '?') + '_ts=' + Date.now();
-                    const res = await fetch(CLOUD_DB_URL + cacheBuster, { 
-                        cache: 'no-store',
-                        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
-                    });
-                    if (res.ok) {
-                        const d = await res.json();
-                        const p = (d && d.data && (d.data.tasks || d.data.team)) ? d.data : d;
-                        if (Array.isArray(p.team)) serverTeam = p.team;
-                        if (p.adminPassword) {
-                            localStorage.setItem('cancerez_admin_password', p.adminPassword);
+                    const { data: sSettings } = await supabaseClient.from('cancerez_settings').select('*');
+                    if (Array.isArray(sSettings)) {
+                        const pObj = sSettings.find(s => s.key === 'admin_password');
+                        if (pObj && pObj.value) localStorage.setItem('cancerez_admin_password', pObj.value);
+                    }
+                } catch(e) {
+                    console.warn("Supabase team fetch:", e);
+                }
+            }
+
+            if (serverTeam.length === 0) {
+                try {
+                    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.port === '8080') {
+                        const res = await fetch('/api/data');
+                        if (res.ok) {
+                            const d = await res.json();
+                            if (Array.isArray(d.team)) serverTeam = d.team;
+                        }
+                    } else {
+                        const cacheBuster = (CLOUD_DB_URL.includes('?') ? '&' : '?') + '_ts=' + Date.now();
+                        const res = await fetch(CLOUD_DB_URL + cacheBuster, { 
+                            cache: 'no-store',
+                            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+                        });
+                        if (res.ok) {
+                            const d = await res.json();
+                            const p = (d && d.data && (d.data.tasks || d.data.team)) ? d.data : d;
+                            if (Array.isArray(p.team)) serverTeam = p.team;
+                            if (p.adminPassword) {
+                                localStorage.setItem('cancerez_admin_password', p.adminPassword);
+                            }
                         }
                     }
-                }
-            } catch(e) {}
+                } catch(e) {}
+            }
 
             // Akıllı Birleştirme: Yerel personelleri ASLA ezme!
             const merged = mergeTeamMembers(localTeam, serverTeam);
@@ -1040,7 +1114,7 @@
         if ('serviceWorker' in navigator) {
             const hadController = !!navigator.serviceWorker.controller;
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=22')
+                navigator.serviceWorker.register('sw.js?v=23')
                     .then(reg => {
                         reg.update();
                     })

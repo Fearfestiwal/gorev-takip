@@ -52,6 +52,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Supabase 7/24 Bulut Veritabanı SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -728,6 +730,143 @@
         let pushInProgress = false;
         let lastKnownTeam = (team && team.length > 0) ? team : [];
 
+        // ================= 7/24 SUPABASE BULUT MOTORU =================
+        let supabaseClient = null;
+        let supabaseRealtimeChannel = null;
+
+        function getSupabaseConfig() {
+            return {
+                url: (localStorage.getItem('cancerez_supabase_url') || '').trim(),
+                key: (localStorage.getItem('cancerez_supabase_key') || '').trim()
+            };
+        }
+
+        function initSupabase() {
+            const cfg = getSupabaseConfig();
+            if (window.supabase && cfg.url && cfg.key) {
+                try {
+                    supabaseClient = window.supabase.createClient(cfg.url, cfg.key, {
+                        auth: { persistSession: false }
+                    });
+                    console.log("CAN ÇEREZ (Personel) - Supabase 7/24 Bulut Motoru Başlatıldı!");
+                    setupSupabaseRealtime();
+                    updatePersonelServerBadge(true);
+                    return true;
+                } catch(e) {
+                    console.warn("Supabase başlatma hatası:", e);
+                    supabaseClient = null;
+                    return false;
+                }
+            } else {
+                supabaseClient = null;
+                return false;
+            }
+        }
+
+        function setupSupabaseRealtime() {
+            if (!supabaseClient) return;
+            try {
+                if (supabaseRealtimeChannel) {
+                    supabaseClient.removeChannel(supabaseRealtimeChannel);
+                }
+                supabaseRealtimeChannel = supabaseClient.channel('cancerez_staff_realtime')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'cancerez_tasks' }, () => {
+                        syncWithServer();
+                    })
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'cancerez_team' }, () => {
+                        syncWithServer();
+                    })
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'cancerez_settings' }, () => {
+                        syncWithServer();
+                    })
+                    .subscribe();
+            } catch(e) {
+                console.warn("Realtime abonelik hatası:", e);
+            }
+        }
+
+        async function fetchFromSupabase() {
+            if (!supabaseClient) return null;
+            try {
+                const [tasksRes, teamRes, settingsRes] = await Promise.all([
+                    supabaseClient.from('cancerez_tasks').select('*'),
+                    supabaseClient.from('cancerez_team').select('*'),
+                    supabaseClient.from('cancerez_settings').select('*')
+                ]);
+
+                if (tasksRes.error || teamRes.error) {
+                    console.warn("Supabase veri çekme:", tasksRes.error || teamRes.error);
+                    return null;
+                }
+
+                let notes = '';
+                let adminPassword = '1978';
+                if (settingsRes && Array.isArray(settingsRes.data)) {
+                    const nObj = settingsRes.data.find(s => s.key === 'admin_notes');
+                    if (nObj) notes = nObj.value || '';
+                    const pObj = settingsRes.data.find(s => s.key === 'admin_password');
+                    if (pObj) adminPassword = pObj.value || '1978';
+                }
+
+                return {
+                    tasks: tasksRes.data || [],
+                    team: teamRes.data || [],
+                    notes: notes,
+                    adminPassword: adminPassword
+                };
+            } catch(e) {
+                console.warn("Supabase fetch exception:", e);
+                return null;
+            }
+        }
+
+        async function pushToSupabase(rawData) {
+            if (!supabaseClient) return false;
+            try {
+                if (Array.isArray(rawData.tasks) && rawData.tasks.length > 0) {
+                    const rows = rawData.tasks.map(t => ({
+                        id: Number(t.id),
+                        title: t.title || 'Görev',
+                        department: t.department || 'Şube Operasyon',
+                        action: t.action || '',
+                        owner: t.owner || '',
+                        dueDate: t.dueDate || '',
+                        status: t.status || 'Açık',
+                        priority: t.priority || 'Normal',
+                        branch: t.branch || 'Merkez / Genel',
+                        recurrence: t.recurrence || 'none',
+                        comments: Array.isArray(t.comments) ? t.comments : [],
+                        updated_at: new Date().toISOString()
+                    }));
+                    await supabaseClient.from('cancerez_tasks').upsert(rows, { onConflict: 'id' });
+                }
+
+                const deletedIds = getDeletedTaskIds();
+                if (deletedIds.length > 0) {
+                    await supabaseClient.from('cancerez_tasks').delete().in('id', deletedIds.map(Number));
+                }
+
+                if (Array.isArray(rawData.team) && rawData.team.length > 0) {
+                    const teamRows = rawData.team.map((m, idx) => ({
+                        id: Number(m.id || (idx + 1)),
+                        name: m.name,
+                        title: m.title || 'Personel',
+                        department: m.department || 'Şube Operasyon',
+                        phone: m.phone || '',
+                        email: m.email || '',
+                        pin: m.pin || '1978',
+                        status: m.status || 'aktif'
+                    }));
+                    await supabaseClient.from('cancerez_team').upsert(teamRows, { onConflict: 'id' });
+                }
+
+                return true;
+            } catch(e) {
+                console.warn("Supabase push exception:", e);
+                return false;
+            }
+        }
+
         function isLocalEnvironment() {
             return window.location.protocol.startsWith('http') && 
                    (window.location.hostname === 'localhost' || 
@@ -809,7 +948,15 @@
 
             try {
                 let data = null;
-                if (isLocalEnvironment()) {
+                if (supabaseClient) {
+                    try {
+                        data = await fetchFromSupabase();
+                    } catch(e) {
+                        console.warn("Supabase sync hatası:", e);
+                    }
+                }
+
+                if (!data && isLocalEnvironment()) {
                     try {
                         const localRes = await fetch('/api/data');
                         if (localRes.ok) data = await localRes.json();
@@ -918,6 +1065,15 @@
                 adminPassword: localStorage.getItem('cancerez_admin_password') || '1978'
             };
 
+            if (supabaseClient) {
+                try {
+                    await pushToSupabase(rawData);
+                    updatePersonelServerBadge(true);
+                } catch(e) {
+                    console.warn("Supabase push hatası:", e);
+                }
+            }
+
             const cloudPayload = JSON.stringify(rawData);
 
             try {
@@ -1019,6 +1175,26 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            if (window.location.hash && window.location.hash.includes('cloud_setup=')) {
+                try {
+                    const match = window.location.hash.match(/cloud_setup=([^&]+)/);
+                    if (match && match[1]) {
+                        const jsonStr = decodeURIComponent(escape(atob(match[1])));
+                        const parsed = JSON.parse(jsonStr);
+                        if (parsed.url && parsed.key) {
+                            localStorage.setItem('cancerez_supabase_url', parsed.url);
+                            localStorage.setItem('cancerez_supabase_key', parsed.key);
+                            console.log("Supabase bulut yapılandırması link üzerinden otomatik yüklendi!");
+                        }
+                    }
+                } catch(e) {
+                    console.warn("Cloud setup hash hatası:", e);
+                }
+                try {
+                    history.replaceState(null, document.title, window.location.pathname + window.location.search);
+                } catch(e) {}
+            }
+            initSupabase();
             updateManagerReturnButton();
             const rememberedStaff = localStorage.getItem('cancerez_remember_staff_user');
             const authUser = sessionStorage.getItem('cancerez_staff_auth_user') || rememberedStaff;
@@ -1995,7 +2171,7 @@
         if ('serviceWorker' in navigator) {
             const hadController = !!navigator.serviceWorker.controller;
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=22').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=23').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);

@@ -21,6 +21,8 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase Official JS SDK (7/24 Cloud DB & Realtime WebSockets) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Tailwind CSS with Official CAN ÇEREZ Pantone Colors -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -1115,6 +1117,40 @@
                     </p>
                 </div>
 
+                <!-- 7/24 SUPABASE BULUT VERİTABANI BAĞLANTISI -->
+                <div class="bg-[#FAF7F2] border border-[#E8DFC8] rounded-2xl p-3.5 text-[#31261D] text-xs space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold flex items-center gap-1.5 text-xs text-[#31261D]">
+                            <i class="fa-solid fa-cloud text-[#1E340C]"></i> 7/24 Supabase Bulut Veritabanı
+                        </span>
+                        <span id="supabaseStatusPill" class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-stone-200 text-stone-600">Bağlı Değil</span>
+                    </div>
+                    <p class="text-[#5C4A3C] text-[10px] leading-relaxed">
+                        Verilerinizi GitHub'da açıkta tutmadan, sadece bu cihazın hafızasından doğrudan kendi güvenli Supabase bulutunuza bağlayabilirsiniz.
+                    </p>
+                    <div class="space-y-2 pt-1">
+                        <div>
+                            <label class="block font-bold text-[10px] text-[#31261D] mb-1">Supabase Project URL</label>
+                            <input type="text" id="supabaseUrlInput" placeholder="https://xxxxxxxxxxxx.supabase.co" class="w-full px-3 py-1.5 text-xs rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] font-mono focus:outline-none focus:border-[#A6192E]">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[10px] text-[#31261D] mb-1">Supabase Anon Public Key</label>
+                            <input type="password" id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full px-3 py-1.5 text-xs rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] font-mono focus:outline-none focus:border-[#A6192E]">
+                        </div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <button type="button" onclick="saveAndTestSupabaseConfig()" class="flex-1 py-2 px-3 bg-[#1E340C] hover:bg-[#2C4A14] text-white rounded-xl font-bold transition-all text-[11px] flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                                <i class="fa-solid fa-plug text-[#FFBF3F]"></i> Bağlan & Kaydet
+                            </button>
+                            <button type="button" onclick="copyStaffSetupLink()" title="Personel cihazlarının tek tıkla bağlanması için güvenli kurulum linkini kopyala" class="py-2 px-3 bg-[#FAF7F2] hover:bg-[#E8DFC8] text-[#31261D] rounded-xl font-bold transition-all text-[11px] border border-[#E8DFC8] flex items-center justify-center gap-1 cursor-pointer">
+                                <i class="fa-solid fa-share-nodes text-[#824701]"></i> Personel Linki
+                            </button>
+                            <button type="button" onclick="disconnectSupabase()" title="Bulut bağlantısını kaldır ve yerel moda dön" class="py-2 px-2 bg-rose-50 hover:bg-rose-100 text-[#A6192E] rounded-xl font-bold transition-all text-[11px] border border-rose-200 flex items-center justify-center cursor-pointer">
+                                <i class="fa-solid fa-unlink"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- YÖNETİCİ ŞİFRE AYARI -->
                 <div class="bg-[#FAF7F2] border border-[#E8DFC8] rounded-2xl p-3 text-[#31261D] text-[11px] space-y-2">
                     <div class="flex items-center justify-between">
@@ -1390,6 +1426,246 @@
         let lastLocalActionTime = parseInt(localStorage.getItem('cancerez_last_local_action') || '0', 10);
         let pushInProgress = false;
 
+        // ================= 7/24 SUPABASE BULUT MOTORU =================
+        let supabaseClient = null;
+        let supabaseRealtimeChannel = null;
+
+        function getSupabaseConfig() {
+            return {
+                url: (localStorage.getItem('cancerez_supabase_url') || '').trim(),
+                key: (localStorage.getItem('cancerez_supabase_key') || '').trim()
+            };
+        }
+
+        function initSupabase() {
+            const cfg = getSupabaseConfig();
+            if (window.supabase && cfg.url && cfg.key) {
+                try {
+                    supabaseClient = window.supabase.createClient(cfg.url, cfg.key, {
+                        auth: { persistSession: false }
+                    });
+                    console.log("CAN ÇEREZ - Supabase 7/24 Bulut Motoru Başlatıldı!");
+                    setupSupabaseRealtime();
+                    updateSupabaseStatusUI(true);
+                    return true;
+                } catch(e) {
+                    console.warn("Supabase başlatma hatası:", e);
+                    supabaseClient = null;
+                    updateSupabaseStatusUI(false);
+                    return false;
+                }
+            } else {
+                supabaseClient = null;
+                updateSupabaseStatusUI(false);
+                return false;
+            }
+        }
+
+        function setupSupabaseRealtime() {
+            if (!supabaseClient) return;
+            try {
+                if (supabaseRealtimeChannel) {
+                    supabaseClient.removeChannel(supabaseRealtimeChannel);
+                }
+                supabaseRealtimeChannel = supabaseClient.channel('cancerez_manager_realtime')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'cancerez_tasks' }, () => {
+                        syncWithServer();
+                    })
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'cancerez_team' }, () => {
+                        syncWithServer();
+                    })
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'cancerez_settings' }, () => {
+                        syncWithServer();
+                    })
+                    .subscribe();
+            } catch(e) {
+                console.warn("Realtime abonelik hatası:", e);
+            }
+        }
+
+        async function fetchFromSupabase() {
+            if (!supabaseClient) return null;
+            try {
+                const [tasksRes, teamRes, settingsRes] = await Promise.all([
+                    supabaseClient.from('cancerez_tasks').select('*'),
+                    supabaseClient.from('cancerez_team').select('*'),
+                    supabaseClient.from('cancerez_settings').select('*')
+                ]);
+
+                if (tasksRes.error || teamRes.error) {
+                    console.warn("Supabase veri çekme:", tasksRes.error || teamRes.error);
+                    return null;
+                }
+
+                let notes = '';
+                let adminPassword = '1978';
+                if (settingsRes && Array.isArray(settingsRes.data)) {
+                    const nObj = settingsRes.data.find(s => s.key === 'admin_notes');
+                    if (nObj) notes = nObj.value || '';
+                    const pObj = settingsRes.data.find(s => s.key === 'admin_password');
+                    if (pObj) adminPassword = pObj.value || '1978';
+                }
+
+                return {
+                    tasks: tasksRes.data || [],
+                    team: teamRes.data || [],
+                    notes: notes,
+                    adminPassword: adminPassword
+                };
+            } catch(e) {
+                console.warn("Supabase fetch exception:", e);
+                return null;
+            }
+        }
+
+        async function pushToSupabase(rawData) {
+            if (!supabaseClient) return false;
+            try {
+                if (Array.isArray(rawData.tasks) && rawData.tasks.length > 0) {
+                    const rows = rawData.tasks.map(t => ({
+                        id: Number(t.id),
+                        title: t.title || 'Görev',
+                        department: t.department || 'Şube Operasyon',
+                        action: t.action || '',
+                        owner: t.owner || '',
+                        dueDate: t.dueDate || '',
+                        status: t.status || 'Açık',
+                        priority: t.priority || 'Normal',
+                        branch: t.branch || 'Merkez / Genel',
+                        recurrence: t.recurrence || 'none',
+                        comments: Array.isArray(t.comments) ? t.comments : [],
+                        updated_at: new Date().toISOString()
+                    }));
+                    await supabaseClient.from('cancerez_tasks').upsert(rows, { onConflict: 'id' });
+                }
+
+                const deletedIds = getDeletedTaskIds();
+                if (deletedIds.length > 0) {
+                    await supabaseClient.from('cancerez_tasks').delete().in('id', deletedIds.map(Number));
+                }
+
+                if (Array.isArray(rawData.team) && rawData.team.length > 0) {
+                    const teamRows = rawData.team.map((m, idx) => ({
+                        id: Number(m.id || (idx + 1)),
+                        name: m.name,
+                        title: m.title || 'Personel',
+                        department: m.department || 'Şube Operasyon',
+                        phone: m.phone || '',
+                        email: m.email || '',
+                        pin: m.pin || '1978',
+                        status: m.status || 'aktif'
+                    }));
+                    await supabaseClient.from('cancerez_team').upsert(teamRows, { onConflict: 'id' });
+                }
+
+                const deletedNames = getDeletedMemberNames();
+                if (deletedNames.length > 0) {
+                    await supabaseClient.from('cancerez_team').delete().in('name', deletedNames);
+                }
+
+                await supabaseClient.from('cancerez_settings').upsert([
+                    { key: 'admin_notes', value: rawData.notes || '', updated_at: new Date().toISOString() },
+                    { key: 'admin_password', value: rawData.adminPassword || '1978', updated_at: new Date().toISOString() }
+                ], { onConflict: 'key' });
+
+                return true;
+            } catch(e) {
+                console.warn("Supabase push exception:", e);
+                return false;
+            }
+        }
+
+        async function saveAndTestSupabaseConfig() {
+            const url = (document.getElementById('supabaseUrlInput')?.value || '').trim();
+            const key = (document.getElementById('supabaseKeyInput')?.value || '').trim();
+
+            if (!url || !key) {
+                alert("Lütfen hem Supabase Project URL hem de anon public key giriniz.");
+                return;
+            }
+
+            try {
+                if (!window.supabase) throw new Error("Supabase kütüphanesi yüklenemedi. İnternet bağlantınızı kontrol ediniz.");
+                const testClient = window.supabase.createClient(url, key, { auth: { persistSession: false } });
+                const testRes = await testClient.from('cancerez_tasks').select('id').limit(1);
+                
+                if (testRes.error) {
+                    if (testRes.error.message && testRes.error.message.includes('cancerez_tasks')) {
+                        alert("⚠️ Supabase bağlantısı kuruldu ancak tablolar henüz oluşturulmamış!\n\nLütfen Supabase panelindeki SQL Editor kısmında sana verdiğim Güvenlik Duvarı SQL kodunu yapıştırıp 'Run' butonuna basınız.");
+                    } else {
+                        throw testRes.error;
+                    }
+                }
+
+                localStorage.setItem('cancerez_supabase_url', url);
+                localStorage.setItem('cancerez_supabase_key', key);
+                initSupabase();
+                await pushDataToServer();
+                updateSupabaseStatusUI(true);
+                alert("🎉 TEBRİKLER!\n\nSupabase 7/24 Bulut Veritabanı başarıyla bağlandı ve verileriniz buluta eşitlendi.\n\nArtık bilgisayarınız kapalıyken bile personeller şubelerden işlem yapabilir ve her şey canlı olarak güncellenir.");
+            } catch(err) {
+                alert("Supabase Bağlantı Hatası: " + (err.message || String(err)) + "\n\nLütfen URL ve Key değerlerinizi kontrol ediniz.");
+            }
+        }
+
+        function copyStaffSetupLink() {
+            const cfg = getSupabaseConfig();
+            if (!cfg.url || !cfg.key) {
+                alert("Önce geçerli bir Supabase URL ve Key girip 'Bağlan & Kaydet' butonuna basınız.");
+                return;
+            }
+            const baseUrl = window.location.href.split('?')[0].replace(/yonetici\.html|$/, 'personel.html');
+            const payload = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+            const setupLink = `${baseUrl}#cloud_setup=${payload}`;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(setupLink).then(() => {
+                    alert("📋 Personel Otomatik Kurulum Linki Kopyalandı!\n\nBu linki personellerinize WhatsApp'tan gönderebilir veya şube cihazlarında 1 kez açabilirsiniz. Açıldığı an o cihaz hiçbir şifre sormadan otomatik olarak bu bulut veritabanına bağlanacaktır.");
+                }).catch(() => {
+                    prompt("Personel Kurulum Linkini Kopyalayın:", setupLink);
+                });
+            } else {
+                prompt("Personel Kurulum Linkini Kopyalayın:", setupLink);
+            }
+        }
+
+        function disconnectSupabase() {
+            if (confirm("Supabase bulut bağlantısını kaldırmak ve yerel hafıza moduna dönmek istediğinize emin misiniz?")) {
+                localStorage.removeItem('cancerez_supabase_url');
+                localStorage.removeItem('cancerez_supabase_key');
+                if (supabaseRealtimeChannel && supabaseClient) {
+                    supabaseClient.removeChannel(supabaseRealtimeChannel);
+                }
+                supabaseClient = null;
+                const uInp = document.getElementById('supabaseUrlInput');
+                const kInp = document.getElementById('supabaseKeyInput');
+                if (uInp) uInp.value = '';
+                if (kInp) kInp.value = '';
+                updateSupabaseStatusUI(false);
+                alert("Bulut bağlantısı kaldırıldı. Sistem yerel hafıza moduna geçti.");
+            }
+        }
+
+        function updateSupabaseStatusUI(online) {
+            const pill = document.getElementById('supabaseStatusPill');
+            const urlInp = document.getElementById('supabaseUrlInput');
+            const keyInp = document.getElementById('supabaseKeyInput');
+            const cfg = getSupabaseConfig();
+
+            if (urlInp && !urlInp.value && cfg.url) urlInp.value = cfg.url;
+            if (keyInp && !keyInp.value && cfg.key) keyInp.value = cfg.key;
+
+            if (pill) {
+                if (online || (cfg.url && cfg.key && supabaseClient)) {
+                    pill.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+                    pill.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block mr-1"></span> 7/24 Supabase Aktif';
+                } else {
+                    pill.className = "text-[10px] px-2 py-0.5 rounded-full font-bold bg-stone-200 text-stone-600";
+                    pill.innerText = "Bağlı Değil";
+                }
+            }
+        }
+
         function isLocalEnvironment() {
             return window.location.protocol.startsWith('http') && 
                    (window.location.hostname === 'localhost' || 
@@ -1471,7 +1747,15 @@
 
             try {
                 let data = null;
-                if (isLocalEnvironment()) {
+                if (supabaseClient) {
+                    try {
+                        data = await fetchFromSupabase();
+                    } catch(e) {
+                        console.warn("Supabase sync hatası:", e);
+                    }
+                }
+
+                if (!data && isLocalEnvironment()) {
                     try {
                         const localRes = await fetch('/api/data');
                         if (localRes.ok) data = await localRes.json();
@@ -1581,6 +1865,15 @@
                 notes: document.getElementById('managementNotes')?.value || localStorage.getItem('task_management_notes') || '',
                 adminPassword: localStorage.getItem('cancerez_admin_password') || '1978'
             };
+
+            if (supabaseClient) {
+                try {
+                    await pushToSupabase(rawData);
+                    updateServerStatusBadge(true);
+                } catch(e) {
+                    console.warn("Supabase push hatası:", e);
+                }
+            }
 
             const cloudPayload = JSON.stringify(rawData);
 
@@ -1811,6 +2104,25 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            if (window.location.hash && window.location.hash.includes('cloud_setup=')) {
+                try {
+                    const match = window.location.hash.match(/cloud_setup=([^&]+)/);
+                    if (match && match[1]) {
+                        const jsonStr = decodeURIComponent(escape(atob(match[1])));
+                        const parsed = JSON.parse(jsonStr);
+                        if (parsed.url && parsed.key) {
+                            localStorage.setItem('cancerez_supabase_url', parsed.url);
+                            localStorage.setItem('cancerez_supabase_key', parsed.key);
+                        }
+                    }
+                } catch(e) {
+                    console.warn("Cloud setup hash hatası:", e);
+                }
+                try {
+                    history.replaceState(null, document.title, window.location.pathname + window.location.search);
+                } catch(e) {}
+            }
+            initSupabase();
             checkAdminAuth();
             const savedNotes = localStorage.getItem('task_management_notes');
             if (savedNotes !== null) {
@@ -3374,6 +3686,7 @@
 
         // ================= YEDEKLEME =================
         function openSettingsModal() {
+            updateSupabaseStatusUI(Boolean(supabaseClient));
             const sm = document.getElementById('settingsModal');
             if (sm) {
                 sm.style.setProperty('display', 'flex', 'important');
@@ -3571,7 +3884,7 @@
         if ('serviceWorker' in navigator) {
             const hadController = !!navigator.serviceWorker.controller;
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=22')
+                navigator.serviceWorker.register('sw.js?v=23')
                     .then(reg => {
                         console.log('CAN ÇEREZ SW Aktif:', reg.scope);
                         reg.update();
