@@ -1252,6 +1252,31 @@
                     </p>
                 </div>
 
+                <!-- YÖNETİCİ İLETİŞİM & WHATSAPP / MAİL HATTI -->
+                <div class="bg-[#FAF7F2] border border-[#E8DFC8] rounded-2xl p-3.5 text-[#31261D] text-xs space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold flex items-center gap-1.5 text-xs text-[#31261D]">
+                            <i class="fa-brands fa-whatsapp text-emerald-600"></i> Yönetici WhatsApp & Bildirim Hattı
+                        </span>
+                        <span class="text-[9px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-200">Personel İletişimi</span>
+                    </div>
+                    <p class="text-[#5C4A3C] text-[10px] leading-relaxed">
+                        Personeller görev ekranından "WhatsApp ile Bildir" veya "Gmail Gönder" dediğinde mesajların gideceği telefon numaranız ve e-postanız:
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 pt-0.5">
+                        <div>
+                            <label class="block font-bold text-[10px] text-[#31261D] mb-0.5">WhatsApp Numarası</label>
+                            <input type="text" id="settingManagerPhone" placeholder="Örn: 05551234567" oninput="saveManagerContactSettings()"
+                                   class="w-full px-2.5 py-1.5 text-xs rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] font-mono focus:outline-none focus:border-[#1E340C]">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[10px] text-[#31261D] mb-0.5">Yönetici E-Postası</label>
+                            <input type="email" id="settingManagerEmail" placeholder="yonetim@cancerez.com.tr" oninput="saveManagerContactSettings()"
+                                   class="w-full px-2.5 py-1.5 text-xs rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] font-mono focus:outline-none focus:border-[#1E340C]">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- KURUMSAL ÖZEL ALAN ADI (DOMAIN) REHBERİ -->
                 <div class="bg-[#FAF7F2] border border-[#E8DFC8] rounded-2xl p-3.5 text-[#31261D] text-xs space-y-2">
                     <div class="flex items-center justify-between">
@@ -2641,7 +2666,7 @@
 
         function filterTasksByBranch(branchName) {
             switchMainPage(2);
-            const searchInput = document.getElementById('taskSearchInput');
+            const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.value = branchName;
             }
@@ -4477,9 +4502,14 @@
             renderApp();
         }
 
-        // ================= YEDEKLEME =================
+        // ================= YEDEKLEME & AYARLAR =================
         function openSettingsModal() {
             updateSupabaseStatusUI(Boolean(supabaseClient));
+            const phoneInput = document.getElementById('settingManagerPhone');
+            if (phoneInput) phoneInput.value = localStorage.getItem('task_manager_phone') || '';
+            const emailInput = document.getElementById('settingManagerEmail');
+            if (emailInput) emailInput.value = localStorage.getItem('task_manager_email') || '';
+
             const sm = document.getElementById('settingsModal');
             if (sm) {
                 sm.style.setProperty('display', 'flex', 'important');
@@ -4491,6 +4521,17 @@
             if (sm) {
                 sm.style.setProperty('display', 'none', 'important');
                 sm.classList.add('hidden');
+            }
+        }
+
+        function saveManagerContactSettings() {
+            const phoneInput = document.getElementById('settingManagerPhone');
+            if (phoneInput) {
+                localStorage.setItem('task_manager_phone', phoneInput.value.trim());
+            }
+            const emailInput = document.getElementById('settingManagerEmail');
+            if (emailInput) {
+                localStorage.setItem('task_manager_email', emailInput.value.trim());
             }
         }
 
@@ -4677,7 +4718,7 @@
         if ('serviceWorker' in navigator) {
             const hadController = !!navigator.serviceWorker.controller;
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=26')
+                navigator.serviceWorker.register('sw.js?v=27')
                     .then(reg => {
                         console.log('CAN ÇEREZ SW Aktif:', reg.scope);
                         reg.update();

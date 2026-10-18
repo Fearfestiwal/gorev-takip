@@ -2657,7 +2657,7 @@
         if ('serviceWorker' in navigator) {
             const hadController = !!navigator.serviceWorker.controller;
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=26').then(reg => {
+                navigator.serviceWorker.register('sw.js?v=27').then(reg => {
                     reg.update();
                 }).catch(err => {
                     console.log('Service Worker kayıt hatası: ', err);
