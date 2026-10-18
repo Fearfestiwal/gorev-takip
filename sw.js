@@ -1,5 +1,5 @@
 // Can Çerez 1978 - Service Worker
-const CACHE_NAME = 'can-cerez-v23';
+const CACHE_NAME = 'can-cerez-v24';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -88,3 +88,21 @@ self.addEventListener('fetch', (e) => {
     })
   );
 });
+
+// 4. Sistem Bildirim Tıklama Olayı (Web Push & Local Notification)
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow('./');
+      }
+    })
+  );
+});
+
