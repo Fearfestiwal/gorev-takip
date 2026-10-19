@@ -63,22 +63,22 @@
 </head>
 <body class="text-[#31261D] antialiased min-h-screen flex flex-col bg-[#FAF7F2]">
 
-    <!-- ÜST BAR (CAN ÇEREZ PERSONEL NAVBAR) -->
-    <header class="bg-[#31261D] text-white shadow-xl sticky top-0 z-30 border-b border-[#FFBF3F]/30">
+    <!-- ÜST BAR (CAN ÇEREZ PERSONEL NAVBAR - AYDINLIK & KURUMSAL LOGO TEMASI) -->
+    <header class="bg-white/95 backdrop-blur-md text-[#31261D] shadow-xs sticky top-0 z-30 border-b border-[#E8DFC8]">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 sm:h-18">
                 <!-- Sol Logo (CAN ÇEREZ 1978) -->
                 <div class="flex items-center gap-3">
                     <div class="flex items-center gap-2 group cursor-default select-none">
-                        <img src="logo.svg" alt="CAN ÇEREZ (1978)" class="h-10 sm:h-11 w-auto object-contain drop-shadow-md">
+                        <img src="logo.svg" alt="CAN ÇEREZ (1978)" class="h-10 sm:h-11 w-auto object-contain drop-shadow-xs">
                     </div>
-                    <div class="border-l border-[#FFBF3F]/30 pl-3">
+                    <div class="border-l border-[#E8DFC8] pl-3">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-[10px] bg-[#A6192E] text-white px-2 py-0.5 rounded-md font-black uppercase border border-[#FFBF3F]/40 shadow-xs">ÇALIŞAN EKRANI</span>
-                            <span class="text-[9px] bg-[#46372A] text-[#FFBF3F] px-2 py-0.5 rounded font-bold uppercase border border-[#FFBF3F]/30 tracking-wider">CAN KARDEŞLER KURULUŞUDUR</span>
+                            <span class="text-[9px] bg-[#FAF2E6] text-[#A6192E] px-2 py-0.5 rounded font-extrabold uppercase border border-[#D49B28]/40 tracking-wider">CAN KARDEŞLER KURULUŞUDUR</span>
                             <button id="personelServerBadge" onclick="syncWithServer(true)" title="Bulut / Yerel veriyi yenilemek için tıklayın" class="hidden text-[10px] px-2 py-0.5 rounded font-bold flex items-center gap-1 cursor-pointer hover:opacity-90 transition-opacity"></button>
                         </div>
-                        <p class="text-[11px] text-[#E5DCD0]">Kişisel Görev & Aksiyon Takip Ekranı</p>
+                        <p class="text-[11px] text-[#5C4A3C] font-medium">Kişisel Görev & Aksiyon Takip Ekranı</p>
                     </div>
                 </div>
 
@@ -91,24 +91,24 @@
                     </button>
 
                     <!-- Anlık Görev Bildirimleri Butonu -->
-                    <button id="btnStaffToggleNotif" onclick="toggleStaffPushNotifications()" title="Anlık Görev Bildirimlerini Aç/Kapat" class="bg-[#31261D] hover:bg-[#46372A] text-[#FFBF3F] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#FFBF3F]/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                    <button id="btnStaffToggleNotif" onclick="toggleStaffPushNotifications()" title="Anlık Görev Bildirimlerini Aç/Kapat" class="bg-[#FAF7F2] hover:bg-[#F2ECE1] text-[#5C4A3C] hover:text-[#A6192E] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#E8DFC8] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
                         <i id="staffNotifIcon" class="fa-regular fa-bell text-xs"></i>
                         <span class="hidden md:inline">Bildirim</span>
                     </button>
 
                     <!-- Yönetici Paneline Geçiş Butonu (Şifreli / Hızlı Dönüş) -->
-                    <button id="btnOpenManagerAccess" onclick="handleManagerAccessClick()" title="Yönetici Paneline Geçiş Yap" class="bg-[#31261D] hover:bg-[#46372A] text-[#FFBF3F] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#FFBF3F]/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
-                        <i class="fa-solid fa-crown text-[#FFBF3F] text-xs"></i>
+                    <button id="btnOpenManagerAccess" onclick="handleManagerAccessClick()" title="Yönetici Paneline Geçiş Yap" class="bg-[#FAF7F2] hover:bg-[#F2ECE1] text-[#A6192E] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#D49B28]/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                        <i class="fa-solid fa-crown text-[#D49B28] text-xs"></i>
                         <span class="hidden sm:inline">Yönetici Girişi</span>
                         <span class="sm:hidden">Yönetici</span>
                     </button>
 
                     <div id="headerUserActions" class="hidden flex items-center gap-2">
-                        <button onclick="openStaffChangePinModal()" title="Kişisel Giriş PIN Kodunuzu Değiştirin" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#46372A] hover:bg-[#574434] text-[#FFBF3F] text-xs font-bold border border-[#5A4737] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
-                            <i class="fa-solid fa-key text-xs"></i>
+                        <button onclick="openStaffChangePinModal()" title="Kişisel Giriş PIN Kodunuzu Değiştirin" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FAF7F2] hover:bg-[#F2ECE1] text-[#31261D] text-xs font-bold border border-[#E8DFC8] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                            <i class="fa-solid fa-key text-xs text-[#A6192E]"></i>
                             <span class="hidden sm:inline">PIN Değiştir</span>
                         </button>
-                        <button onclick="logoutStaffUser()" title="Oturumu Kapat ve Profil Seçimine Dön" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#A6192E]/30 hover:bg-[#A6192E] text-[#FFBF3F] hover:text-white text-xs font-bold border border-[#FFBF3F]/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                        <button onclick="logoutStaffUser()" title="Oturumu Kapat ve Profil Seçimine Dön" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-[#A6192E] text-[#A6192E] hover:text-white text-xs font-bold border border-rose-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
                             <i class="fa-solid fa-lock text-xs"></i>
                             <span class="hidden sm:inline">Güvenli Çıkış</span>
                             <span class="sm:hidden">Çıkış</span>
@@ -2117,6 +2117,7 @@
         function renderPersonalDashboard(name) {
             if (!name) return;
             currentSelectedUser = name;
+            window.currentSelectedUser = name;
             localStorage.setItem('task_personel_selected_user', name);
 
             document.getElementById('userSelectionScreen').classList.add('hidden');
