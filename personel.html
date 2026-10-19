@@ -248,14 +248,14 @@
                 <!-- Filtre & Başlık Barı -->
                 <div class="px-4 py-3 bg-[#FAF7F2] border-b border-[#E8DFC8] flex items-center justify-between gap-2 flex-wrap">
                     <div class="flex items-center gap-1.5">
-                        <button type="button" onclick="setTaskFilter('all')" id="filterTabAll" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-[#31261D] text-white transition-all cursor-pointer shadow-2xs">
-                            Tümü (<span id="userBadgeTaskCount">0</span>)
-                        </button>
-                        <button type="button" onclick="setTaskFilter('open')" id="filterTabOpen" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer">
-                            Bekleyenler
+                        <button type="button" onclick="setTaskFilter('open')" id="filterTabOpen" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-[#824701] text-white transition-all cursor-pointer shadow-2xs">
+                            <i class="fa-solid fa-clock mr-1 text-[#FFBF3F]"></i> Bekleyen Görevler (<span id="userBadgeTaskCount">0</span>)
                         </button>
                         <button type="button" onclick="setTaskFilter('completed')" id="filterTabCompleted" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer">
-                            Tamamlananlar
+                            <i class="fa-solid fa-check text-emerald-600 mr-1"></i> Bitenler (Geçmiş)
+                        </button>
+                        <button type="button" onclick="setTaskFilter('all')" id="filterTabAll" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer">
+                            Tümü
                         </button>
                     </div>
                     <div class="text-[11px] text-[#5C4A3C] hidden sm:block">
@@ -1448,6 +1448,7 @@
                         const serverTasksStr = JSON.stringify(normalizedServerTasks);
                         if (serverTasksStr !== JSON.stringify(tasks)) {
                             tasks = normalizedServerTasks;
+                            window.tasks = tasks;
                             localStorage.setItem('task_items', serverTasksStr);
                             changed = true;
                         }
@@ -1679,6 +1680,7 @@
                 const deletedIds = getDeletedTaskIds();
                 const raw = JSON.parse(e.newValue || '[]');
                 tasks = normalizeTasks(raw.filter(t => !deletedIds.includes(String(t.id))));
+                window.tasks = tasks;
                 if (currentSelectedUser) renderPersonalDashboard(currentSelectedUser);
                 if (activeCommentTaskId) {
                     const curTask = tasks.find(t => String(t.id) === String(activeCommentTaskId));
@@ -1692,6 +1694,9 @@
 
         function saveTasks() {
             setLocalActionTimestamp();
+            const activeTasks = (window.tasks && Array.isArray(window.tasks) && window.tasks.length > 0) ? window.tasks : tasks;
+            tasks = activeTasks;
+            window.tasks = tasks;
             localStorage.setItem('task_items', JSON.stringify(tasks));
             pushDataToServer();
         }
@@ -2085,7 +2090,7 @@
             }
         }
 
-        let currentTaskFilter = 'all';
+        let currentTaskFilter = 'open';
 
         function setTaskFilter(filter) {
             currentTaskFilter = filter;
@@ -2093,16 +2098,16 @@
             const tabOpen = document.getElementById('filterTabOpen');
             const tabComp = document.getElementById('filterTabCompleted');
 
-            if (tabAll) tabAll.className = filter === 'all' 
-                ? "px-2.5 py-1 text-xs font-bold rounded-lg bg-[#31261D] text-white transition-all cursor-pointer shadow-2xs" 
-                : "px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer";
-
             if (tabOpen) tabOpen.className = filter === 'open' 
                 ? "px-2.5 py-1 text-xs font-bold rounded-lg bg-[#824701] text-white transition-all cursor-pointer shadow-2xs" 
                 : "px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer";
 
             if (tabComp) tabComp.className = filter === 'completed' 
                 ? "px-2.5 py-1 text-xs font-bold rounded-lg bg-[#1E340C] text-white transition-all cursor-pointer shadow-2xs" 
+                : "px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer";
+
+            if (tabAll) tabAll.className = filter === 'all' 
+                ? "px-2.5 py-1 text-xs font-bold rounded-lg bg-[#31261D] text-white transition-all cursor-pointer shadow-2xs" 
                 : "px-2.5 py-1 text-xs font-semibold rounded-lg bg-white text-[#5C4A3C] hover:bg-[#E8DFC8]/50 border border-[#E8DFC8] transition-all cursor-pointer";
 
             if (currentSelectedUser) renderPersonalDashboard(currentSelectedUser);
@@ -2127,7 +2132,8 @@
             const now = new Date();
             now.setHours(0,0,0,0);
 
-            const userTasks = tasks.filter(t => (t.owner || t.assignee || '').toLowerCase().trim() === name.toLowerCase().trim());
+            const activeTasks = (window.tasks && Array.isArray(window.tasks) && window.tasks.length > 0) ? window.tasks : tasks;
+            const userTasks = activeTasks.filter(t => (t.owner || t.assignee || '').toLowerCase().trim() === name.toLowerCase().trim());
             const total = userTasks.length;
             const completed = userTasks.filter(t => t.status === 'Tamamlandı').length;
             const open = userTasks.filter(t => t.status !== 'Tamamlandı').length;
@@ -2142,7 +2148,7 @@
             document.getElementById('userSuccessPct').innerText = `%${pct}`;
             document.getElementById('userFractionText').innerText = `${completed} / ${total} Bitti`;
             const badgeCount = document.getElementById('userBadgeTaskCount');
-            if (badgeCount) badgeCount.innerText = `${total}`;
+            if (badgeCount) badgeCount.innerText = `${open}`;
 
             const fill = document.getElementById('userProgressFill');
             if (fill) fill.style.width = pct + '%';
@@ -2257,7 +2263,8 @@
         }
 
         function setTaskStatus(taskId, status) {
-            const task = tasks.find(t => String(t.id) === String(taskId));
+            const activeTasks = (window.tasks && Array.isArray(window.tasks) && window.tasks.length > 0) ? window.tasks : tasks;
+            const task = activeTasks.find(t => String(t.id) === String(taskId));
             if (task) {
                 if (status === 'Tamamlandı' && task.recurrence && task.recurrence !== 'none') {
                     const isRec = handleTaskRecurrenceOnComplete(task, currentSelectedUser || 'Personel');
@@ -2266,9 +2273,17 @@
                     }
                 } else {
                     task.status = status;
+                    if (status === 'Tamamlandı') {
+                        task.completedAt = new Date().toISOString();
+                    } else {
+                        delete task.completedAt;
+                    }
                 }
                 saveTasks();
                 renderPersonalDashboard(currentSelectedUser);
+                if (status === 'Tamamlandı') {
+                    alert("✅ Görev tamamlandı!\n\nGörev aktif personel ekranınızdan kaldırıldı ve yöneticinizin kontrol ekranına iletildi (yönetici ekranında 1 ay saklanacaktır).");
+                }
             }
         }
 

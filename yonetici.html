@@ -608,12 +608,13 @@
 
                     <div>
                         <select id="statusFilter" onchange="renderApp()" class="w-full px-3 py-2 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] text-[#31261D] font-medium">
-                            <option value="ALL">Tüm Durumlar</option>
+                            <option value="ALL">Tüm Durumlar (Son 1 Ay)</option>
                             <option value="Açık">Sadece Açık Görevler</option>
                             <option value="Devam Ediyor">Devam Edenler</option>
                             <option value="Bugun">📅 Bugün Bitenler</option>
                             <option value="Geciken">⚠️ Sadece Gecikenler</option>
-                            <option value="Tamamlandı">Tamamlananlar</option>
+                            <option value="Tamamlandı">Tamamlananlar (Son 1 Ay)</option>
+                            <option value="Archived">📂 1 Aydan Eski Arşiv (Geçmiş)</option>
                         </select>
                     </div>
 
@@ -1026,8 +1027,23 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-[#31261D] mb-1">İlgili Birim *</label>
-                        <input type="text" id="taskDepartment" placeholder="Örn: Kavurma / Üretim, Satış..." required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                        <label class="block font-bold text-[#31261D] mb-1 flex items-center justify-between">
+                            <span><i class="fa-solid fa-briefcase text-[#824701] mr-1"></i>İlgili Birim *</span>
+                            <span id="autoDeptBadge" class="hidden text-[10px] text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded"><i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> Oto</span>
+                        </label>
+                        <select id="taskDepartment" onchange="handleDepartmentSelectChange(this)" required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-medium focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                            <option value="Satış & Pazarlama">Satış & Pazarlama</option>
+                            <option value="Şube Operasyon">Şube Operasyon</option>
+                            <option value="Kavurma & Üretim">Kavurma & Üretim</option>
+                            <option value="Merkez Depo & Lojistik">Merkez Depo & Lojistik</option>
+                            <option value="Satın Alma & Tedarik">Satın Alma & Tedarik</option>
+                            <option value="Muhasebe & Finans">Muhasebe & Finans</option>
+                            <option value="Kalite Kontrol & Gıda Güvenliği">Kalite Kontrol & Gıda Güvenliği</option>
+                            <option value="Yönetim & İdari İşler">Yönetim & İdari İşler</option>
+                            <option value="Teknik Servis & Bakım">Teknik Servis & Bakım</option>
+                            <option value="E-Ticaret & Dijital Kanallar">E-Ticaret & Dijital Kanallar</option>
+                            <option value="__NEW__">➕ Yeni Birim Ekle...</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block font-bold text-[#31261D] mb-1">Öncelik Derecesi</label>
@@ -1078,7 +1094,7 @@
                             <span>Sorumlu Kişi *</span>
                             <span class="text-[10px] text-[#A6192E] font-semibold">Rehberden seçilir</span>
                         </label>
-                        <input type="text" id="taskOwner" list="teamDatalist" placeholder="Örn: Hikmet CAN..." required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                        <input type="text" id="taskOwner" list="teamDatalist" oninput="onTaskOwnerChanged()" onchange="onTaskOwnerChanged()" placeholder="Örn: Hikmet CAN..." required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
                         <datalist id="teamDatalist"></datalist>
                     </div>
                     <div>
@@ -3044,6 +3060,17 @@
             }
         }
 
+        function isTaskOlderThan1Month(task) {
+            if (!task || task.status !== 'Tamamlandı') return false;
+            const refDateStr = task.completedAt || task.dueDate || task.createdAt;
+            if (!refDateStr) return false;
+            const refDate = new Date(refDateStr);
+            if (isNaN(refDate.getTime())) return false;
+            const diffMs = Date.now() - refDate.getTime();
+            const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+            return diffMs > ONE_MONTH_MS;
+        }
+
         function renderApp() {
             calculateAndRenderStatistics();
             calculateAndRenderBranchLeague();
@@ -3057,10 +3084,13 @@
             const now = new Date();
             now.setHours(0,0,0,0);
 
-            const total = tasks.length;
-            const completed = tasks.filter(t => t.status === 'Tamamlandı').length;
-            const open = tasks.filter(t => t.status !== 'Tamamlandı').length;
-            const delayed = tasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now).length;
+            // 1 aydan eski tamamlanan görevler arşive kaldırıldığı için aktif dönem istatistiklerine dahil edilmez
+            const currentTasks = tasks.filter(t => !isTaskOlderThan1Month(t));
+
+            const total = currentTasks.length;
+            const completed = currentTasks.filter(t => t.status === 'Tamamlandı').length;
+            const open = currentTasks.filter(t => t.status !== 'Tamamlandı').length;
+            const delayed = currentTasks.filter(t => t.status !== 'Tamamlandı' && new Date(t.dueDate) < now).length;
 
             const completionPct = total > 0 ? Math.round((completed / total) * 100) : 0;
             const delayedPct = total > 0 ? Math.round((delayed / total) * 100) : 0;
@@ -3296,7 +3326,7 @@
                     email: ""
                 };
 
-                const personTasks = tasks.filter(t => (t.owner || t.assignee || '').toLowerCase().trim() === ownerName.toLowerCase().trim());
+                const personTasks = tasks.filter(t => (t.owner || t.assignee || '').toLowerCase().trim() === ownerName.toLowerCase().trim() && !isTaskOlderThan1Month(t));
                 const pTotal = personTasks.length;
                 const pCompleted = personTasks.filter(t => t.status === 'Tamamlandı').length;
                 const pOpen = personTasks.filter(t => t.status !== 'Tamamlandı').length;
@@ -3358,11 +3388,14 @@
             const container = document.getElementById('page1QuickTasksContainer');
             if (!container) return;
 
-            if (!tasks || tasks.length === 0) {
+            // 1. sayfadaki hızlı görev özetinde 1 aydan eski tamamlananları gösterme (arşive aktarılır)
+            const quickTasks = tasks.filter(t => !isTaskOlderThan1Month(t));
+
+            if (!quickTasks || quickTasks.length === 0) {
                 container.innerHTML = `
                     <div class="py-8 text-center text-stone-400">
                         <i class="fa-solid fa-list-check text-3xl mb-2 text-stone-300"></i>
-                        <p class="font-bold text-stone-700 text-xs">Henüz kayıtlı bir görev bulunmuyor.</p>
+                        <p class="font-bold text-stone-700 text-xs">Aktif veya son 1 aya ait görev bulunmuyor.</p>
                         <p class="text-[11px] text-stone-500 mt-1">Yukarıdaki <strong>"Yeni Görev Ekle"</strong> butonuna tıklayarak ilk görevinizi tanımlayabilirsiniz.</p>
                     </div>
                 `;
@@ -3372,7 +3405,7 @@
             const now = new Date();
             now.setHours(0,0,0,0);
 
-            container.innerHTML = tasks.map((task, idx) => {
+            container.innerHTML = quickTasks.map((task, idx) => {
                 const isOverdue = task.status !== 'Tamamlandı' && new Date(task.dueDate) < now;
                 const isCompleted = task.status === 'Tamamlandı';
                 const dateFormatted = formatTurkishDate(task.dueDate);
@@ -3450,11 +3483,20 @@
                 itemDate.setHours(0,0,0,0);
                 const isDelayed = item.status !== 'Tamamlandı' && itemDate < now;
                 const isDueToday = item.status !== 'Tamamlandı' && itemDate.getTime() === now.getTime();
+                const isOlderThan1Month = isTaskOlderThan1Month(item);
+
+                // 1 Ay Kuralı: Eğer "Archived" seçildiyse SADECE 1 aydan eski tamamlananları göster
+                if (statusFilter === 'Archived') {
+                    if (!isOlderThan1Month) return false;
+                } else {
+                    // Normal filtrelerde (ALL, Açık, Devam Ediyor, Tamamlandı, Geciken vb.) 1 aydan eski tamamlananları gizle
+                    if (isOlderThan1Month) return false;
+                }
 
                 if (branchFilter !== 'ALL' && (item.branch || 'Merkez / Genel') !== branchFilter) return false;
                 if (statusFilter === 'Geciken' && !isDelayed) return false;
                 if (statusFilter === 'Bugun' && !isDueToday) return false;
-                if (statusFilter !== 'ALL' && statusFilter !== 'Geciken' && statusFilter !== 'Bugun' && item.status !== statusFilter) return false;
+                if (statusFilter !== 'ALL' && statusFilter !== 'Geciken' && statusFilter !== 'Bugun' && statusFilter !== 'Archived' && item.status !== statusFilter) return false;
 
                 if (monthFilter !== 'ALL') {
                     const taskMonth = new Date(item.dueDate).getMonth() + 1;
@@ -4207,12 +4249,94 @@
             }
         }
 
-        // ================= GÖREV CRUD =================
+        // ================= GÖREV CRUD & BİRİM OTO-SEÇİM =================
+        function onTaskOwnerChanged() {
+            const ownerInput = document.getElementById('taskOwner');
+            const deptSelect = document.getElementById('taskDepartment');
+            const autoBadge = document.getElementById('autoDeptBadge');
+            if (!ownerInput || !deptSelect) return;
+
+            const ownerName = ownerInput.value.trim().toLowerCase();
+            if (!ownerName) {
+                if (autoBadge) autoBadge.classList.add('hidden');
+                return;
+            }
+
+            const member = team.find(m => m && m.name && m.name.toLowerCase().trim() === ownerName);
+            if (member && member.department && member.department.trim()) {
+                const dept = member.department.trim();
+                let exists = false;
+                for (let i = 0; i < deptSelect.options.length; i++) {
+                    if (deptSelect.options[i].value.toLowerCase() === dept.toLowerCase()) {
+                        deptSelect.selectedIndex = i;
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    const opt = document.createElement('option');
+                    opt.value = dept;
+                    opt.textContent = dept;
+                    const newOpt = deptSelect.querySelector('option[value="__NEW__"]');
+                    if (newOpt) {
+                        deptSelect.insertBefore(opt, newOpt);
+                    } else {
+                        deptSelect.appendChild(opt);
+                    }
+                    deptSelect.value = dept;
+                }
+                if (autoBadge) {
+                    autoBadge.classList.remove('hidden');
+                }
+            } else {
+                if (autoBadge) autoBadge.classList.add('hidden');
+            }
+        }
+
+        function handleDepartmentSelectChange(selectEl) {
+            const autoBadge = document.getElementById('autoDeptBadge');
+            if (autoBadge) autoBadge.classList.add('hidden');
+
+            if (selectEl.value === '__NEW__') {
+                const newDept = prompt("Eklemek istediğiniz yeni birim adını yazınız:");
+                if (newDept && newDept.trim()) {
+                    const trimmed = newDept.trim();
+                    let exists = false;
+                    for (let i = 0; i < selectEl.options.length; i++) {
+                        if (selectEl.options[i].value.toLowerCase() === trimmed.toLowerCase()) {
+                            selectEl.selectedIndex = i;
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists) {
+                        const opt = document.createElement('option');
+                        opt.value = trimmed;
+                        opt.textContent = trimmed;
+                        const newOpt = selectEl.querySelector('option[value="__NEW__"]');
+                        if (newOpt) {
+                            selectEl.insertBefore(opt, newOpt);
+                        } else {
+                            selectEl.appendChild(opt);
+                        }
+                        selectEl.value = trimmed;
+                    }
+                } else {
+                    selectEl.selectedIndex = 0;
+                }
+            }
+        }
+
         function openNewTaskModal() {
             document.getElementById('taskForm').reset();
             document.getElementById('editTaskId').value = '';
             document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus text-[#FFBF3F]"></i> Yeni Görev / Aksiyon Girişi';
             
+            const deptSelect = document.getElementById('taskDepartment');
+            if (deptSelect) deptSelect.value = 'Satış & Pazarlama';
+            const autoBadge = document.getElementById('autoDeptBadge');
+            if (autoBadge) autoBadge.classList.add('hidden');
+
             document.getElementById('taskBranch').value = 'Merkez / Genel';
             document.getElementById('taskRecurrence').value = 'none';
 
@@ -4234,7 +4358,33 @@
             if (!task) return;
 
             document.getElementById('editTaskId').value = task.id;
-            document.getElementById('taskDepartment').value = task.department;
+
+            const deptSelect = document.getElementById('taskDepartment');
+            const autoBadge = document.getElementById('autoDeptBadge');
+            if (deptSelect) {
+                let exists = false;
+                for (let i = 0; i < deptSelect.options.length; i++) {
+                    if (deptSelect.options[i].value === task.department) {
+                        deptSelect.selectedIndex = i;
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists && task.department) {
+                    const opt = document.createElement('option');
+                    opt.value = task.department;
+                    opt.textContent = task.department;
+                    const newOpt = deptSelect.querySelector('option[value="__NEW__"]');
+                    if (newOpt) {
+                        deptSelect.insertBefore(opt, newOpt);
+                    } else {
+                        deptSelect.appendChild(opt);
+                    }
+                    deptSelect.value = task.department;
+                }
+            }
+            if (autoBadge) autoBadge.classList.add('hidden');
+
             document.getElementById('taskTitle').value = task.title;
             document.getElementById('taskAction').value = task.action;
             document.getElementById('taskOwner').value = task.owner;
@@ -4281,6 +4431,10 @@
                 recurrence: document.getElementById('taskRecurrence').value
             };
 
+            if (taskData.status === 'Tamamlandı') {
+                taskData.completedAt = new Date().toISOString();
+            }
+
             const exists = team.some(m => m.name.toLowerCase().trim() === ownerName.toLowerCase());
             if (!exists && ownerName) {
                 team.push({
@@ -4295,7 +4449,15 @@
 
             if (editId) {
                 const index = tasks.findIndex(t => String(t.id) === String(editId));
-                if (index !== -1) tasks[index] = { ...tasks[index], ...taskData };
+                if (index !== -1) {
+                    if (taskData.status === 'Tamamlandı' && !tasks[index].completedAt) {
+                        taskData.completedAt = new Date().toISOString();
+                    } else if (taskData.status !== 'Tamamlandı') {
+                        delete taskData.completedAt;
+                        delete tasks[index].completedAt;
+                    }
+                    tasks[index] = { ...tasks[index], ...taskData };
+                }
             } else {
                 const newId = tasks.length > 0 ? Math.max(...tasks.map(t => Number(t.id) || 0)) + 1 : 1;
                 tasks.push({ id: newId, comments: [], ...taskData });
@@ -4349,9 +4511,11 @@
                     }
                 } else {
                     task.status = 'Tamamlandı';
+                    task.completedAt = new Date().toISOString();
                 }
             } else {
                 task.status = 'Açık';
+                delete task.completedAt;
             }
 
             saveData();
