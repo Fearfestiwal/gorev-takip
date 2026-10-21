@@ -257,6 +257,17 @@
                                     </div>
                                 </button>
 
+                                <!-- Şube & Birim Yönetimi -->
+                                <button type="button" onclick="openBranchDeptModal(); closeAdminQuickToolsMenu();" class="w-full text-left px-4 py-2.5 hover:bg-[#FAF7F2] flex items-center gap-3 transition-colors group cursor-pointer">
+                                    <div class="w-8 h-8 rounded-lg bg-[#FAF2E6] group-hover:bg-[#FFBF3F] text-[#A6192E] group-hover:text-[#31261D] flex items-center justify-center text-sm transition-all shrink-0 border border-[#FFBF3F]/30">
+                                        <i class="fa-solid fa-building-circle-gear"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs sm:text-sm font-bold text-[#31261D] group-hover:text-[#A6192E] whitespace-nowrap">Şube & Birim Yönetimi</div>
+                                        <div class="text-[11px] text-[#7A6A5C]">Şube ve fabrika birimlerini ekle, düzenle, sil</div>
+                                    </div>
+                                </button>
+
                                 <!-- Şube QR Kodları -->
                                 <button type="button" onclick="openBranchQrModal(); closeAdminQuickToolsMenu();" class="w-full text-left px-4 py-2.5 hover:bg-[#FAF7F2] flex items-center gap-3 transition-colors group cursor-pointer">
                                     <div class="w-8 h-8 rounded-lg bg-[#FAF2E6] group-hover:bg-[#FFBF3F] text-[#A6192E] group-hover:text-[#31261D] flex items-center justify-center text-sm transition-all shrink-0 border border-[#FFBF3F]/30">
@@ -480,6 +491,10 @@
                         </p>
                     </div>
                     <div class="flex items-center gap-2">
+                        <button type="button" onclick="openBranchDeptModal('branches')" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FAF7F2] hover:bg-[#EFE8DD] text-[#31261D] font-bold text-xs rounded-xl border border-[#E8DFC8] transition-all cursor-pointer shadow-2xs">
+                            <i class="fa-solid fa-building-circle-gear text-[#A6192E]"></i>
+                            <span>Şube & Birimleri Yönet</span>
+                        </button>
                         <button onclick="openBranchQrModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FAF7F2] hover:bg-[#EFE8DD] text-[#31261D] font-bold text-xs rounded-xl border border-[#E8DFC8] transition-all cursor-pointer shadow-2xs">
                             <i class="fa-solid fa-qrcode text-[#A6192E]"></i>
                             <span>Şube QR Kodları</span>
@@ -598,13 +613,6 @@
                     <div>
                         <select id="branchFilter" onchange="renderApp()" class="w-full px-3 py-2 text-xs rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E] text-[#31261D] font-medium">
                             <option value="ALL">📍 Tüm Şubeler / Lokasyonlar</option>
-                            <option value="Merkez / Genel">Merkez / Genel</option>
-                            <option value="Alsancak Şubesi">Alsancak Şubesi</option>
-                            <option value="Karşıyaka Şubesi">Karşıyaka Şubesi</option>
-                            <option value="Bornova Şubesi">Bornova Şubesi</option>
-                            <option value="Göztepe Şubesi">Göztepe Şubesi</option>
-                            <option value="Kavurma & Üretim Tesisi">Kavurma & Üretim Tesisi</option>
-                            <option value="Merkez Depo & Lojistik">Merkez Depo & Lojistik</option>
                         </select>
                     </div>
 
@@ -977,7 +985,8 @@
                             </div>
                             <div>
                                 <label class="block font-bold text-[#31261D] mb-1">İlgili Birim</label>
-                                <input type="text" id="personDepartment" placeholder="Örn: Üretim, Satış..." class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                                <input type="text" id="personDepartment" list="deptDatalist" placeholder="Örn: Üretim, Lojistik..." class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-white text-[#31261D] focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                                <datalist id="deptDatalist"></datalist>
                             </div>
                             <div>
                                 <label class="block font-bold text-[#31261D] mb-1 flex items-center justify-between">
@@ -1031,20 +1040,13 @@
                     <div>
                         <label class="block font-bold text-[#31261D] mb-1 flex items-center justify-between">
                             <span><i class="fa-solid fa-briefcase text-[#824701] mr-1"></i>İlgili Birim *</span>
-                            <span id="autoDeptBadge" class="hidden text-[10px] text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded"><i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> Oto</span>
+                            <span class="flex items-center gap-1">
+                                <button type="button" onclick="openBranchDeptModal('departments')" class="text-[10px] text-[#A6192E] hover:underline font-bold flex items-center gap-0.5 cursor-pointer"><i class="fa-solid fa-gear text-[9px]"></i> Yönet</button>
+                                <span id="autoDeptBadge" class="hidden text-[10px] text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded"><i class="fa-solid fa-wand-magic-sparkles text-[9px]"></i> Oto</span>
+                            </span>
                         </label>
                         <select id="taskDepartment" onchange="handleDepartmentSelectChange(this)" required class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-medium focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                            <option value="Satış & Pazarlama">Satış & Pazarlama</option>
-                            <option value="Şube Operasyon">Şube Operasyon</option>
-                            <option value="Kavurma & Üretim">Kavurma & Üretim</option>
-                            <option value="Merkez Depo & Lojistik">Merkez Depo & Lojistik</option>
-                            <option value="Satın Alma & Tedarik">Satın Alma & Tedarik</option>
-                            <option value="Muhasebe & Finans">Muhasebe & Finans</option>
-                            <option value="Kalite Kontrol & Gıda Güvenliği">Kalite Kontrol & Gıda Güvenliği</option>
-                            <option value="Yönetim & İdari İşler">Yönetim & İdari İşler</option>
-                            <option value="Teknik Servis & Bakım">Teknik Servis & Bakım</option>
-                            <option value="E-Ticaret & Dijital Kanallar">E-Ticaret & Dijital Kanallar</option>
-                            <option value="__NEW__">➕ Yeni Birim Ekle...</option>
+                            <!-- Dinamik olarak refreshBranchAndDepartmentSelects() tarafından doldurulacak -->
                         </select>
                     </div>
                     <div>
@@ -1059,17 +1061,12 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-[#31261D] mb-1">
-                            <i class="fa-solid fa-location-dot text-[#A6192E] mr-1"></i>Şube / Lokasyon *
+                        <label class="block font-bold text-[#31261D] mb-1 flex items-center justify-between">
+                            <span><i class="fa-solid fa-location-dot text-[#A6192E] mr-1"></i>Şube / Lokasyon *</span>
+                            <button type="button" onclick="openBranchDeptModal('branches')" class="text-[10px] text-[#A6192E] hover:underline font-bold flex items-center gap-0.5 cursor-pointer"><i class="fa-solid fa-gear text-[9px]"></i> Yönet</button>
                         </label>
-                        <select id="taskBranch" class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-medium focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
-                            <option value="Merkez / Genel">Merkez / Genel</option>
-                            <option value="Alsancak Şubesi">Alsancak Şubesi</option>
-                            <option value="Karşıyaka Şubesi">Karşıyaka Şubesi</option>
-                            <option value="Bornova Şubesi">Bornova Şubesi</option>
-                            <option value="Göztepe Şubesi">Göztepe Şubesi</option>
-                            <option value="Kavurma & Üretim Tesisi">Kavurma & Üretim Tesisi</option>
-                            <option value="Merkez Depo & Lojistik">Merkez Depo & Lojistik</option>
+                        <select id="taskBranch" onchange="handleBranchSelectChange(this)" class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-medium focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                            <!-- Dinamik olarak refreshBranchAndDepartmentSelects() tarafından doldurulacak -->
                         </select>
                     </div>
                     <div>
@@ -1377,6 +1374,109 @@
         </div>
     </div>
 
+    <!-- ŞUBE VE BİRİM YÖNETİM MERKEZİ MODALI -->
+    <div id="branchDeptModal" class="fixed inset-0 bg-[#31261D]/75 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
+            <!-- Modal Başlık -->
+            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+                <div>
+                    <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
+                        <i class="fa-solid fa-building-circle-gear text-[#FFBF3F]"></i>
+                        <span>Şube & Birim Yönetim Merkezi</span>
+                    </h3>
+                    <p class="text-[11px] text-[#E5DCD0]">CAN ÇEREZ şubelerini ve fabrika birimlerini buradan ekleyip çıkarabilirsiniz.</p>
+                </div>
+                <button type="button" onclick="closeBranchDeptModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Tab Butonları -->
+            <div class="flex border-b border-[#E8DFC8] bg-[#FAF7F2] p-1.5 gap-2">
+                <button type="button" id="tabBtnBranches" onclick="switchBranchDeptTab('branches')" class="flex-1 py-2 px-3 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 bg-white text-[#A6192E] shadow-xs border border-[#E8DFC8]">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span>Şubeler & Lokasyonlar</span>
+                    <span id="branchTabCount" class="bg-[#A6192E] text-white text-[10px] px-2 py-0.2 rounded-full">0</span>
+                </button>
+                <button type="button" id="tabBtnDepartments" onclick="switchBranchDeptTab('departments')" class="flex-1 py-2 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 text-[#5C4A3C] hover:text-[#31261D] hover:bg-white/60">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <span>Fabrika & Birimler</span>
+                    <span id="deptTabCount" class="bg-stone-300 text-[#31261D] text-[10px] px-2 py-0.2 rounded-full">0</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: ŞUBELER -->
+            <div id="tabContentBranches" class="p-5 space-y-4 text-xs">
+                <!-- Yeni Şube Ekleme Formu -->
+                <form onsubmit="handleAddNewBranch(event)" class="flex gap-2">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-location-dot absolute left-3 top-1/2 -translate-y-1/2 text-[#A6192E]"></i>
+                        <input type="text" id="newBranchInput" placeholder="Yeni şube adı (Örn: Karşıyaka - Çarşı)..." required class="w-full pl-8 pr-3 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-medium focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                    </div>
+                    <button type="submit" class="px-4 py-2.5 bg-[#A6192E] hover:bg-[#8C1224] text-white font-black rounded-xl transition-all shadow-md shadow-[#A6192E]/20 flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95">
+                        <i class="fa-solid fa-plus text-[#FFBF3F]"></i>
+                        <span>Şube Ekle</span>
+                    </button>
+                </form>
+
+                <!-- Şube Listesi -->
+                <div class="border border-[#E8DFC8] rounded-2xl overflow-hidden bg-white">
+                    <div class="bg-[#FAF7F2] px-4 py-2 border-b border-[#E8DFC8] flex items-center justify-between text-[11px] font-bold text-[#5C4A3C]">
+                        <span>Kayıtlı Şube / Lokasyon</span>
+                        <span>İşlem</span>
+                    </div>
+                    <div id="branchItemsList" class="divide-y divide-[#E8DFC8] max-h-72 overflow-y-auto">
+                        <!-- renderBranchModalList() tarafından doldurulacak -->
+                    </div>
+                </div>
+                <p class="text-[11px] text-[#7A6A5C] italic flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-[#A6192E]"></i>
+                    Bir şubeyi sildiğinizde eski görev kayıtları korunur, yalnızca yeni görev seçimlerinden kaldırılır.
+                </p>
+            </div>
+
+            <!-- TAB 2: DEPARTMANLAR / BİRİMLER -->
+            <div id="tabContentDepartments" class="hidden p-5 space-y-4 text-xs">
+                <!-- Yeni Birim Ekleme Formu -->
+                <form onsubmit="handleAddNewDept(event)" class="flex gap-2">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-briefcase absolute left-3 top-1/2 -translate-y-1/2 text-[#824701]"></i>
+                        <input type="text" id="newDeptInput" placeholder="Yeni birim adı (Örn: Ar-Ge & Ürün Geliştirme)..." required class="w-full pl-8 pr-3 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-medium focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
+                    </div>
+                    <button type="submit" class="px-4 py-2.5 bg-[#1E340C] hover:bg-[#2C4A14] text-[#FFBF3F] font-black rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Birim Ekle</span>
+                    </button>
+                </form>
+
+                <!-- Birim Listesi -->
+                <div class="border border-[#E8DFC8] rounded-2xl overflow-hidden bg-white">
+                    <div class="bg-[#FAF7F2] px-4 py-2 border-b border-[#E8DFC8] flex items-center justify-between text-[11px] font-bold text-[#5C4A3C]">
+                        <span>Kayıtlı Fabrika & Birim</span>
+                        <span>İşlem</span>
+                    </div>
+                    <div id="deptItemsList" class="divide-y divide-[#E8DFC8] max-h-72 overflow-y-auto">
+                        <!-- renderDeptModalList() tarafından doldurulacak -->
+                    </div>
+                </div>
+                <p class="text-[11px] text-[#7A6A5C] italic flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-[#1E340C]"></i>
+                    Birimler görev formundaki "İlgili Birim" açılır menüsünde ve personel atamalarında kullanılır.
+                </p>
+            </div>
+
+            <!-- Modal Alt Bilgi & Kapat -->
+            <div class="bg-[#FAF7F2] px-6 py-3 border-t border-[#E8DFC8] flex items-center justify-between">
+                <span class="text-[11px] text-[#7A6A5C]">
+                    <i class="fa-solid fa-cloud-arrow-up text-emerald-600 mr-1"></i>Değişiklikler anında 7/24 buluta kaydedilir
+                </span>
+                <button type="button" onclick="closeBranchDeptModal()" class="px-4 py-2 bg-[#31261D] hover:bg-[#46372A] text-white font-bold rounded-xl text-xs transition-colors cursor-pointer">
+                    Tamamla & Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ŞUBE HIZLI GİRİŞ QR KODLARI MODALI -->
     <div id="branchQrModal" class="fixed inset-0 bg-[#31261D]/75 backdrop-blur-xs z-50 items-center justify-center p-4 no-print" style="display: none;">
         <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
@@ -1576,7 +1676,7 @@
                 deadline: "2026-10-16",
                 status: "Devam Ediyor",
                 createdAt: "2026-10-16T08:00:00.000Z",
-                branch: "Alsancak Şubesi",
+                branch: "Bornova - Özkanlar",
                 recurrence: "daily",
                 comments: [
                     {
@@ -1757,6 +1857,60 @@
         }
         window.team = team;
 
+        // ================= CAN ÇEREZ ŞUBELERİ & FABRİKA BİRİMLERİ =================
+        const DEFAULT_BRANCHES = [
+            "Bornova - Özkanlar",
+            "Göztepe - Güzelyalı",
+            "Konak - Çankaya",
+            "Karşıyaka - Aksoy",
+            "Aliağa",
+            "Hatay Şube",
+            "Hatay - Nokta (Hatay 2)",
+            "Çankaya - Borsa",
+            "Merkez / Genel"
+        ];
+
+        const DEFAULT_DEPARTMENTS = [
+            "Üretim",
+            "Lojistik",
+            "Muhasebe",
+            "Satınalma",
+            "İnsan Kaynakları (İK)",
+            "Ballıdede",
+            "Genel Müdürlük",
+            "Şube Operasyon"
+        ];
+
+        let branches = [];
+        try {
+            const rawStoredBranches = localStorage.getItem('task_branches');
+            if (rawStoredBranches) {
+                branches = JSON.parse(rawStoredBranches);
+            }
+        } catch(e) {
+            branches = [];
+        }
+        if (!Array.isArray(branches) || branches.length === 0) {
+            branches = [...DEFAULT_BRANCHES];
+            localStorage.setItem('task_branches', JSON.stringify(branches));
+        }
+        window.branches = branches;
+
+        let departments = [];
+        try {
+            const rawStoredDepartments = localStorage.getItem('task_departments');
+            if (rawStoredDepartments) {
+                departments = JSON.parse(rawStoredDepartments);
+            }
+        } catch(e) {
+            departments = [];
+        }
+        if (!Array.isArray(departments) || departments.length === 0) {
+            departments = [...DEFAULT_DEPARTMENTS];
+            localStorage.setItem('task_departments', JSON.stringify(departments));
+        }
+        window.departments = departments;
+
         let activePage = 1;
         let viewMode = "table";
         let currentEmailPersonName = "";
@@ -1844,18 +1998,30 @@
 
                 let notes = '';
                 let adminPassword = '1978';
+                let branchesData = null;
+                let departmentsData = null;
                 if (settingsRes && Array.isArray(settingsRes.data)) {
                     const nObj = settingsRes.data.find(s => s.key === 'admin_notes');
                     if (nObj) notes = nObj.value || '';
                     const pObj = settingsRes.data.find(s => s.key === 'admin_password');
                     if (pObj) adminPassword = pObj.value || '1978';
+                    const bObj = settingsRes.data.find(s => s.key === 'branches');
+                    if (bObj && bObj.value) {
+                        try { branchesData = JSON.parse(bObj.value); } catch(e){}
+                    }
+                    const dObj = settingsRes.data.find(s => s.key === 'departments');
+                    if (dObj && dObj.value) {
+                        try { departmentsData = JSON.parse(dObj.value); } catch(e){}
+                    }
                 }
 
                 return {
                     tasks: tasksRes.data || [],
                     team: teamRes.data || [],
                     notes: notes,
-                    adminPassword: adminPassword
+                    adminPassword: adminPassword,
+                    branches: branchesData,
+                    departments: departmentsData
                 };
             } catch(e) {
                 console.warn("Supabase fetch exception:", e);
@@ -1908,10 +2074,17 @@
                     await supabaseClient.from('cancerez_team').delete().in('name', deletedNames);
                 }
 
-                await supabaseClient.from('cancerez_settings').upsert([
+                const settingsRows = [
                     { key: 'admin_notes', value: rawData.notes || '', updated_at: new Date().toISOString() },
                     { key: 'admin_password', value: rawData.adminPassword || '1978', updated_at: new Date().toISOString() }
-                ], { onConflict: 'key' });
+                ];
+                if (Array.isArray(rawData.branches) && rawData.branches.length > 0) {
+                    settingsRows.push({ key: 'branches', value: JSON.stringify(rawData.branches), updated_at: new Date().toISOString() });
+                }
+                if (Array.isArray(rawData.departments) && rawData.departments.length > 0) {
+                    settingsRows.push({ key: 'departments', value: JSON.stringify(rawData.departments), updated_at: new Date().toISOString() });
+                }
+                await supabaseClient.from('cancerez_settings').upsert(settingsRows, { onConflict: 'key' });
 
                 return true;
             } catch(e) {
@@ -2181,6 +2354,29 @@
                         }
                     }
 
+                    if (Array.isArray(data.branches) && data.branches.length > 0) {
+                        const sBranches = data.branches;
+                        if (JSON.stringify(sBranches) !== JSON.stringify(window.branches)) {
+                            window.branches = sBranches;
+                            branches = sBranches;
+                            localStorage.setItem('task_branches', JSON.stringify(branches));
+                            refreshBranchAndDepartmentSelects();
+                            calculateAndRenderBranchLeague();
+                            changed = true;
+                        }
+                    }
+
+                    if (Array.isArray(data.departments) && data.departments.length > 0) {
+                        const sDepts = data.departments;
+                        if (JSON.stringify(sDepts) !== JSON.stringify(window.departments)) {
+                            window.departments = sDepts;
+                            departments = sDepts;
+                            localStorage.setItem('task_departments', JSON.stringify(departments));
+                            refreshBranchAndDepartmentSelects();
+                            changed = true;
+                        }
+                    }
+
                     if (changed) {
                         renderApp();
                         if (activeCommentTaskId) {
@@ -2207,6 +2403,8 @@
             const rawData = {
                 tasks: tasks,
                 team: team,
+                branches: window.branches || DEFAULT_BRANCHES,
+                departments: window.departments || DEFAULT_DEPARTMENTS,
                 notes: document.getElementById('managementNotes')?.value || localStorage.getItem('task_management_notes') || '',
                 adminPassword: localStorage.getItem('cancerez_admin_password') || '1978'
             };
@@ -2468,6 +2666,7 @@
                 } catch(e) {}
             }
             initSupabase();
+            refreshBranchAndDepartmentSelects();
             checkAdminAuth();
             const savedNotes = localStorage.getItem('task_management_notes');
             if (savedNotes !== null) {
@@ -2582,15 +2781,7 @@
             const container = document.getElementById('branchLeagueGrid');
             if (!container) return;
 
-            const allBranches = [
-                "Alsancak Şubesi",
-                "Karşıyaka Şubesi",
-                "Bornova Şubesi",
-                "Göztepe Şubesi",
-                "Kavurma & Üretim Tesisi",
-                "Merkez Depo & Lojistik",
-                "Merkez / Genel"
-            ];
+            const allBranches = Array.from(new Set([...(window.branches || DEFAULT_BRANCHES)]));
 
             tasks.forEach(t => {
                 if (t.branch && !allBranches.includes(t.branch)) {
@@ -4303,31 +4494,427 @@
                 const newDept = prompt("Eklemek istediğiniz yeni birim adını yazınız:");
                 if (newDept && newDept.trim()) {
                     const trimmed = newDept.trim();
-                    let exists = false;
-                    for (let i = 0; i < selectEl.options.length; i++) {
-                        if (selectEl.options[i].value.toLowerCase() === trimmed.toLowerCase()) {
-                            selectEl.selectedIndex = i;
-                            exists = true;
-                            break;
-                        }
+                    if (!Array.isArray(window.departments)) window.departments = [...DEFAULT_DEPARTMENTS];
+                    if (!window.departments.some(d => d.toLowerCase() === trimmed.toLowerCase())) {
+                        window.departments.push(trimmed);
+                        saveDepartments();
+                        refreshBranchAndDepartmentSelects();
                     }
-                    if (!exists) {
-                        const opt = document.createElement('option');
-                        opt.value = trimmed;
-                        opt.textContent = trimmed;
-                        const newOpt = selectEl.querySelector('option[value="__NEW__"]');
-                        if (newOpt) {
-                            selectEl.insertBefore(opt, newOpt);
-                        } else {
-                            selectEl.appendChild(opt);
-                        }
-                        selectEl.value = trimmed;
-                    }
+                    selectEl.value = trimmed;
                 } else {
-                    selectEl.selectedIndex = 0;
+                    selectEl.value = (window.departments && window.departments[0]) || 'Üretim';
                 }
             }
         }
+
+        // ================= 7. ŞUBE & BİRİM YÖNETİM MERKEZİ =================
+        function refreshBranchAndDepartmentSelects() {
+            // 1. Branch Filter Select
+            const branchFilter = document.getElementById('branchFilter');
+            if (branchFilter) {
+                const curVal = branchFilter.value || 'ALL';
+                const allBranchesList = Array.from(new Set([...(window.branches || DEFAULT_BRANCHES)]));
+                if (Array.isArray(window.tasks)) {
+                    window.tasks.forEach(t => {
+                        if (t.branch && !allBranchesList.includes(t.branch)) {
+                            allBranchesList.push(t.branch);
+                        }
+                    });
+                }
+                let html = '<option value="ALL">📍 Tüm Şubeler / Lokasyonlar</option>';
+                allBranchesList.forEach(b => {
+                    html += `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`;
+                });
+                branchFilter.innerHTML = html;
+                branchFilter.value = allBranchesList.includes(curVal) ? curVal : 'ALL';
+            }
+
+            // 2. Task Branch Select
+            const taskBranch = document.getElementById('taskBranch');
+            if (taskBranch) {
+                const curVal = taskBranch.value;
+                const bList = window.branches || DEFAULT_BRANCHES;
+                let html = '';
+                bList.forEach(b => {
+                    html += `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`;
+                });
+                html += '<option value="__NEW_BRANCH__">➕ Yeni Şube Ekle...</option>';
+                taskBranch.innerHTML = html;
+                if (curVal && curVal !== '__NEW_BRANCH__' && bList.includes(curVal)) {
+                    taskBranch.value = curVal;
+                } else if (bList.length > 0) {
+                    taskBranch.value = bList[0];
+                }
+            }
+
+            // 3. Task Department Select
+            const taskDept = document.getElementById('taskDepartment');
+            if (taskDept) {
+                const curVal = taskDept.value;
+                const dList = window.departments || DEFAULT_DEPARTMENTS;
+                let html = '';
+                dList.forEach(d => {
+                    html += `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`;
+                });
+                html += '<option value="__NEW__">➕ Yeni Birim Ekle...</option>';
+                taskDept.innerHTML = html;
+                if (curVal && curVal !== '__NEW__' && dList.includes(curVal)) {
+                    taskDept.value = curVal;
+                } else if (dList.length > 0) {
+                    taskDept.value = dList[0];
+                }
+            }
+
+            // 4. Branch QR Select
+            const qrSelect = document.getElementById('branchQrSelect');
+            if (qrSelect) {
+                const curVal = qrSelect.value;
+                const bList = window.branches || DEFAULT_BRANCHES;
+                let html = '';
+                bList.forEach(b => {
+                    html += `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`;
+                });
+                qrSelect.innerHTML = html;
+                if (curVal && bList.includes(curVal)) {
+                    qrSelect.value = curVal;
+                } else if (bList.length > 0) {
+                    qrSelect.value = bList[0];
+                }
+            }
+
+            // 5. Team Modal Department Datalist
+            const deptDl = document.getElementById('deptDatalist');
+            if (deptDl) {
+                deptDl.innerHTML = (window.departments || DEFAULT_DEPARTMENTS).map(d => `<option value="${escapeHtml(d)}">`).join('');
+            }
+        }
+
+        function openBranchDeptModal(tab = 'branches') {
+            switchBranchDeptTab(tab);
+            renderBranchModalList();
+            renderDeptModalList();
+            const modal = document.getElementById('branchDeptModal');
+            if (modal) {
+                modal.style.setProperty('display', 'flex', 'important');
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeBranchDeptModal() {
+            const modal = document.getElementById('branchDeptModal');
+            if (modal) {
+                modal.style.setProperty('display', 'none', 'important');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function switchBranchDeptTab(tab) {
+            const tabBranches = document.getElementById('tabContentBranches');
+            const tabDepts = document.getElementById('tabContentDepartments');
+            const btnBranches = document.getElementById('tabBtnBranches');
+            const btnDepts = document.getElementById('tabBtnDepartments');
+
+            if (tab === 'departments') {
+                if (tabBranches) tabBranches.classList.add('hidden');
+                if (tabDepts) tabDepts.classList.remove('hidden');
+                if (btnBranches) {
+                    btnBranches.className = "flex-1 py-2 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 text-[#5C4A3C] hover:text-[#31261D] hover:bg-white/60";
+                }
+                if (btnDepts) {
+                    btnDepts.className = "flex-1 py-2 px-3 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 bg-white text-[#1E340C] shadow-xs border border-[#E8DFC8]";
+                }
+            } else {
+                if (tabBranches) tabBranches.classList.remove('hidden');
+                if (tabDepts) tabDepts.classList.add('hidden');
+                if (btnBranches) {
+                    btnBranches.className = "flex-1 py-2 px-3 text-xs font-black rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 bg-white text-[#A6192E] shadow-xs border border-[#E8DFC8]";
+                }
+                if (btnDepts) {
+                    btnDepts.className = "flex-1 py-2 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 text-[#5C4A3C] hover:text-[#31261D] hover:bg-white/60";
+                }
+            }
+        }
+
+        function renderBranchModalList() {
+            const listEl = document.getElementById('branchItemsList');
+            const countEl = document.getElementById('branchTabCount');
+            if (!listEl) return;
+            const branchList = window.branches || DEFAULT_BRANCHES;
+            if (countEl) countEl.innerText = branchList.length;
+
+            if (branchList.length === 0) {
+                listEl.innerHTML = '<div class="p-6 text-center text-stone-400">Henüz kayıtlı şube bulunmuyor.</div>';
+                return;
+            }
+
+            listEl.innerHTML = branchList.map((bName, idx) => {
+                const taskCount = (window.tasks || []).filter(t => (t.branch || 'Merkez / Genel') === bName).length;
+                const isDefault = bName === 'Merkez / Genel';
+                return `
+                    <div class="px-4 py-3 flex items-center justify-between hover:bg-[#FAF7F2] transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-[#FAF2E6] text-[#A6192E] flex items-center justify-center font-bold text-xs border border-[#FFBF3F]/30">
+                                ${idx + 1}
+                            </div>
+                            <div>
+                                <div class="font-bold text-[#31261D] text-xs flex items-center gap-1.5">
+                                    <span>${escapeHtml(bName)}</span>
+                                    ${isDefault ? '<span class="text-[9px] bg-stone-100 text-stone-600 px-1.5 py-0.2 rounded font-semibold">Merkez</span>' : ''}
+                                </div>
+                                <div class="text-[10px] text-[#7A6A5C]">
+                                    <i class="fa-solid fa-list-check mr-1 text-[#824701]"></i>${taskCount} görev bağlı
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="editBranchName('${escapeHtml(bName)}')" title="Şube Adını Düzenle" class="px-2.5 py-1 bg-white hover:bg-[#FAF2E6] text-[#31261D] border border-[#E8DFC8] rounded-lg text-[11px] font-bold transition-all cursor-pointer">
+                                <i class="fa-solid fa-pen-to-square text-[#A6192E] mr-1"></i>Düzenle
+                            </button>
+                            <button type="button" onclick="deleteBranchItem('${escapeHtml(bName)}')" title="Şubeyi Kaldır" class="px-2.5 py-1 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-[11px] font-bold transition-all cursor-pointer">
+                                <i class="fa-solid fa-trash mr-1"></i>Sil
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDeptModalList() {
+            const listEl = document.getElementById('deptItemsList');
+            const countEl = document.getElementById('deptTabCount');
+            if (!listEl) return;
+            const deptList = window.departments || DEFAULT_DEPARTMENTS;
+            if (countEl) countEl.innerText = deptList.length;
+
+            if (deptList.length === 0) {
+                listEl.innerHTML = '<div class="p-6 text-center text-stone-400">Henüz kayıtlı birim bulunmuyor.</div>';
+                return;
+            }
+
+            listEl.innerHTML = deptList.map((dName, idx) => {
+                const taskCount = (window.tasks || []).filter(t => (t.department || '') === dName).length;
+                const memberCount = (window.team || []).filter(m => (m.department || '') === dName).length;
+                return `
+                    <div class="px-4 py-3 flex items-center justify-between hover:bg-[#FAF7F2] transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-[#FAF2E6] text-[#1E340C] flex items-center justify-center font-bold text-xs border border-[#FFBF3F]/30">
+                                ${idx + 1}
+                            </div>
+                            <div>
+                                <div class="font-bold text-[#31261D] text-xs">
+                                    ${escapeHtml(dName)}
+                                </div>
+                                <div class="text-[10px] text-[#7A6A5C] flex items-center gap-2">
+                                    <span><i class="fa-solid fa-list-check mr-1 text-[#824701]"></i>${taskCount} görev</span>
+                                    <span>•</span>
+                                    <span><i class="fa-solid fa-user mr-1 text-[#1E340C]"></i>${memberCount} personel</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="editDeptName('${escapeHtml(dName)}')" title="Birim Adını Düzenle" class="px-2.5 py-1 bg-white hover:bg-[#FAF2E6] text-[#31261D] border border-[#E8DFC8] rounded-lg text-[11px] font-bold transition-all cursor-pointer">
+                                <i class="fa-solid fa-pen-to-square text-[#A6192E] mr-1"></i>Düzenle
+                            </button>
+                            <button type="button" onclick="deleteDeptItem('${escapeHtml(dName)}')" title="Birimi Kaldır" class="px-2.5 py-1 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-[11px] font-bold transition-all cursor-pointer">
+                                <i class="fa-solid fa-trash mr-1"></i>Sil
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function handleAddNewBranch(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            const input = document.getElementById('newBranchInput');
+            if (!input) return;
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (!Array.isArray(window.branches)) window.branches = [...DEFAULT_BRANCHES];
+
+            const exists = window.branches.some(b => b.toLowerCase() === name.toLowerCase());
+            if (exists) {
+                alert(`"${name}" şubesi zaten listede mevcut.`);
+                return;
+            }
+
+            window.branches.push(name);
+            saveBranches();
+            input.value = '';
+            renderBranchModalList();
+            refreshBranchAndDepartmentSelects();
+            calculateAndRenderBranchLeague();
+        }
+
+        function editBranchName(oldName) {
+            const newName = prompt(`"${oldName}" şubesinin yeni adını giriniz:`, oldName);
+            if (!newName || !newName.trim() || newName.trim() === oldName) return;
+
+            const trimmed = newName.trim();
+            const exists = window.branches.some(b => b.toLowerCase() === trimmed.toLowerCase() && b !== oldName);
+            if (exists) {
+                alert(`"${trimmed}" isimli bir şube zaten var.`);
+                return;
+            }
+
+            const idx = window.branches.indexOf(oldName);
+            if (idx !== -1) {
+                window.branches[idx] = trimmed;
+            }
+
+            let updatedTasks = 0;
+            if (Array.isArray(window.tasks)) {
+                window.tasks.forEach(t => {
+                    if ((t.branch || 'Merkez / Genel') === oldName) {
+                        t.branch = trimmed;
+                        updatedTasks++;
+                    }
+                });
+            }
+
+            if (updatedTasks > 0) {
+                localStorage.setItem('task_items', JSON.stringify(window.tasks));
+            }
+
+            saveBranches();
+            renderBranchModalList();
+            refreshBranchAndDepartmentSelects();
+            calculateAndRenderBranchLeague();
+            renderApp();
+        }
+
+        function deleteBranchItem(name) {
+            if (!window.branches) return;
+            if (window.branches.length <= 1) {
+                alert("En az bir şube bulunmalıdır.");
+                return;
+            }
+
+            const linkedTasksCount = (window.tasks || []).filter(t => (t.branch || 'Merkez / Genel') === name).length;
+            let msg = `"${name}" şubesini silmek istediğinize emin misiniz?`;
+            if (linkedTasksCount > 0) {
+                msg = `"${name}" şubesine bağlı ${linkedTasksCount} adet görev bulunmaktadır.\n\nŞube listeden kaldırılacaktır ancak mevcut görev kayıtları bozulmayacak ve geçmiş raporlarda görünmeye devam edecektir.\n\nOnaylıyor musunuz?`;
+            }
+
+            if (!confirm(msg)) return;
+
+            window.branches = window.branches.filter(b => b !== name);
+            saveBranches();
+            renderBranchModalList();
+            refreshBranchAndDepartmentSelects();
+            calculateAndRenderBranchLeague();
+        }
+
+        function handleAddNewDept(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            const input = document.getElementById('newDeptInput');
+            if (!input) return;
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (!Array.isArray(window.departments)) window.departments = [...DEFAULT_DEPARTMENTS];
+
+            const exists = window.departments.some(d => d.toLowerCase() === name.toLowerCase());
+            if (exists) {
+                alert(`"${name}" birimi zaten listede mevcut.`);
+                return;
+            }
+
+            window.departments.push(name);
+            saveDepartments();
+            input.value = '';
+            renderDeptModalList();
+            refreshBranchAndDepartmentSelects();
+        }
+
+        function editDeptName(oldName) {
+            const newName = prompt(`"${oldName}" biriminin yeni adını giriniz:`, oldName);
+            if (!newName || !newName.trim() || newName.trim() === oldName) return;
+
+            const trimmed = newName.trim();
+            const exists = window.departments.some(d => d.toLowerCase() === trimmed.toLowerCase() && d !== oldName);
+            if (exists) {
+                alert(`"${trimmed}" isimli bir birim zaten var.`);
+                return;
+            }
+
+            const idx = window.departments.indexOf(oldName);
+            if (idx !== -1) {
+                window.departments[idx] = trimmed;
+            }
+
+            let updatedTasks = 0;
+            if (Array.isArray(window.tasks)) {
+                window.tasks.forEach(t => {
+                    if ((t.department || '') === oldName) {
+                        t.department = trimmed;
+                        updatedTasks++;
+                    }
+                });
+            }
+
+            if (updatedTasks > 0) {
+                localStorage.setItem('task_items', JSON.stringify(window.tasks));
+            }
+
+            saveDepartments();
+            renderDeptModalList();
+            refreshBranchAndDepartmentSelects();
+            renderApp();
+        }
+
+        function deleteDeptItem(name) {
+            if (!window.departments) return;
+            if (window.departments.length <= 1) {
+                alert("En az bir birim bulunmalıdır.");
+                return;
+            }
+
+            const linkedTasksCount = (window.tasks || []).filter(t => (t.department || '') === name).length;
+            let msg = `"${name}" birimini silmek istediğinize emin misiniz?`;
+            if (linkedTasksCount > 0) {
+                msg = `"${name}" birimine bağlı ${linkedTasksCount} adet görev bulunmaktadır.\n\nBirim listeden kaldırılacaktır ancak mevcut görevlerin kayıtları bozulmayacaktır.\n\nOnaylıyor musunuz?`;
+            }
+
+            if (!confirm(msg)) return;
+
+            window.departments = window.departments.filter(d => d !== name);
+            saveDepartments();
+            renderDeptModalList();
+            refreshBranchAndDepartmentSelects();
+        }
+
+        function saveBranches() {
+            localStorage.setItem('task_branches', JSON.stringify(window.branches));
+            pushDataToServer();
+        }
+
+        function saveDepartments() {
+            localStorage.setItem('task_departments', JSON.stringify(window.departments));
+            pushDataToServer();
+        }
+
+        function handleBranchSelectChange(selectEl) {
+            if (!selectEl) return;
+            if (selectEl.value === '__NEW_BRANCH__') {
+                const newBranch = prompt("Eklemek istediğiniz yeni şube / lokasyon adını yazınız:");
+                if (newBranch && newBranch.trim()) {
+                    const trimmed = newBranch.trim();
+                    if (!Array.isArray(window.branches)) window.branches = [...DEFAULT_BRANCHES];
+                    if (!window.branches.some(b => b.toLowerCase() === trimmed.toLowerCase())) {
+                        window.branches.push(trimmed);
+                        saveBranches();
+                        refreshBranchAndDepartmentSelects();
+                        calculateAndRenderBranchLeague();
+                    }
+                    selectEl.value = trimmed;
+                } else {
+                    selectEl.value = (window.branches && window.branches[0]) || 'Bornova - Özkanlar';
+                }
+            }
+        }
+
 
         function openNewTaskModal() {
             document.getElementById('taskForm').reset();
@@ -4335,11 +4922,12 @@
             document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-plus text-[#FFBF3F]"></i> Yeni Görev / Aksiyon Girişi';
             
             const deptSelect = document.getElementById('taskDepartment');
-            if (deptSelect) deptSelect.value = 'Satış & Pazarlama';
+            if (deptSelect) deptSelect.value = (window.departments && window.departments[0]) || 'Üretim';
             const autoBadge = document.getElementById('autoDeptBadge');
             if (autoBadge) autoBadge.classList.add('hidden');
 
-            document.getElementById('taskBranch').value = 'Merkez / Genel';
+            const branchSelect = document.getElementById('taskBranch');
+            if (branchSelect) branchSelect.value = (window.branches && window.branches[0]) || 'Bornova - Özkanlar';
             document.getElementById('taskRecurrence').value = 'none';
 
             const d = new Date();

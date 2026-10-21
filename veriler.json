@@ -27,7 +27,7 @@
       "deadline": "2026-10-16",
       "status": "Devam Ediyor",
       "createdAt": "2026-10-16T08:00:00.000Z",
-      "branch": "Alsancak Şubesi",
+      "branch": "Bornova - Özkanlar",
       "recurrence": "daily",
       "comments": [
         {
@@ -41,5 +41,26 @@
     }
   ],
   "notes": "CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan) - Can Kardeşler Kuruluşudur.\n7/24 Kesintisiz Bulut Senkronizasyonu Devrede.",
-  "adminPassword": "1978"
+  "adminPassword": "1978",
+  "branches": [
+    "Bornova - Özkanlar",
+    "Göztepe - Güzelyalı",
+    "Konak - Çankaya",
+    "Karşıyaka - Aksoy",
+    "Aliağa",
+    "Hatay Şube",
+    "Hatay - Nokta (Hatay 2)",
+    "Çankaya - Borsa",
+    "Merkez / Genel"
+  ],
+  "departments": [
+    "Üretim",
+    "Lojistik",
+    "Muhasebe",
+    "Satınalma",
+    "İnsan Kaynakları (İK)",
+    "Ballıdede",
+    "Genel Müdürlük",
+    "Şube Operasyon"
+  ]
 }

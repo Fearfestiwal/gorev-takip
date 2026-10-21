@@ -396,13 +396,7 @@
                 <div>
                     <label class="block font-bold text-xs text-[#31261D] mb-1">Çalıştığınız Şube *</label>
                     <select id="selfRegBranch" class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#1E340C]">
-                        <option value="Alsancak Şubesi">Alsancak Şubesi</option>
-                        <option value="Karşıyaka Şubesi">Karşıyaka Şubesi</option>
-                        <option value="Bornova Şubesi">Bornova Şubesi</option>
-                        <option value="Göztepe Şubesi">Göztepe Şubesi</option>
-                        <option value="Kavurma & Üretim Tesisi">Kavurma & Üretim Tesisi</option>
-                        <option value="Merkez Depo & Lojistik">Merkez Depo & Lojistik</option>
-                        <option value="Merkez / Genel">Merkez / Genel</option>
+                        <!-- Dinamik olarak refreshPersonelBranchSelect() tarafından doldurulacak -->
                     </select>
                 </div>
 
@@ -670,7 +664,7 @@
                 deadline: "2026-10-16",
                 status: "Devam Ediyor",
                 createdAt: "2026-10-16T08:00:00.000Z",
-                branch: "Alsancak Şubesi",
+                branch: "Bornova - Özkanlar",
                 recurrence: "daily",
                 comments: [
                     {
@@ -850,6 +844,47 @@
             localStorage.setItem('task_team_members', JSON.stringify(team));
         }
         window.team = team;
+
+        // ================= CAN ÇEREZ ŞUBELERİ & FABRİKA BİRİMLERİ (PERSONEL) =================
+        const DEFAULT_BRANCHES = [
+            "Bornova - Özkanlar",
+            "Göztepe - Güzelyalı",
+            "Konak - Çankaya",
+            "Karşıyaka - Aksoy",
+            "Aliağa",
+            "Hatay Şube",
+            "Hatay - Nokta (Hatay 2)",
+            "Çankaya - Borsa",
+            "Merkez / Genel"
+        ];
+
+        let branches = [];
+        try {
+            const rawStoredBranches = localStorage.getItem('task_branches');
+            if (rawStoredBranches) {
+                branches = JSON.parse(rawStoredBranches);
+            }
+        } catch(e) {
+            branches = [];
+        }
+        if (!Array.isArray(branches) || branches.length === 0) {
+            branches = [...DEFAULT_BRANCHES];
+            localStorage.setItem('task_branches', JSON.stringify(branches));
+        }
+        window.branches = branches;
+
+        function refreshPersonelBranchSelect() {
+            const sel = document.getElementById('selfRegBranch');
+            if (!sel) return;
+            const curVal = sel.value;
+            const bList = window.branches || DEFAULT_BRANCHES;
+            sel.innerHTML = bList.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+            if (curVal && bList.includes(curVal)) {
+                sel.value = curVal;
+            } else if (bList.length > 0) {
+                sel.value = bList[0];
+            }
+        }
 
         let currentSelectedUser = localStorage.getItem('task_personel_selected_user') || '';
 
@@ -1250,18 +1285,30 @@
 
                 let notes = '';
                 let adminPassword = '1978';
+                let branchesData = null;
+                let departmentsData = null;
                 if (settingsRes && Array.isArray(settingsRes.data)) {
                     const nObj = settingsRes.data.find(s => s.key === 'admin_notes');
                     if (nObj) notes = nObj.value || '';
                     const pObj = settingsRes.data.find(s => s.key === 'admin_password');
                     if (pObj) adminPassword = pObj.value || '1978';
+                    const bObj = settingsRes.data.find(s => s.key === 'branches');
+                    if (bObj && bObj.value) {
+                        try { branchesData = JSON.parse(bObj.value); } catch(e){}
+                    }
+                    const dObj = settingsRes.data.find(s => s.key === 'departments');
+                    if (dObj && dObj.value) {
+                        try { departmentsData = JSON.parse(dObj.value); } catch(e){}
+                    }
                 }
 
                 return {
                     tasks: tasksRes.data || [],
                     team: teamRes.data || [],
                     notes: notes,
-                    adminPassword: adminPassword
+                    adminPassword: adminPassword,
+                    branches: branchesData,
+                    departments: departmentsData
                 };
             } catch(e) {
                 console.warn("Supabase fetch exception:", e);
@@ -1479,6 +1526,16 @@
                         localStorage.setItem('cancerez_admin_password', data.adminPassword);
                     }
 
+                    if (Array.isArray(data.branches) && data.branches.length > 0) {
+                        const sBranches = data.branches;
+                        if (JSON.stringify(sBranches) !== JSON.stringify(window.branches)) {
+                            window.branches = sBranches;
+                            branches = sBranches;
+                            localStorage.setItem('task_branches', JSON.stringify(branches));
+                            refreshPersonelBranchSelect();
+                        }
+                    }
+
                     if (changed) {
                         if (currentSelectedUser) {
                             renderPersonalDashboard(currentSelectedUser);
@@ -1644,6 +1701,7 @@
                     history.replaceState(null, document.title, window.location.pathname + window.location.search);
                 } catch(e) {}
             }
+            refreshPersonelBranchSelect();
             initBranchFromUrl();
             updateStaffNotificationIconUI();
             initSupabase();
