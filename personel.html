@@ -75,7 +75,7 @@
                     <div class="border-l border-[#E8DFC8] pl-3">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-[10px] bg-[#A6192E] text-white px-2 py-0.5 rounded-md font-black uppercase border border-[#FFBF3F]/40 shadow-xs">ÇALIŞAN EKRANI</span>
-                            <span class="text-[9px] bg-[#FAF2E6] text-[#A6192E] px-2 py-0.5 rounded font-extrabold uppercase border border-[#D49B28]/40 tracking-wider">CAN KARDEŞLER KURULUŞUDUR</span>
+                            <span class="text-[9px] bg-[#FAF2E6] text-[#A6192E] px-2 py-0.5 rounded font-extrabold uppercase border border-[#D49B28]/40 tracking-wider">CAN ÇEREZ (1978)</span>
                             <button id="personelServerBadge" onclick="syncWithServer(true)" title="Bulut / Yerel veriyi yenilemek için tıklayın" class="hidden text-[10px] px-2 py-0.5 rounded font-bold flex items-center gap-1 cursor-pointer hover:opacity-90 transition-opacity"></button>
                         </div>
                         <p class="text-[11px] text-[#5C4A3C] font-medium">Kişisel Görev & Aksiyon Takip Ekranı</p>
@@ -630,7 +630,7 @@
         </div>
     </div>
 
-    <!-- CAN ÇEREZ & CAN KARDEŞLER KURUMSAL FOOTER -->
+    <!-- CAN ÇEREZ KURUMSAL FOOTER -->
     <footer class="py-6 border-t border-[#E8DFC8] bg-[#FAF7F2] text-center text-xs text-[#5C4A3C] no-print mt-auto">
         <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2.5">
@@ -639,7 +639,7 @@
                 <span class="text-[#824701] font-semibold text-xs">• Adıyla Tadıyla Can'dan</span>
             </div>
             <p class="text-xs text-[#5C4A3C]">
-                Bir <strong>Can Kardeşler Kuruyemiş</strong> Markasıdır. Tüm hakları saklıdır. © 1978 - 2026
+                <strong>CAN ÇEREZ (1978)</strong> • Tüm hakları saklıdır. © 1978 - 2026
             </p>
         </div>
     </footer>
@@ -2525,7 +2525,7 @@
             const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
             let msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n`;
-            msg += `🏢 _Can Kardeşler Kuruyemiş Grubu_\n`;
+            msg += `🏢 _CAN ÇEREZ (1978)_\n`;
             msg += `*Personel Görev & Durum Bildirimi*\n\n`;
             msg += `Sayın Yöneticim,\n`;
             msg += `Ben *${currentSelectedUser}*, üzerimdeki görevlerin son durumunu bilgilerinize sunarım:\n\n`;
@@ -2560,7 +2560,7 @@
             if (!task) return;
 
             let msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n`;
-            msg += `🏢 _Can Kardeşler Kuruyemiş Grubu_\n`;
+            msg += `🏢 _CAN ÇEREZ (1978)_\n`;
             msg += `*Görev Durum Güncellemesi*\n\n`;
             msg += `Sayın Yöneticim,\n`;
             msg += `*${currentSelectedUser}* olarak ilgili görev durumu hakkında bilgi vermek isterim:\n\n`;
@@ -2611,7 +2611,7 @@
             const subject = `[CAN ÇEREZ] Görev Durum Bildirimi - ${currentSelectedUser}`;
 
             let body = `CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)\n`;
-            body += `Can Kardeşler Kuruyemiş Grubu - Personel Görev Raporu\n\n`;
+            body += `CAN ÇEREZ (1978) - Personel Görev Raporu\n\n`;
             body += `Sayın Yöneticim,\n\n`;
             body += `Ben ${currentSelectedUser}, üzerimdeki görevlerin son durumunu bilgilerinize sunarım:\n\n`;
             body += `📊 Genel Durum: Toplam ${total} görev / ${completed} tamamlandı (%${pct} Başarı)\n`;

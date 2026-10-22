@@ -130,7 +130,7 @@
 
                 <div>
                     <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#FFBF3F] bg-[#46372A] px-3 py-1 rounded-full border border-[#FFBF3F]/30 inline-block shadow-2xs">
-                        Can Kardeşler Kuruluşudur
+                        CAN ÇEREZ (1978)
                     </span>
                     <h2 class="text-xl sm:text-2xl font-black text-white mt-2.5 tracking-tight font-serif">YÖNETİCİ PANELİ GİRİŞİ</h2>
                     <p class="text-xs text-[#E5DCD0] mt-1">Şirket içi koordinasyon ve görev yönetimine erişmek için lütfen yönetici şifrenizi giriniz.</p>
@@ -198,7 +198,7 @@
                                     👑 YÖNETİCİ PANELİ
                                 </span>
                                 <span class="text-[9px] bg-[#FAF2E6] text-[#A6192E] px-2 py-0.5 rounded-md font-extrabold uppercase tracking-wider border border-[#D49B28]/40">
-                                    CAN KARDEŞLER KURULUŞUDUR
+                                    CAN ÇEREZ (1978)
                                 </span>
                                 <button id="serverStatusBadge" onclick="syncWithServer(true)" title="Bulut / Yerel veriyi yenilemek için tıklayın" class="hidden text-[10px] px-2 py-0.5 rounded font-semibold flex items-center gap-1 cursor-pointer hover:opacity-90 transition-opacity"></button>
                             </div>
@@ -337,9 +337,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center space-x-2 py-2.5">
                 <button id="navTab1" onclick="switchMainPage(1)" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#A6192E] text-white shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/40 cursor-pointer">
-                    <i class="fa-solid fa-chart-column"></i>
-                    <span>Yönetim Performans Raporu</span>
-                    <span id="badgeCompletionPct" class="bg-[#FFBF3F] text-[#31261D] text-[11px] px-2 py-0.5 rounded-full font-black">0%</span>
+                    <i class="fa-solid fa-handshake"></i>
+                    <span>Haftalık Koordinasyon</span>
                 </button>
 
                 <button id="navTab2" onclick="switchMainPage(2)" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#F2ECE1] cursor-pointer">
@@ -374,42 +373,29 @@
                 </div>
             </div>
 
-            <!-- CAN ÇEREZ Genel Tamamlanma Yüzdesi Banner'ı (Aydınlık & Prestijli Logo Teması) -->
-            <div class="bg-gradient-to-br from-[#FFFDF7] via-white to-[#FAF6EE] rounded-3xl p-6 sm:p-7 shadow-lg shadow-[#D49B28]/10 border-2 border-[#FFBF3F]/70 relative overflow-hidden">
-                <div class="absolute -right-16 -top-16 w-56 h-56 bg-[#FFBF3F]/15 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -left-16 -bottom-16 w-56 h-56 bg-[#A6192E]/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                    <div class="md:col-span-2 space-y-2">
-                        <span class="text-xs uppercase font-extrabold tracking-widest text-[#A6192E] flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#A6192E] animate-ping"></span>
-                            <i class="fa-solid fa-crown text-[#D49B28]"></i>
-                            CAN ÇEREZ 1978 • KOORDİNASYON İLERLEMESİ
-                        </span>
-                        <h2 class="text-xl sm:text-2xl font-black text-[#31261D] tracking-tight">
-                            Genel Aksiyon & Görev Başarı Oranı
-                        </h2>
-                        <p class="text-xs text-[#5C4A3C] leading-relaxed max-w-xl font-medium">
-                            Şubeler, Kavurma/Üretim, Satış-Pazarlama ve Depo birimlerimizin haftalık aksiyonlarının anlık durumudur. Herhangi bir sorumluya tıklayarak kişiye özel aksiyon raporunu WhatsApp veya Gmail ile iletebilirsiniz.
-                        </p>
-                        <div class="pt-3">
-                            <div class="flex justify-between text-xs font-bold mb-1.5">
-                                <span class="text-[#5C4A3C]">Genel İlerleme</span>
-                                <span id="progressPercentText" class="text-[#A6192E] font-black text-sm">0% Tamamlandı</span>
-                            </div>
-                            <div class="w-full bg-[#EFE8D8] rounded-full h-3.5 overflow-hidden p-0.5 border border-[#D49B28]/40 shadow-inner">
-                                <div id="progressBarFill" class="bg-gradient-to-r from-[#A6192E] via-[#FFBF3F] to-[#223E0E] h-full rounded-full transition-all duration-500 shadow-sm" style="width: 0%"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-gradient-to-b from-white to-[#FAF7F2] rounded-2xl p-5 border-2 border-[#FFBF3F]/70 flex flex-col items-center justify-center text-center shadow-md">
-                        <span class="text-[11px] text-[#8C1224] font-extrabold uppercase tracking-wider">Net Başarı Oranı</span>
-                        <div id="kpiBigPercentage" class="text-4xl sm:text-5xl font-black text-[#A6192E] my-1 font-serif drop-shadow-xs">
-                            %0
-                        </div>
-                        <span id="kpiCompletedFraction" class="text-xs text-[#5C4A3C] font-bold">0 / 0 Görev Bitti</span>
-                    </div>
+            <!-- HAFTALIK KOORDİNASYON TOPLANTI BAŞLIĞI -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 sm:p-5 rounded-3xl border border-[#E8DFC8] shadow-xs">
+                <div>
+                    <span class="text-[10px] uppercase font-extrabold tracking-widest text-[#A6192E] flex items-center gap-1.5">
+                        <i class="fa-solid fa-handshake text-[#D49B28]"></i>
+                        <span>CAN ÇEREZ (1978) • HAFTALIK KOORDİNASYON TOPLANTISI</span>
+                    </span>
+                    <h2 class="text-lg sm:text-xl font-black text-[#31261D] tracking-tight mt-0.5">
+                        Haftalık Koordinasyon Paneli
+                    </h2>
+                    <p class="text-xs text-[#5C4A3C] mt-0.5">
+                        Haftalık toplantı aksiyonları, şube performans ligi ve sorumlu kişi görev matrisi.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button type="button" onclick="openNewTaskModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#A6192E] hover:bg-[#8C1224] text-white font-bold text-xs rounded-xl shadow-md shadow-[#A6192E]/20 border border-[#FFBF3F]/30 transition-all hover:scale-105 active:scale-95 cursor-pointer">
+                        <i class="fa-solid fa-plus text-[#FFBF3F]"></i>
+                        <span>Yeni Görev / Aksiyon Ekle</span>
+                    </button>
+                    <button type="button" onclick="switchMainPage(2)" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#FAF7F2] hover:bg-[#EFE8DD] text-[#31261D] font-bold text-xs rounded-xl border border-[#E8DFC8] transition-all cursor-pointer shadow-2xs">
+                        <span>Aksiyon Listesini Gör</span>
+                        <i class="fa-solid fa-arrow-right text-xs text-[#A6192E]"></i>
+                    </button>
                 </div>
             </div>
 
@@ -621,6 +607,7 @@
                             <option value="ALL">Tüm Durumlar (Son 1 Ay)</option>
                             <option value="Açık">Sadece Açık Görevler</option>
                             <option value="Devam Ediyor">Devam Edenler</option>
+                            <option value="ThisWeek">⚡ Bu Hafta (Koordinasyon)</option>
                             <option value="Bugun">📅 Bugün Bitenler</option>
                             <option value="Geciken">⚠️ Sadece Gecikenler</option>
                             <option value="Tamamlandı">Tamamlananlar (Son 1 Ay)</option>
@@ -736,7 +723,7 @@
 
         </div>
 
-        <!-- CAN ÇEREZ & CAN KARDEŞLER KURUMSAL FOOTER -->
+        <!-- CAN ÇEREZ KURUMSAL FOOTER -->
         <footer class="py-6 border-t border-[#E8DFC8] bg-[#FAF7F2] text-center text-xs text-[#5C4A3C] no-print mt-8">
             <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
@@ -745,7 +732,7 @@
                     <span class="text-[#824701] font-semibold text-xs">• Adıyla Tadıyla Can'dan</span>
                 </div>
                 <p class="text-xs text-[#5C4A3C]">
-                    Bir <strong>Can Kardeşler Kuruyemiş</strong> Markasıdır. Tüm hakları saklıdır. © 1978 - 2026
+                    <strong>CAN ÇEREZ (1978)</strong> • Tüm hakları saklıdır. © 1978 - 2026
                 </p>
             </div>
         </footer>
@@ -3289,13 +3276,19 @@
             const delayedPct = total > 0 ? Math.round((delayed / total) * 100) : 0;
             const openPct = total > 0 ? Math.round((open / total) * 100) : 0;
 
-            document.getElementById('badgeCompletionPct').innerText = `%${completionPct}`;
-            document.getElementById('badgeTotalTasks').innerText = `${total} Görev`;
+            const bPct = document.getElementById('badgeCompletionPct');
+            if (bPct) bPct.innerText = `%${completionPct}`;
+            const bTotal = document.getElementById('badgeTotalTasks');
+            if (bTotal) bTotal.innerText = `${total} Görev`;
 
-            document.getElementById('progressPercentText').innerText = `%${completionPct} Tamamlandı`;
-            document.getElementById('progressBarFill').style.width = `${completionPct}%`;
-            document.getElementById('kpiBigPercentage').innerText = `%${completionPct}`;
-            document.getElementById('kpiCompletedFraction').innerText = `${completed} / ${total} Görev Bitti`;
+            const pText = document.getElementById('progressPercentText');
+            if (pText) pText.innerText = `%${completionPct} Tamamlandı`;
+            const pFill = document.getElementById('progressBarFill');
+            if (pFill) pFill.style.width = `${completionPct}%`;
+            const kpiBig = document.getElementById('kpiBigPercentage');
+            if (kpiBig) kpiBig.innerText = `%${completionPct}`;
+            const kpiFrac = document.getElementById('kpiCompletedFraction');
+            if (kpiFrac) kpiFrac.innerText = `${completed} / ${total} Görev Bitti`;
 
             document.getElementById('p1Total').innerText = total;
             document.getElementById('p1Delayed').innerText = delayed;
@@ -3687,9 +3680,24 @@
                 }
 
                 if (branchFilter !== 'ALL' && (item.branch || 'Merkez / Genel') !== branchFilter) return false;
+                const isThisWeek = () => {
+                    if (!item.dueDate) return false;
+                    const d = new Date(item.dueDate);
+                    d.setHours(0,0,0,0);
+                    const day = now.getDay() || 7;
+                    const monday = new Date(now);
+                    monday.setDate(now.getDate() - (day - 1));
+                    monday.setHours(0,0,0,0);
+                    const sunday = new Date(monday);
+                    sunday.setDate(monday.getDate() + 6);
+                    sunday.setHours(23,59,59,999);
+                    return d >= monday && d <= sunday;
+                };
+
                 if (statusFilter === 'Geciken' && !isDelayed) return false;
                 if (statusFilter === 'Bugun' && !isDueToday) return false;
-                if (statusFilter !== 'ALL' && statusFilter !== 'Geciken' && statusFilter !== 'Bugun' && statusFilter !== 'Archived' && item.status !== statusFilter) return false;
+                if (statusFilter === 'ThisWeek' && !isThisWeek()) return false;
+                if (statusFilter !== 'ALL' && statusFilter !== 'Geciken' && statusFilter !== 'Bugun' && statusFilter !== 'ThisWeek' && statusFilter !== 'Archived' && item.status !== statusFilter) return false;
 
                 if (monthFilter !== 'ALL') {
                     const taskMonth = new Date(item.dueDate).getMonth() + 1;
@@ -4098,7 +4106,7 @@
             const isOverdue = task.status !== 'Tamamlandı' && new Date(task.dueDate) < now;
 
             let msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n`;
-            msg += `🏢 _Can Kardeşler Kuruyemiş Grubu_\n`;
+            msg += `🏢 _CAN ÇEREZ (1978)_\n`;
             msg += `*Görev & Aksiyon Hatırlatması*\n\n`;
             if (ownerName) {
                 msg += `Sayın *${ownerName}*,\n`;
@@ -4129,7 +4137,7 @@
             const completedTasks = pTasks.filter(t => t.status === 'Tamamlandı');
 
             let msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n`;
-            msg += `🏢 _Can Kardeşler Kuruyemiş Grubu_\n`;
+            msg += `🏢 _CAN ÇEREZ (1978)_\n`;
             msg += `*Görev & Performans Durum Özeti*\n\n`;
             msg += `Sayın *${ownerName}*,\n`;
             msg += `Koordinasyon Takip Sistemindeki güncel görev durumunuz:\n\n`;
@@ -4173,7 +4181,7 @@
 
         function shareBulkWhatsApp() {
             const rawText = document.getElementById('bulkBodyPreview').value;
-            const msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n🏢 _Can Kardeşler Kuruyemiş Grubu_\n*Koordinasyon Toplantısı - Toplu Aksiyon Hatırlatması*\n\n` + rawText;
+            const msg = `🥜 *CAN ÇEREZ (1978 | Adıyla Tadıyla Can'dan)*\n🏢 _CAN ÇEREZ (1978)_\n*Koordinasyon Toplantısı - Toplu Aksiyon Hatırlatması*\n\n` + rawText;
             const encoded = encodeURIComponent(msg);
             window.open(`https://wa.me/?text=${encoded}`, '_blank');
         }
