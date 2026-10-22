@@ -442,7 +442,7 @@
             <form onsubmit="handleStaffPinChange(event)" class="p-6 space-y-4 text-xs text-[#31261D]">
                 <div>
                     <label class="block font-bold text-[#31261D] text-xs mb-1">Mevcut PIN Kodunuz *</label>
-                    <input type="password" id="modalStaffCurPin" placeholder="Mevcut PIN (Varsayılan: 1978)" maxlength="6" required
+                    <input type="password" id="modalStaffCurPin" placeholder="Mevcut PIN Kodunuz" maxlength="6" required
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-center text-[#31261D] text-base font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
                 </div>
                 <div>
@@ -491,13 +491,16 @@
                 <div>
                     <label class="block font-bold text-[#31261D] text-xs mb-1">Yönetici Şifreniz *</label>
                     <div class="relative">
-                        <input type="password" id="managerAccessPassInput" placeholder="Varsayılan: 1978" maxlength="20" required autocomplete="current-password"
+                        <input type="password" id="managerAccessPassInput" placeholder="••••••••" maxlength="20" required autocomplete="current-password"
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-center text-[#31261D] text-base font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-[#A6192E]/20 focus:border-[#A6192E]">
                         <button type="button" onclick="toggleManagerAccessPassVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer">
                             <i id="managerAccessPassEye" class="fa-solid fa-eye"></i>
                         </button>
                     </div>
-                    <p class="text-[10px] text-stone-400 mt-1 text-center">İlk kurulum / fabrika şifresi: <strong class="text-[#31261D]">1978</strong></p>
+                    <p class="text-[10px] text-[#7A6A5C] mt-1.5 text-center flex items-center justify-center gap-1.5 font-medium">
+                        <i class="fa-solid fa-shield-halved text-[#A6192E]"></i>
+                        <span>Yetkili yönetici şifrenizi giriniz</span>
+                    </p>
                 </div>
 
                 <div id="managerAccessError" class="hidden text-xs text-[#A6192E] font-bold bg-rose-50 border border-rose-200 p-2.5 rounded-xl text-center">
