@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+graphify-out/
+_test*.html
+_*.html
