@@ -56,6 +56,10 @@
     <!-- Supabase 7/24 Bulut Veritabanı SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #FAF7F2;
@@ -73,7 +77,7 @@
                     <div class="flex items-center gap-2 group cursor-default select-none">
                         <img src="logo.svg" alt="CAN ÇEREZ (1978)" class="h-9 sm:h-11 w-auto object-contain drop-shadow-xs">
                     </div>
-                    <div class="border-l border-[#E8DFC8] pl-2 sm:pl-3">
+                    <div class="hidden sm:block border-l border-[#E8DFC8] pl-2 sm:pl-3">
                         <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                             <span class="text-[10px] bg-[#A6192E] text-white px-2 py-0.5 rounded-md font-black uppercase border border-[#FFBF3F]/40 shadow-xs whitespace-nowrap">ÇALIŞAN EKRANI</span>
                             <span class="hidden md:inline-block text-[9px] bg-[#FAF2E6] text-[#A6192E] px-2 py-0.5 rounded font-extrabold uppercase border border-[#D49B28]/40 tracking-wider whitespace-nowrap">CAN ÇEREZ (1978)</span>

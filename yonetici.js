@@ -1124,13 +1124,13 @@
             if (pageNumber === 1) {
                 p1.classList.remove('hidden');
                 p2.classList.add('hidden');
-                tab1.className = "flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#A6192E] text-white shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/40 cursor-pointer";
-                tab2.className = "flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#F2ECE1] cursor-pointer";
+                tab1.className = "flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-[11px] sm:text-sm font-bold transition-all bg-[#A6192E] text-white shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/40 cursor-pointer min-w-0";
+                tab2.className = "flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-[11px] sm:text-sm font-bold transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#F2ECE1] cursor-pointer min-w-0";
             } else {
                 p2.classList.remove('hidden');
                 p1.classList.add('hidden');
-                tab2.className = "flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-[#A6192E] text-white shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/40 cursor-pointer";
-                tab1.className = "flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#F2ECE1] cursor-pointer";
+                tab2.className = "flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-[11px] sm:text-sm font-bold transition-all bg-[#A6192E] text-white shadow-md shadow-[#A6192E]/25 border border-[#FFBF3F]/40 cursor-pointer min-w-0";
+                tab1.className = "flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-[11px] sm:text-sm font-bold transition-all text-[#5C4A3C] hover:text-[#31261D] hover:bg-[#F2ECE1] cursor-pointer min-w-0";
             }
             renderApp();
         }
