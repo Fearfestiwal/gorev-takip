@@ -62,65 +62,65 @@
         }
     </style>
 </head>
-<body class="text-[#31261D] antialiased min-h-screen flex flex-col bg-[#FAF7F2]">
+<body class="text-[#31261D] antialiased min-h-screen flex flex-col bg-[#FAF7F2] overflow-x-hidden">
 
     <!-- ÜST BAR (CAN ÇEREZ PERSONEL NAVBAR - AYDINLIK & KURUMSAL LOGO TEMASI) -->
     <header class="bg-white/95 backdrop-blur-md text-[#31261D] shadow-xs sticky top-0 z-30 border-b border-[#E8DFC8]">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16 sm:h-18">
+        <div class="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between min-h-[3.75rem] sm:min-h-[4.25rem] py-1.5 sm:py-2 gap-2 flex-wrap sm:flex-nowrap">
                 <!-- Sol Logo (CAN ÇEREZ 1978) -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
                     <div class="flex items-center gap-2 group cursor-default select-none">
-                        <img src="logo.svg" alt="CAN ÇEREZ (1978)" class="h-10 sm:h-11 w-auto object-contain drop-shadow-xs">
+                        <img src="logo.svg" alt="CAN ÇEREZ (1978)" class="h-9 sm:h-11 w-auto object-contain drop-shadow-xs">
                     </div>
-                    <div class="border-l border-[#E8DFC8] pl-3">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-[10px] bg-[#A6192E] text-white px-2 py-0.5 rounded-md font-black uppercase border border-[#FFBF3F]/40 shadow-xs">ÇALIŞAN EKRANI</span>
-                            <span class="text-[9px] bg-[#FAF2E6] text-[#A6192E] px-2 py-0.5 rounded font-extrabold uppercase border border-[#D49B28]/40 tracking-wider">CAN ÇEREZ (1978)</span>
-                            <button id="personelServerBadge" onclick="syncWithServer(true)" title="Bulut / Yerel veriyi yenilemek için tıklayın" class="hidden text-[10px] px-2 py-0.5 rounded font-bold flex items-center gap-1 cursor-pointer hover:opacity-90 transition-opacity"></button>
+                    <div class="border-l border-[#E8DFC8] pl-2 sm:pl-3">
+                        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                            <span class="text-[10px] bg-[#A6192E] text-white px-2 py-0.5 rounded-md font-black uppercase border border-[#FFBF3F]/40 shadow-xs whitespace-nowrap">ÇALIŞAN EKRANI</span>
+                            <span class="hidden md:inline-block text-[9px] bg-[#FAF2E6] text-[#A6192E] px-2 py-0.5 rounded font-extrabold uppercase border border-[#D49B28]/40 tracking-wider whitespace-nowrap">CAN ÇEREZ (1978)</span>
+                            <button id="personelServerBadge" onclick="syncWithServer(true)" title="Bulut / Yerel veriyi yenilemek için tıklayın" class="hidden text-[10px] px-2 py-0.5 rounded font-bold flex items-center gap-1 cursor-pointer hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"></button>
                         </div>
-                        <p class="text-[11px] text-[#5C4A3C] font-medium">Kişisel Görev & Aksiyon Takip Ekranı</p>
+                        <p class="text-[11px] text-[#5C4A3C] font-medium hidden md:block">Kişisel Görev & Aksiyon Takip Ekranı</p>
                     </div>
                 </div>
 
                 <!-- Sağ: Seçili Kişi & Güvenli Çıkış & PWA & Bildirim -->
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <!-- PWA Yükleme Butonu -->
-                    <button id="pwaInstallBtn" onclick="installPWA()" title="Can Çerez Uygulamasını Cihaza Yükle" class="hidden bg-[#FFBF3F] hover:bg-[#E5A529] text-[#31261D] text-xs font-black px-2.5 py-1.5 rounded-xl shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer animate-pulse">
+                    <button id="pwaInstallBtn" onclick="installPWA()" title="Can Çerez Uygulamasını Cihaza Yükle" class="hidden bg-[#FFBF3F] hover:bg-[#E5A529] text-[#31261D] text-xs font-black px-2.5 py-1.5 rounded-xl shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer animate-pulse whitespace-nowrap">
                         <i class="fa-solid fa-download"></i>
-                        <span class="hidden sm:inline">Uygulamayı Yükle</span>
+                        <span class="hidden sm:inline">Yükle</span>
                     </button>
 
                     <!-- Anlık Görev Bildirimleri Butonu -->
-                    <button id="btnStaffToggleNotif" onclick="toggleStaffPushNotifications()" title="Anlık Görev Bildirimlerini Aç/Kapat" class="bg-[#FAF7F2] hover:bg-[#F2ECE1] text-[#5C4A3C] hover:text-[#A6192E] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#E8DFC8] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                    <button id="btnStaffToggleNotif" onclick="toggleStaffPushNotifications()" title="Anlık Görev Bildirimlerini Aç/Kapat" class="bg-[#FAF7F2] hover:bg-[#F2ECE1] text-[#5C4A3C] hover:text-[#A6192E] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#E8DFC8] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 whitespace-nowrap">
                         <i id="staffNotifIcon" class="fa-regular fa-bell text-xs"></i>
                         <span class="hidden md:inline">Bildirim</span>
                     </button>
 
                     <!-- Yönetici Paneline Geçiş Butonu (Şifreli / Hızlı Dönüş) -->
-                    <button id="btnOpenManagerAccess" onclick="handleManagerAccessClick()" title="Yönetici Paneline Geçiş Yap" class="bg-[#FAF7F2] hover:bg-[#F2ECE1] text-[#A6192E] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#D49B28]/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                    <button id="btnOpenManagerAccess" onclick="handleManagerAccessClick()" title="Yönetici Paneline Geçiş Yap" class="bg-[#FAF7F2] hover:bg-[#F2ECE1] text-[#A6192E] text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#D49B28]/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 whitespace-nowrap">
                         <i class="fa-solid fa-crown text-[#D49B28] text-xs"></i>
                         <span class="hidden sm:inline">Yönetici Girişi</span>
                         <span class="sm:hidden">Yönetici</span>
                     </button>
 
-                    <div id="headerUserActions" class="hidden flex items-center gap-2">
-                        <button onclick="openStaffChangePinModal()" title="Kişisel Giriş PIN Kodunuzu Değiştirin" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FAF7F2] hover:bg-[#F2ECE1] text-[#31261D] text-xs font-bold border border-[#E8DFC8] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                    <div id="headerUserActions" class="hidden flex items-center gap-1.5 sm:gap-2">
+                        <button onclick="openStaffChangePinModal()" title="Kişisel Giriş PIN Kodunuzu Değiştirin" class="px-2 sm:px-3 py-1.5 rounded-xl bg-[#FAF7F2] hover:bg-[#F2ECE1] text-[#31261D] text-xs font-bold border border-[#E8DFC8] transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 whitespace-nowrap">
                             <i class="fa-solid fa-key text-xs text-[#A6192E]"></i>
-                            <span class="hidden sm:inline">PIN Değiştir</span>
+                            <span class="hidden md:inline">PIN Değiştir</span>
                         </button>
-                        <button onclick="logoutStaffUser()" title="Oturumu Kapat ve Profil Seçimine Dön" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-[#A6192E] text-[#A6192E] hover:text-white text-xs font-bold border border-rose-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95">
+                        <button onclick="logoutStaffUser()" title="Oturumu Kapat ve Profil Seçimine Dön" class="px-2 sm:px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-[#A6192E] text-[#A6192E] hover:text-white text-xs font-bold border border-rose-300 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 whitespace-nowrap">
                             <i class="fa-solid fa-lock text-xs"></i>
                             <span class="hidden sm:inline">Güvenli Çıkış</span>
                             <span class="sm:hidden">Çıkış</span>
                         </button>
-                        <button onclick="notifyManagerWhatsApp()" class="px-3 py-1.5 rounded-xl bg-[#1E340C] hover:bg-[#2C4A14] text-white text-xs font-bold shadow-md shadow-[#1E340C]/20 border border-[#FFBF3F]/30 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                        <button onclick="notifyManagerWhatsApp()" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#1E340C] hover:bg-[#2C4A14] text-white text-xs font-bold shadow-md shadow-[#1E340C]/20 border border-[#FFBF3F]/30 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer whitespace-nowrap">
                             <i class="fa-brands fa-whatsapp text-sm text-[#FFBF3F]"></i>
-                            <span class="hidden sm:inline">WhatsApp</span>
+                            <span class="hidden md:inline">WhatsApp</span>
                         </button>
-                        <button onclick="notifyManagerMail()" title="Gmail ile Bildir" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#A6192E] hover:bg-[#8C1224] text-white text-xs font-bold border border-[#FFBF3F]/30 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                        <button onclick="notifyManagerMail()" title="Gmail ile Bildir" class="px-2 sm:px-2.5 py-1.5 rounded-xl bg-[#A6192E] hover:bg-[#8C1224] text-white text-xs font-bold border border-[#FFBF3F]/30 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer whitespace-nowrap">
                             <i class="fa-solid fa-envelope text-xs text-[#FFBF3F]"></i>
-                            <span class="hidden md:inline">Gmail</span>
+                            <span class="hidden lg:inline">Gmail</span>
                         </button>
                     </div>
                 </div>
@@ -129,7 +129,7 @@
     </header>
 
     <!-- ANA İÇERİK -->
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full min-w-0">
 
         <!-- 6. ŞUBE HIZLI ERİŞİM & KASA QR KARŞILAMA BANNERI (?branch= parametresi ile açıldığında görünür) -->
         <div id="branchQuickAccessBanner" class="hidden mb-6 bg-gradient-to-r from-[#31261D] via-[#46372A] to-[#31261D] border-2 border-[#FFBF3F] rounded-2xl p-4 text-white shadow-lg animate-in fade-in slide-in-from-top duration-300">
@@ -1379,11 +1379,11 @@
             if (!badge) return;
             badge.classList.remove('hidden');
             if (online) {
-                badge.className = "text-[11px] bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded font-semibold border border-emerald-400/30 flex items-center gap-1.5";
-                badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 7/24 Bulut Canlı Senkronize';
+                badge.className = "text-[10px] bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-full font-bold border border-emerald-300 flex items-center gap-1.5 whitespace-nowrap shrink-0";
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span><span class="hidden md:inline">7/24 Bulut </span>Canlı';
             } else {
-                badge.className = "text-[11px] bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded font-semibold border border-amber-400/30 flex items-center gap-1.5";
-                badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Çevrimdışı (Yerel)';
+                badge.className = "text-[10px] bg-amber-50 text-amber-800 px-2 py-0.5 rounded-full font-bold border border-amber-300 flex items-center gap-1.5 whitespace-nowrap shrink-0";
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span><span class="hidden md:inline">Çevrimdışı </span>(Yerel)';
             }
         }
 

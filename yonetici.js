@@ -576,11 +576,11 @@
             if (!badge) return;
             badge.classList.remove('hidden');
             if (online) {
-                badge.className = "text-[11px] bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded font-semibold border border-emerald-400/30 flex items-center gap-1.5";
-                badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 7/24 Bulut Canlı Senkronize';
+                badge.className = "text-[10px] bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-full font-bold border border-emerald-300 flex items-center gap-1.5 whitespace-nowrap shrink-0";
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span><span class="hidden md:inline">7/24 Bulut </span>Canlı';
             } else {
-                badge.className = "text-[11px] bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded font-semibold border border-amber-400/30 flex items-center gap-1.5";
-                badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Çevrimdışı (Yerel)';
+                badge.className = "text-[10px] bg-amber-50 text-amber-800 px-2 py-0.5 rounded-full font-bold border border-amber-300 flex items-center gap-1.5 whitespace-nowrap shrink-0";
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span><span class="hidden md:inline">Çevrimdışı </span>(Yerel)';
             }
         }
 
