@@ -2085,6 +2085,38 @@
         }
 
         // ================= PWA KURULUM & SERVICE WORKER =================
+        (function initStaffModalCloseHandlers() {
+            const modalMap = {
+                userPinModal: typeof closeUserPinModal === 'function' ? closeUserPinModal : null,
+                staffSelfRegisterModal: typeof closeStaffSelfRegisterModal === 'function' ? closeStaffSelfRegisterModal : null,
+                staffChangePinModal: typeof closeStaffChangePinModal === 'function' ? closeStaffChangePinModal : null,
+                managerAccessModal: typeof closeManagerAccessModal === 'function' ? closeManagerAccessModal : null,
+                taskCommentsModal: typeof closeTaskCommentsModal === 'function' ? closeTaskCommentsModal : null,
+                staffNotificationModal: typeof closeStaffNotificationModal === 'function' ? closeStaffNotificationModal : null
+            };
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    Object.entries(modalMap).forEach(([id, closeFn]) => {
+                        const el = document.getElementById(id);
+                        if (el && el.style.display !== 'none' && !el.classList.contains('hidden')) {
+                            if (typeof closeFn === 'function') closeFn();
+                        }
+                    });
+                }
+            });
+
+            Object.entries(modalMap).forEach(([id, closeFn]) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('click', (e) => {
+                        if (e.target === el && typeof closeFn === 'function') {
+                            closeFn();
+                        }
+                    });
+                }
+            });
+        })();
         let deferredPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();

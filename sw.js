@@ -1,5 +1,5 @@
 // Can Çerez 1978 - Service Worker
-const CACHE_NAME = 'can-cerez-v37';
+const CACHE_NAME = 'can-cerez-v38';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

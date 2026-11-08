@@ -3711,6 +3711,45 @@
             }
         }
 
+        // Tüm modallarda ESC tuşu ve dış arka plana (backdrop) tıklayınca kapatma desteği
+        (function initModalCloseHandlers() {
+            const modalMap = {
+                settingsModal: closeSettingsModal,
+                taskModal: closeTaskModal,
+                teamModal: closeTeamModal,
+                emailModal: closeEmailModal,
+                quickMailPickerModal: closeQuickMailPickerModal,
+                bulkReminderModal: closeBulkReminderModal,
+                taskCommentsModal: closeTaskCommentsModal,
+                changePasswordModal: closeChangePasswordModal,
+                branchDeptModal: closeBranchDeptModal,
+                branchQrModal: closeBranchQrModal,
+                notificationModal: closeNotificationModal
+            };
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    Object.entries(modalMap).forEach(([id, closeFn]) => {
+                        const el = document.getElementById(id);
+                        if (el && el.style.display !== 'none' && !el.classList.contains('hidden')) {
+                            if (typeof closeFn === 'function') closeFn();
+                        }
+                    });
+                }
+            });
+
+            Object.entries(modalMap).forEach(([id, closeFn]) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('click', (e) => {
+                        if (e.target === el && typeof closeFn === 'function') {
+                            closeFn();
+                        }
+                    });
+                }
+            });
+        })();
+
         function saveManagerContactSettings() {
             const phoneInput = document.getElementById('settingManagerPhone');
             if (phoneInput) {

@@ -64,6 +64,38 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #FAF7F2;
         }
+        #userPinModal,
+        #staffSelfRegisterModal,
+        #staffChangePinModal,
+        #managerAccessModal,
+        #taskCommentsModal,
+        #staffNotificationModal {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 9999 !important;
+            padding: 1rem !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        #userPinModal > div,
+        #staffSelfRegisterModal > div,
+        #staffChangePinModal > div,
+        #managerAccessModal > div,
+        #taskCommentsModal > div,
+        #staffNotificationModal > div {
+            max-height: 88vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #staffSelfRegisterModal > div > form,
+        #staffChangePinModal > div > form,
+        #managerAccessModal > div > form,
+        #taskCommentsModal > div > #commentModalList,
+        #staffNotificationModal > div > div:nth-child(2) {
+            overflow-y: auto !important;
+            min-height: 0 !important;
+            flex: 1 1 auto !important;
+        }
     </style>
 </head>
 <body class="text-[#31261D] antialiased min-h-screen flex flex-col bg-[#FAF7F2] overflow-x-hidden">
@@ -344,8 +376,8 @@
     </div>
 
     <!-- YENİ PERSONEL KENDİ KENDİNE KAYIT MODALI -->
-    <div id="staffSelfRegisterModal" class="fixed inset-0 bg-[#241A13]/90 backdrop-blur-md z-50 items-center justify-center p-4" style="display: none;">
-        <div class="max-w-md w-full bg-white rounded-3xl border border-[#E8DFC8] shadow-2xl p-6 relative overflow-hidden animate-in fade-in zoom-in duration-150 text-[#31261D]">
+    <div id="staffSelfRegisterModal" class="fixed inset-0 bg-[#241A13]/90 backdrop-blur-md z-50 items-center justify-center p-4 overflow-y-auto" style="display: none;">
+        <div class="max-w-md w-full bg-white rounded-3xl border border-[#E8DFC8] shadow-2xl p-6 relative overflow-y-auto max-h-[88vh] my-auto animate-in fade-in zoom-in duration-150 text-[#31261D]">
             <div class="flex items-center justify-between pb-3 border-b border-[#E8DFC8]">
                 <div class="flex items-center gap-2.5">
                     <div class="w-10 h-10 rounded-2xl bg-[#1E340C] text-[#FFBF3F] flex items-center justify-center font-black text-base shadow-md">
@@ -559,10 +591,10 @@
     </div>
 
     <!-- PERSONEL BİLDİRİM YÖNETİM & GERİ ÇEKME MODALI -->
-    <div id="staffNotificationModal" class="fixed inset-0 bg-black/75 backdrop-blur-xs z-[9999] items-center justify-center p-4 no-print" style="display: none;">
-        <div class="bg-[#FAF7F2] rounded-3xl max-w-md w-full shadow-2xl border border-[#E8DFC8] overflow-hidden animate-in fade-in zoom-in duration-150">
+    <div id="staffNotificationModal" class="fixed inset-0 bg-black/75 backdrop-blur-xs z-[9999] items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
+        <div class="bg-[#FAF7F2] rounded-3xl max-w-md w-full shadow-2xl border border-[#E8DFC8] overflow-hidden animate-in fade-in zoom-in duration-150 flex flex-col max-h-[88vh] my-auto">
             <!-- Modal Başlığı -->
-            <div class="bg-[#31261D] text-white px-5 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+            <div class="bg-[#31261D] text-white px-5 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-[#46372A] text-[#FFBF3F] flex items-center justify-center text-base border border-[#FFBF3F]/30 shadow-xs">
                         <i class="fa-solid fa-bell"></i>
@@ -577,7 +609,7 @@
                 </button>
             </div>
 
-            <div class="p-5 space-y-4 text-xs text-[#31261D]">
+            <div class="p-5 space-y-4 text-xs text-[#31261D] overflow-y-auto flex-1">
                 <!-- DURUM KARTI (DİNAMİK) -->
                 <div id="staffNotifStatusCard" class="p-4 rounded-2xl border transition-all"></div>
 

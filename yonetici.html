@@ -104,6 +104,56 @@
         .report-person-row:hover {
             background-color: #f0f9ff;
         }
+        /* Tüm açılır modalların ekran yüksekliğini aşmasını ve X butonunun kaybolmasını engeller */
+        #settingsModal,
+        #taskModal,
+        #teamModal,
+        #emailModal,
+        #quickMailPickerModal,
+        #bulkReminderModal,
+        #taskCommentsModal,
+        #changePasswordModal,
+        #branchDeptModal,
+        #branchQrModal,
+        #notificationModal {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 9999 !important;
+            padding: 1rem !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        #settingsModal > div,
+        #taskModal > div,
+        #teamModal > div,
+        #emailModal > div,
+        #quickMailPickerModal > div,
+        #bulkReminderModal > div,
+        #taskCommentsModal > div,
+        #changePasswordModal > div,
+        #branchDeptModal > div,
+        #branchQrModal > div,
+        #notificationModal > div {
+            max-height: 88vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        #settingsModal > div > div:nth-child(2),
+        #taskModal > div > form,
+        #teamModal > div > div:nth-child(2),
+        #emailModal > div > div:nth-child(2),
+        #quickMailPickerModal > div > div:nth-child(2),
+        #bulkReminderModal > div > div:nth-child(2),
+        #taskCommentsModal > div > #commentModalList,
+        #changePasswordModal > div > form,
+        #branchDeptModal > div > #tabContentBranches,
+        #branchDeptModal > div > #tabContentDepartments,
+        #branchQrModal > div > div:nth-child(2),
+        #notificationModal > div > div:nth-child(2) {
+            overflow-y: auto !important;
+            min-height: 0 !important;
+            flex: 1 1 auto !important;
+        }
     </style>
 </head>
 <body class="text-stone-800 antialiased min-h-screen flex flex-col bg-[#FAF7F2] overflow-x-hidden">
@@ -770,8 +820,8 @@
 
     <!-- TOPLU HATIRLATMA MAİLİ MODALI -->
     <div id="bulkReminderModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150 flex flex-col max-h-[88vh] my-auto">
+            <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-[#A6192E] flex items-center justify-center text-[#FFBF3F] text-lg shadow-md border border-[#FFBF3F]/30">
                         <i class="fa-solid fa-bell"></i>
@@ -788,7 +838,7 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-4 text-xs">
+            <div class="p-6 space-y-4 text-xs overflow-y-auto flex-1">
                 <!-- Özet Rozetler -->
                 <div class="grid grid-cols-3 gap-3 text-center">
                     <div class="bg-[#FAF7F2] p-3 rounded-2xl border border-[#E8DFC8]">
@@ -852,8 +902,8 @@
 
     <!-- HIZLI MAİL SEÇİM MODALI -->
     <div id="quickMailPickerModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150 flex flex-col max-h-[88vh] my-auto">
+            <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <div>
                     <h3 class="font-bold text-base flex items-center gap-2">
                         <i class="fa-solid fa-paper-plane text-[#FFBF3F]"></i>
@@ -866,7 +916,7 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-4">
+            <div class="p-6 space-y-4 overflow-y-auto flex-1">
                 <!-- TOPLU HATIRLATMA BUTONU (EN TEPEDE) -->
                 <button onclick="closeQuickMailPickerModal(); openBulkReminderModal();" class="w-full py-3.5 px-4 bg-gradient-to-r from-[#A6192E] via-[#8C1224] to-[#824701] hover:from-[#8C1224] hover:to-[#6E3C01] text-white rounded-2xl font-black text-xs shadow-lg shadow-[#A6192E]/25 border border-[#FFBF3F]/30 flex items-center justify-center gap-2.5 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer">
                     <i class="fa-solid fa-bell text-sm text-[#FFBF3F] animate-bounce"></i>
@@ -889,8 +939,8 @@
 
     <!-- MAİL GÖNDERME MODALI -->
     <div id="emailModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150 flex flex-col max-h-[88vh] my-auto">
+            <div class="bg-gradient-to-r from-[#31261D] via-[#4A161E] to-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <div>
                     <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
                         <i class="fa-solid fa-paper-plane text-[#FFBF3F]"></i>
@@ -903,7 +953,7 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-4 text-xs">
+            <div class="p-6 space-y-4 text-xs overflow-y-auto flex-1">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#FAF7F2] p-3 rounded-2xl border border-[#E8DFC8]">
                     <div>
                         <label class="block font-bold text-[#31261D] mb-1">Sorumlu Kişi:</label>
@@ -961,8 +1011,8 @@
 
     <!-- EKİP REHBERİ MODALI -->
     <div id="teamModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150 flex flex-col max-h-[88vh] my-auto">
+            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <div>
                     <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
                         <i class="fa-solid fa-users text-[#FFBF3F]"></i>
@@ -975,7 +1025,7 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-5 text-xs">
+            <div class="p-6 space-y-5 text-xs overflow-y-auto flex-1">
                 <div class="bg-[#FAF7F2] p-4 sm:p-5 rounded-2xl border border-[#E8DFC8]">
                     <h4 id="teamFormTitle" class="font-black text-[#31261D] text-xs mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-user-plus text-[#A6192E]"></i> Yeni Kişi Ekle
@@ -1035,8 +1085,8 @@
 
     <!-- GÖREV EKLE / DÜZENLE MODALI -->
     <div id="taskModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150 flex flex-col max-h-[88vh] my-auto">
+            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <h3 id="modalTitle" class="font-bold text-sm sm:text-base flex items-center gap-2">
                     <i class="fa-solid fa-pen-to-square text-[#FFBF3F]"></i>
                     Yeni Görev / Aksiyon Girişi
@@ -1046,7 +1096,7 @@
                 </button>
             </div>
 
-            <form id="taskForm" onsubmit="handleTaskSubmit(event)" class="p-6 space-y-4 text-xs">
+            <form id="taskForm" onsubmit="handleTaskSubmit(event)" class="p-6 space-y-4 text-xs overflow-y-auto flex-1">
                 <input type="hidden" id="editTaskId">
 
                 <div>
@@ -1186,18 +1236,18 @@
     </div>
 
     <!-- AYARLAR & YEDEKLEME MODALI -->
-    <div id="settingsModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 no-print" style="display: none;">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-[#E8DFC8]">
-            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+    <div id="settingsModal" class="fixed inset-0 bg-[#31261D]/70 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-[#E8DFC8] flex flex-col max-h-[88vh] my-auto">
+            <div class="bg-[#31261D] text-white px-5 py-3.5 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
                     <i class="fa-solid fa-sliders text-[#FFBF3F]"></i>
-                    CAN ÇEREZ • Yönetici Ayarları & Yedekleme
+                    <span>Yönetici Ayarları & Yedekleme</span>
                 </h3>
-                <button onclick="closeSettingsModal()" class="text-stone-300 hover:text-white transition-colors cursor-pointer">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <button type="button" onclick="closeSettingsModal()" title="Kapat (ESC)" class="w-8 h-8 rounded-lg bg-[#46372A] hover:bg-[#A6192E] text-white flex items-center justify-center transition-colors cursor-pointer shrink-0">
+                    <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
-            <div class="p-6 space-y-4 text-xs text-[#31261D]">
+            <div class="p-5 space-y-4 text-xs text-[#31261D] overflow-y-auto flex-1">
                 <div class="space-y-2">
                     <button onclick="exportBackup()" class="w-full py-2.5 px-4 bg-[#FAF7F2] hover:bg-[#E8DFC8] text-[#31261D] rounded-xl font-bold flex items-center justify-center gap-2 transition-colors border border-[#E8DFC8] cursor-pointer">
                         <i class="fa-solid fa-download text-[#824701]"></i>
@@ -1341,13 +1391,20 @@
                     </button>
                 </div>
             </div>
+            <!-- Sabit Alt Kapatma Çubuğu -->
+            <div class="bg-[#FAF7F2] px-5 py-3 border-t border-[#E8DFC8] flex items-center justify-between shrink-0">
+                <span class="text-[11px] text-[#7A6A5C] font-medium">Dışarıya veya ESC tuşuna basarak da kapatabilirsiniz</span>
+                <button type="button" onclick="closeSettingsModal()" class="px-5 py-2 bg-[#31261D] hover:bg-[#A6192E] text-[#FFBF3F] hover:text-white font-bold rounded-xl text-xs transition-colors cursor-pointer shrink-0 shadow-xs">
+                    Kapat
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- YÖNETİCİ ŞİFRE DEĞİŞTİRME MODALI -->
-    <div id="changePasswordModal" class="fixed inset-0 bg-[#31261D]/75 backdrop-blur-xs z-50 items-center justify-center p-4 no-print" style="display: none;">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+    <div id="changePasswordModal" class="fixed inset-0 bg-[#31261D]/75 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150 flex flex-col max-h-[88vh] my-auto">
+            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
                     <i class="fa-solid fa-key text-[#FFBF3F]"></i>
                     CAN ÇEREZ • Yönetici Şifresini Değiştir
@@ -1394,9 +1451,9 @@
 
     <!-- ŞUBE VE BİRİM YÖNETİM MERKEZİ MODALI -->
     <div id="branchDeptModal" class="fixed inset-0 bg-[#31261D]/75 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150 flex flex-col max-h-[88vh] my-auto">
             <!-- Modal Başlık -->
-            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <div>
                     <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
                         <i class="fa-solid fa-building-circle-gear text-[#FFBF3F]"></i>
@@ -1496,9 +1553,9 @@
     </div>
 
     <!-- ŞUBE HIZLI GİRİŞ QR KODLARI MODALI -->
-    <div id="branchQrModal" class="fixed inset-0 bg-[#31261D]/75 backdrop-blur-xs z-50 items-center justify-center p-4 no-print" style="display: none;">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150">
-            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+    <div id="branchQrModal" class="fixed inset-0 bg-[#31261D]/75 backdrop-blur-xs z-50 items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-[#E8DFC8] animate-in fade-in zoom-in duration-150 flex flex-col max-h-[88vh] my-auto">
+            <div class="bg-[#31261D] text-white px-6 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
                     <i class="fa-solid fa-qrcode text-[#FFBF3F]"></i>
                     Şube Kasa QR Kartı
@@ -1507,7 +1564,7 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <div class="p-5 space-y-4 text-xs text-[#31261D]">
+            <div class="p-5 space-y-4 text-xs text-[#31261D] overflow-y-auto flex-1">
                 <div>
                     <label class="block font-bold text-[#31261D] text-xs mb-1">Şube / Lokasyon Seçiniz:</label>
                     <select id="branchQrSelect" onchange="updateBranchQrDisplay()" class="w-full px-3 py-2 rounded-xl border border-[#E8DFC8] bg-[#FAF7F2] text-[#31261D] font-bold text-xs focus:ring-2 focus:ring-[#A6192E]/20">
@@ -1557,10 +1614,10 @@
     </div>
 
     <!-- BİLDİRİM YÖNETİM & GERİ ÇEKME MODALI -->
-    <div id="notificationModal" class="fixed inset-0 bg-black/75 backdrop-blur-xs z-[9999] items-center justify-center p-4 no-print" style="display: none;">
-        <div class="bg-[#FAF7F2] rounded-3xl max-w-md w-full shadow-2xl border border-[#E8DFC8] overflow-hidden animate-in fade-in zoom-in duration-150">
+    <div id="notificationModal" class="fixed inset-0 bg-black/75 backdrop-blur-xs z-[9999] items-center justify-center p-4 overflow-y-auto no-print" style="display: none;">
+        <div class="bg-[#FAF7F2] rounded-3xl max-w-md w-full shadow-2xl border border-[#E8DFC8] overflow-hidden animate-in fade-in zoom-in duration-150 flex flex-col max-h-[88vh] my-auto">
             <!-- Modal Başlığı -->
-            <div class="bg-[#31261D] text-white px-5 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30">
+            <div class="bg-[#31261D] text-white px-5 py-4 flex items-center justify-between border-b border-[#FFBF3F]/30 shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-[#46372A] text-[#FFBF3F] flex items-center justify-center text-base border border-[#FFBF3F]/30 shadow-xs">
                         <i class="fa-solid fa-bell"></i>
@@ -1575,7 +1632,7 @@
                 </button>
             </div>
 
-            <div class="p-5 space-y-4 text-xs text-[#31261D]">
+            <div class="p-5 space-y-4 text-xs text-[#31261D] overflow-y-auto flex-1">
                 <!-- DURUM KARTI (DİNAMİK) -->
                 <div id="notifStatusCard" class="p-4 rounded-2xl border transition-all"></div>
 
