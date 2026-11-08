@@ -1,11 +1,13 @@
 // Can Çerez 1978 - Service Worker
-const CACHE_NAME = 'can-cerez-v36';
+const CACHE_NAME = 'can-cerez-v37';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './index.js',
   './yonetici.html',
   './yonetici.js',
   './personel.html',
+  './personel.js',
   './manifest.json',
   './favicon.svg',
   './logo.svg',
