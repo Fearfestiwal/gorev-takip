@@ -380,6 +380,8 @@
                 let adminPassword = '1978';
                 let branchesData = null;
                 let departmentsData = null;
+                let deletedIdsData = null;
+                let deletedMemberNamesData = null;
                 if (settingsRes && Array.isArray(settingsRes.data)) {
                     const nObj = settingsRes.data.find(s => s.key === 'admin_notes');
                     if (nObj) notes = nObj.value || '';
@@ -393,6 +395,14 @@
                     if (dObj && dObj.value) {
                         try { departmentsData = JSON.parse(dObj.value); } catch(e){}
                     }
+                    const delTaskObj = settingsRes.data.find(s => s.key === 'deleted_ids');
+                    if (delTaskObj && delTaskObj.value) {
+                        try { deletedIdsData = JSON.parse(delTaskObj.value); } catch(e){}
+                    }
+                    const delMemObj = settingsRes.data.find(s => s.key === 'deleted_member_names');
+                    if (delMemObj && delMemObj.value) {
+                        try { deletedMemberNamesData = JSON.parse(delMemObj.value); } catch(e){}
+                    }
                 }
 
                 return {
@@ -401,7 +411,9 @@
                     notes: notes,
                     adminPassword: adminPassword,
                     branches: branchesData,
-                    departments: departmentsData
+                    departments: departmentsData,
+                    deletedIds: deletedIdsData,
+                    deletedMemberNames: deletedMemberNamesData
                 };
             } catch(e) {
                 console.warn("Supabase fetch exception:", e);
@@ -456,7 +468,9 @@
 
                 const settingsRows = [
                     { key: 'admin_notes', value: rawData.notes || '', updated_at: new Date().toISOString() },
-                    { key: 'admin_password', value: rawData.adminPassword || '1978', updated_at: new Date().toISOString() }
+                    { key: 'admin_password', value: rawData.adminPassword || '1978', updated_at: new Date().toISOString() },
+                    { key: 'deleted_ids', value: JSON.stringify(rawData.deletedIds || getDeletedTaskIds()), updated_at: new Date().toISOString() },
+                    { key: 'deleted_member_names', value: JSON.stringify(rawData.deletedMemberNames || getDeletedMemberNames()), updated_at: new Date().toISOString() }
                 ];
                 if (Array.isArray(rawData.branches) && rawData.branches.length > 0) {
                     settingsRows.push({ key: 'branches', value: JSON.stringify(rawData.branches), updated_at: new Date().toISOString() });
@@ -689,6 +703,22 @@
 
                     let changed = false;
 
+                    if (Array.isArray(data.deletedIds) && data.deletedIds.length > 0) {
+                        const localDelIds = getDeletedTaskIds();
+                        const mergedDelIds = Array.from(new Set([...localDelIds, ...data.deletedIds.map(String)]));
+                        if (mergedDelIds.length !== localDelIds.length) {
+                            localStorage.setItem('task_deleted_ids', JSON.stringify(mergedDelIds));
+                        }
+                    }
+
+                    if (Array.isArray(data.deletedMemberNames) && data.deletedMemberNames.length > 0) {
+                        const localDelNames = getDeletedMemberNames();
+                        const mergedDelNames = Array.from(new Set([...localDelNames, ...data.deletedMemberNames.map(n => String(n).toLowerCase().trim())]));
+                        if (mergedDelNames.length !== localDelNames.length) {
+                            localStorage.setItem('task_deleted_member_names', JSON.stringify(mergedDelNames));
+                        }
+                    }
+
                     if (Array.isArray(data.tasks)) {
                         const deletedIds = getDeletedTaskIds();
                         // Silinmiş görevleri sunucudan tekrar gelse bile içeri alma
@@ -786,7 +816,9 @@
                 branches: window.branches || DEFAULT_BRANCHES,
                 departments: window.departments || DEFAULT_DEPARTMENTS,
                 notes: document.getElementById('managementNotes')?.value || localStorage.getItem('task_management_notes') || '',
-                adminPassword: localStorage.getItem('cancerez_admin_password') || '1978'
+                adminPassword: localStorage.getItem('cancerez_admin_password') || '1978',
+                deletedIds: getDeletedTaskIds(),
+                deletedMemberNames: getDeletedMemberNames()
             };
 
             if (supabaseClient) {

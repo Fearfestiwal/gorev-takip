@@ -21,23 +21,56 @@ DATA_FILE = "veriler.json"
 
 DEFAULT_TEAM = []
 DEFAULT_TASKS = []
+DEFAULT_BRANCHES = [
+    "Bornova - Özkanlar",
+    "Göztepe - Güzelyalı",
+    "Konak - Çankaya",
+    "Karşıyaka - Aksoy",
+    "Aliağa",
+    "Hatay Şube",
+    "Hatay - Nokta (Hatay 2)",
+    "Çankaya - Borsa",
+    "Merkez / Genel"
+]
+DEFAULT_DEPARTMENTS = [
+    "Üretim",
+    "Lojistik",
+    "Muhasebe",
+    "Satınalma",
+    "İnsan Kaynakları (İK)",
+    "Ballıdede",
+    "Genel Müdürlük",
+    "Şube Operasyon"
+]
 
 def load_data():
+    defaults = {
+        "team": DEFAULT_TEAM,
+        "tasks": DEFAULT_TASKS,
+        "notes": "",
+        "adminPassword": "1978",
+        "branches": DEFAULT_BRANCHES,
+        "departments": DEFAULT_DEPARTMENTS,
+        "deletedIds": [],
+        "deletedMemberNames": []
+    }
     if os.path.exists(DATA_FILE):
         try:
             with open(DATA_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                if isinstance(data, dict):
+                    merged = dict(defaults)
+                    merged.update(data)
+                    return merged
         except Exception:
             pass
-    return {
-        "team": DEFAULT_TEAM,
-        "tasks": DEFAULT_TASKS,
-        "notes": ""
-    }
+    return defaults
 
 def save_data(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
+    tmp_file = DATA_FILE + ".tmp"
+    with open(tmp_file, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(tmp_file, DATA_FILE)
 
 class TaskServerHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -79,12 +112,9 @@ class TaskServerHandler(http.server.SimpleHTTPRequestHandler):
                 posted_data = json.loads(body.decode("utf-8"))
                 current_data = load_data()
                 payload_data = posted_data.get("data", posted_data) if isinstance(posted_data, dict) else {}
-                if "tasks" in payload_data:
-                    current_data["tasks"] = payload_data["tasks"]
-                if "team" in payload_data:
-                    current_data["team"] = payload_data["team"]
-                if "notes" in payload_data:
-                    current_data["notes"] = payload_data["notes"]
+                for key in ("tasks", "team", "notes", "adminPassword", "branches", "departments", "deletedIds", "deletedMemberNames"):
+                    if key in payload_data and payload_data[key] is not None:
+                        current_data[key] = payload_data[key]
                 save_data(current_data)
 
                 response = json.dumps({"status": "ok", "message": "Kaydedildi"}).encode("utf-8")

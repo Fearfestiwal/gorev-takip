@@ -866,6 +866,17 @@
             "Merkez / Genel"
         ];
 
+        const DEFAULT_DEPARTMENTS = [
+            "Üretim",
+            "Lojistik",
+            "Muhasebe",
+            "Satınalma",
+            "İnsan Kaynakları (İK)",
+            "Ballıdede",
+            "Genel Müdürlük",
+            "Şube Operasyon"
+        ];
+
         let branches = [];
         try {
             const rawStoredBranches = localStorage.getItem('task_branches');
@@ -880,6 +891,21 @@
             localStorage.setItem('task_branches', JSON.stringify(branches));
         }
         window.branches = branches;
+
+        let departments = [];
+        try {
+            const rawStoredDepartments = localStorage.getItem('task_departments');
+            if (rawStoredDepartments) {
+                departments = JSON.parse(rawStoredDepartments);
+            }
+        } catch(e) {
+            departments = [];
+        }
+        if (!Array.isArray(departments) || departments.length === 0) {
+            departments = [...DEFAULT_DEPARTMENTS];
+            localStorage.setItem('task_departments', JSON.stringify(departments));
+        }
+        window.departments = departments;
 
         function refreshPersonelBranchSelect() {
             const sel = document.getElementById('selfRegBranch');
@@ -1295,6 +1321,8 @@
                 let adminPassword = '1978';
                 let branchesData = null;
                 let departmentsData = null;
+                let deletedIdsData = null;
+                let deletedMemberNamesData = null;
                 if (settingsRes && Array.isArray(settingsRes.data)) {
                     const nObj = settingsRes.data.find(s => s.key === 'admin_notes');
                     if (nObj) notes = nObj.value || '';
@@ -1308,6 +1336,14 @@
                     if (dObj && dObj.value) {
                         try { departmentsData = JSON.parse(dObj.value); } catch(e){}
                     }
+                    const delTaskObj = settingsRes.data.find(s => s.key === 'deleted_ids');
+                    if (delTaskObj && delTaskObj.value) {
+                        try { deletedIdsData = JSON.parse(delTaskObj.value); } catch(e){}
+                    }
+                    const delMemObj = settingsRes.data.find(s => s.key === 'deleted_member_names');
+                    if (delMemObj && delMemObj.value) {
+                        try { deletedMemberNamesData = JSON.parse(delMemObj.value); } catch(e){}
+                    }
                 }
 
                 return {
@@ -1316,7 +1352,9 @@
                     notes: notes,
                     adminPassword: adminPassword,
                     branches: branchesData,
-                    departments: departmentsData
+                    departments: departmentsData,
+                    deletedIds: deletedIdsData,
+                    deletedMemberNames: deletedMemberNamesData
                 };
             } catch(e) {
                 console.warn("Supabase fetch exception:", e);
@@ -1496,6 +1534,22 @@
 
                     let changed = false;
 
+                    if (Array.isArray(data.deletedIds) && data.deletedIds.length > 0) {
+                        const localDelIds = getDeletedTaskIds();
+                        const mergedDelIds = Array.from(new Set([...localDelIds, ...data.deletedIds.map(String)]));
+                        if (mergedDelIds.length !== localDelIds.length) {
+                            localStorage.setItem('task_deleted_ids', JSON.stringify(mergedDelIds));
+                        }
+                    }
+
+                    if (Array.isArray(data.deletedMemberNames) && data.deletedMemberNames.length > 0) {
+                        const localDelNames = getDeletedMemberNames();
+                        const mergedDelNames = Array.from(new Set([...localDelNames, ...data.deletedMemberNames.map(n => String(n).toLowerCase().trim())]));
+                        if (mergedDelNames.length !== localDelNames.length) {
+                            localStorage.setItem('task_deleted_member_names', JSON.stringify(mergedDelNames));
+                        }
+                    }
+
                     if (Array.isArray(data.tasks)) {
                         const deletedIds = getDeletedTaskIds();
                         const validServerTasks = data.tasks.filter(t => !deletedIds.includes(String(t.id)));
@@ -1544,6 +1598,15 @@
                         }
                     }
 
+                    if (Array.isArray(data.departments) && data.departments.length > 0) {
+                        const sDepts = data.departments;
+                        if (JSON.stringify(sDepts) !== JSON.stringify(window.departments)) {
+                            window.departments = sDepts;
+                            departments = sDepts;
+                            localStorage.setItem('task_departments', JSON.stringify(departments));
+                        }
+                    }
+
                     if (changed) {
                         if (currentSelectedUser) {
                             renderPersonalDashboard(currentSelectedUser);
@@ -1576,8 +1639,12 @@
             const rawData = {
                 tasks: tasks,
                 team: safeTeam,
+                branches: window.branches || DEFAULT_BRANCHES,
+                departments: window.departments || DEFAULT_DEPARTMENTS,
                 notes: localStorage.getItem('task_management_notes') || '',
-                adminPassword: localStorage.getItem('cancerez_admin_password') || '1978'
+                adminPassword: localStorage.getItem('cancerez_admin_password') || '1978',
+                deletedIds: getDeletedTaskIds(),
+                deletedMemberNames: getDeletedMemberNames()
             };
 
             if (supabaseClient) {
